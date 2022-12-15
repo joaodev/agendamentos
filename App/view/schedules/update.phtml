@@ -1,0 +1,186 @@
+<?php 
+$entity = $this->view->entity; 
+$role = $_SESSION['ROLE'];
+?>
+<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('schedules'))): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-pen-square pr-1"></i>
+                        Editar Agendamento
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" name="formUpdateSchedule" id="formUpdateSchedule"
+                                enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="service_uuid">Atribuir Serviço*</label>
+                                            <select name="service_uuid" id="service_uuid" class="form-control" required>
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->services as $service): ?>
+                                                    <option value="<?php echo $service['uuid']; ?>"
+                                                        <?php echo ($service['uuid'] == $entity['service_uuid'])
+                                                            ? 'selected' : ''; ?>>
+                                                        <?php echo $service['title']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="customer_uuid">Atribuir Cliente</label>
+                                            <select name="customer_uuid" id="customer_uuid" class="form-control">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->customers as $customer): ?>
+                                                    <option value="<?php echo $customer['uuid']; ?>"
+                                                        <?php echo ($customer['uuid'] == $entity['customer_uuid'])
+                                                            ? 'selected' : ''; ?>>
+                                                        <?php echo $customer['name']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="form-group">
+                                            <label for="schedule_date">Data*</label>
+                                            <input type="date" class="form-control" name="schedule_date" id="schedule_date" required
+                                                value="<?php echo $entity['schedule_date']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <div class="form-group">
+                                            <label for="schedule_time">Horário*</label>
+                                            <input type="time" class="form-control" name="schedule_time" id="schedule_time" required
+                                                value="<?php echo $entity['schedule_time']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="form-group">
+                                            <label for="amount">Valor*</label>
+                                            <input type="text" class="form-control" name="amount" id="amount" required placeholder="0,00"
+                                                value="<?php echo number_format($entity['amount'], 2, ",", "."); ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="form-group">
+                                            <label for="payment_type_uuid">Forma de Pagamento</label>
+                                            <select name="payment_type_uuid" id="payment_type_uuid" class="form-control">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->paymentTypes as $paymentType): ?>    
+                                                    <option value="<?php echo $paymentType['uuid']; ?>"
+                                                        <?php echo ($paymentType['uuid'] == $entity['payment_type_uuid'])
+                                                            ? 'selected' : ''; ?>>
+                                                        <?php echo $paymentType['name']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="description">Informações Adicionais</label>
+                                            <input type="text" class="form-control" name="description" id="description" maxlength="255"
+                                                value="<?php echo $entity['description']; ?>">
+                                        </div>
+                                    </div>   
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="user_uuid">Anexar Arquivo:</label>
+                                            <input type="file" class="form-control" name="file" id="file">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <div class="form-group">
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Agendado</option>
+                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Concluído</option>
+                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Cancelado</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 text-right mt-3 mb-2">
+                                        <input type="hidden" name="uuid" id="id_agendamento" value="<?php echo $entity['uuid']; ?>">
+                                        <button type="button" class="btn btn-default mr-3"
+                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                            <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function(){
+            $("input[id=amount]").maskMoney({allowNegative: false, thousands:'.', decimal:',', affixesStay: true});
+
+            $('#formUpdateSchedule').validate({
+                submitHandler: function() {
+                    let file_data = $('#file').prop('files')[0];
+                    let form_data = new FormData();         
+                    
+                    form_data.append('file', file_data);    
+                    form_data.append('description', $("#description").val());    
+                    form_data.append('amount', $("#amount").val());    
+                    form_data.append('schedule_date', $("#schedule_date").val());    
+                    form_data.append('schedule_time', $("#schedule_time").val());    
+                    form_data.append('customer_uuid', $("#customer_uuid").val());    
+                    form_data.append('service_uuid', $("#service_uuid").val());    
+                    form_data.append('payment_type_uuid', $("#payment_type_uuid").val());    
+                    form_data.append('status', $("#status_1").val());
+                    form_data.append('uuid', $("#id_agendamento").val());    
+
+                    $("#baseLoader").show();
+                    $("#btnSubmit").attr('disabled', true);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>agendamentos/processa-edicao",
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: form_data,
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        if (data.type === 'success') {
+                            updateSchedule('<?php echo $entity['uuid']; ?>');
+                        } else {
+                            $("#baseLoader").hide();
+                            $("#btnSubmit").attr('disabled', false);
+                        }
+                    }).fail(function() {
+                        showInternalErrorAlert(); 
+                        $("#baseLoader").hide();   
+                        $("#btnSubmit").attr('disabled', false);
+                    }); 
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

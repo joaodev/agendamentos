@@ -1,0 +1,131 @@
+<?php
+$entity = $this->view->entity;
+$role = $_SESSION['ROLE'];
+
+$canView    = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('smtp'));
+$canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('smtp'));
+?>
+<?php if ($canView): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-envelope-square pr-1"></i>
+                        SMTP
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" name="formUpdateConfig" id="formUpdateConfig">
+
+                                <div class="form-group row">
+                                    <label for="mail_host" class="col-sm-2 form-control-label">Servidor SMTP</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="mail_host" id="mail_host" maxlength="30"
+                                               value="<?php echo $entity['mail_host']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="mail_port" class="col-sm-2 form-control-label">Porta</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="mail_port" id="mail_port" maxlength="10"
+                                               value="<?php echo $entity['mail_port']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="mail_username" class="col-sm-2 form-control-label">Usuário</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="mail_username" id="mail_username" maxlength="50"
+                                               value="<?php echo $entity['mail_username']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
+                                    </div>
+                                </div>
+                                <?php if ($canUpdate): ?>
+                                    <div class="form-group row">
+                                        <label for="mail_password" class="col-sm-2 form-control-label">Senha</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" name="mail_password" id="mail_password" maxlength="50">
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="form-group row">
+                                    <label for="mail_from_address" class="col-sm-2 form-control-label">Email para envio</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="mail_from_address" id="mail_from_address" maxlength="100"
+                                               value="<?php echo $entity['mail_from_address']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="mail_to_address" class="col-sm-2 form-control-label">Email para Recebimento</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="mail_to_address" id="mail_to_address" maxlength="100"
+                                               value="<?php echo $entity['mail_to_address']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
+                                    </div>
+                                </div>
+                                <?php if ($canUpdate): ?>
+                                    <div class="row">
+                                        <div class="col-md-12 text-right mt-3 mb-2">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fa fa-save pr-1"></i> Salvar
+                                            </button>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php if ($canUpdate): ?>
+        <script>
+            $(document).ready(function(){
+                $('#formUpdateConfig').validate({
+                    submitHandler: function(){
+                        let form_data = new FormData();
+
+                        form_data.append('uuid', '<?php echo $entity['uuid']; ?>');
+
+                        form_data.append('mail_host', $("#mail_host").val());
+                        form_data.append('mail_port', $("#mail_port").val());
+                        form_data.append('mail_username', $("#mail_username").val());
+                        form_data.append('mail_password', $("#mail_password").val());
+                        form_data.append('mail_from_address', $("#mail_from_address").val());
+                        form_data.append('mail_to_address', $("#mail_to_address").val());
+
+                        $("#baseLoader").show();
+                        $("#btnSubmit").show('disabled', true);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "<?php echo baseUrl; ?>smtp/processa-edicao",
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: form_data,
+                            dataType: 'json',
+                            async: true
+                        }).done(function(data) {
+                            showAlert(data.type, data.title, data.msg, data.pos);
+                            $("#baseLoader").hide();
+                        }).fail(function() {
+                            showInternalErrorAlert();
+                            $("#baseLoader").hide();
+                            $("#btnSubmit").show('disabled', false);
+                        });
+
+                        return false;
+                    }
+                });
+            });
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

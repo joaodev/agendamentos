@@ -1,0 +1,150 @@
+<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('customers'))): ?>
+    <?php $entity = $this->view->entity; ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-info-circle pr-1"></i>
+                        Dados de Cliente
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body"> 
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Nome</label>
+                                        <p><?php echo $entity['name']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Email</label>
+                                        <p><?php echo $entity['email']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12"><hr></div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">CPF</label>
+                                        <p><?php echo $entity['document_1']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">CNPJ</label>
+                                        <p><?php echo $entity['document_2']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">Telefone</label>
+                                        <p><?php echo $entity['phone']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">Celular</label>
+                                        <p><?php echo $entity['cellphone']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12"><hr></div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">CEP</label>
+                                        <p><?php echo $entity['postal_code']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">Endereço</label>
+                                        <p><?php echo $entity['address']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">Número</label>
+                                        <p><?php echo $entity['number']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">Complemento</label>
+                                        <p><?php echo $entity['complement']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">Bairro</label>
+                                        <p><?php echo $entity['neighborhood']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">Cidade</label>
+                                        <p><?php echo $entity['city']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">UF</label>
+                                        <p><?php echo $entity['state']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="name">Status</label>
+                                        <p><?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12"><hr></div>
+                                <div class="col-6 col-md-6 text-left">
+                                    <span>Cadastrado em:</span> <br>
+                                    <b><?php echo $this->formatDateTime($entity['created_at']); ?></b>
+                                </div>
+                                <div class="col-6 col-md-6 text-right">
+                                    <?php if (!empty($entity['updated_at'])): ?>
+                                        <span>Atualizado em:</span> <br>
+                                        <b><?php echo $this->formatDateTime($entity['updated_at']); ?></b>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-12"><hr></div>
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                            <button type="button" class="btn btn-primary" onclick="openModule('clientes');" style="width: 100%;">
+                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('customers'))): ?>
+                                                <button type="button" class="btn btn-primary" onclick="updateCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                    <i class="fa fa-pen pr-1"></i> Editar
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('customers'))): ?>
+                                                <button type="button" class="btn btn-primary" onclick="deleteCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                    <i class="fa fa-trash"></i> Remover
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>

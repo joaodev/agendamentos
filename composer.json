@@ -1,0 +1,25 @@
+{
+  "name": "webframework",
+  "require": {
+    "php": ">=8.1",
+    "ext-pdo": "*",
+    "ext-simplexml": "*",
+    "ext-curl": "*"
+  },
+  "minimum-stability": "alpha",
+  "authors": [
+    {
+      "name": "João Augusto Bonfante",
+      "email": "joao.dev93@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-0": {
+      "Core" : "vendor",
+      "App" : "/"
+    }
+  },
+  "config": {
+    "bin-dir": "bin"
+  }
+}

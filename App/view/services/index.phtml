@@ -1,0 +1,238 @@
+<?php
+$data = $this->view->data;
+
+$isAdmin = $_SESSION['ROLE_ADM'] == '1';
+$role    = $_SESSION['ROLE'];
+
+$canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('services'));
+$canCreate  = $isAdmin || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('services'));
+$canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('services'));
+$canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('services'));
+?>
+<?php if ($canView): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-8">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-cubes pr-1"></i>
+                        Serviços
+                    </h1>
+                </div>
+                <div class="col-4">
+                    <?php if ($canCreate): ?>
+                        <ol class="breadcrumb float-right">
+                            <li class="breadcrumb-item">
+                                <button type="button" class="btn btn-primary btn-flat"
+                                    onclick="createService();" style="position: relative; top: 3px">
+                                    <i class="fas fa-plus pr-1"></i> Novo
+                                </button>
+                            </li>
+                        </ol>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table_sv" style="width: 99.9%;">
+                                    <thead>
+                                        <tr class="text-center" style="height: 30px;">
+                                            <th style="font-size: 14px;">Serviço</th>
+                                            <th style="font-size: 14px;">Descrição</th>
+                                            <th style="font-size: 14px;">Valor</th>
+                                            <th style="font-size: 14px;">Status</th>
+                                            <th style="display: none;">Status</th>
+                                            <th style="display: none;">Cadastrado em</th>
+                                            <th style="display: none;">Atualizado em</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($data as $entity): ?>
+                                            <tr class="text-center" style="cursor: pointer;"
+                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
+                                                <td style="font-size: 15px">
+                                                    <?php echo $entity['title']; ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php echo $entity['description']; ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php echo number_format($entity['price'], 2, ",","."); ?>
+                                                </td>
+                                                <td style="width: 80px;">
+                                                    <?php if ($entity['status'] == '1'): ?>
+                                                        <i class="fa fa-circle" style="color: green;"></i>
+                                                    <?php else: ?>
+                                                        <i class="fa fa-circle" style="color: red;"></i>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="display: none;">
+                                                    <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
+                                                </td>
+                                                <td style="display: none;">
+                                                    <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                                </td>
+                                                <td style="display: none;">
+                                                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let buttonCommon = {
+                exportOptions: {
+                    format: {
+                        body: function ( data ) {
+                            return data;
+                        }
+                    }
+                }
+            };
+
+            $('#table_sv').DataTable({
+                "sDom": 'flBtip',
+                searching: true,
+                buttons: [
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'excel',
+                        title: 'Serviços',
+                        exportOptions: {columns: [0,1,2,4,5,6]}
+                    })
+                ],
+                order: [ [0, "asc"] ],
+                columnDefs: [{orderable: false, targets: [3]}],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyService": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+
+        function openDetails(uuid) {
+            $("#baseLoader").show();
+            $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>servicos/detalhes",
+                data: {uuid:uuid},
+                async: true
+            }).done(function(data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").hide();
+            }).fail(function() {
+                showInternalErrorAlert();
+                $("#baseLoader").hide();
+            });
+        }
+    </script>
+    <?php if ($canCreate): ?>
+        <script>
+            function createService() {
+                $("#baseLoader").show();
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>servicos/cadastrar",
+                    async: true
+                }).done(function(data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#baseLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canUpdate): ?>
+        <script>
+            function updateService(uuid) {
+                $("#baseLoader").show();
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>servicos/editar",
+                    data: {uuid:uuid},
+                    async: true
+                }).done(function(data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#baseLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canDelete): ?>
+        <script>
+            function deleteService(uuid) {
+                $("#modalXL").modal('hide');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Serviço');
+                $("#modalDeleteLoader").hide();
+                $("#modalDelete").modal('show');
+                $("#modalDeleteResult").html('<button type="button" class="btn btn-default" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }
+
+            function runDelete(uuid) {
+                if (uuid !== null) {
+                    $("#modalDeleteLoader").show();
+
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>servicos/excluir",
+                        data: {uuid: uuid},
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#modalDelete").modal('hide');
+                        $("#modalXL").modal('hide');
+                        openModule('servicos');
+                    }).fail(function() {
+                        showInternalErrorAlert();
+                        $("#modalDeleteLoader").hide();
+                    });
+                }
+            }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

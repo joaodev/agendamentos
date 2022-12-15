@@ -1,0 +1,171 @@
+<?php 
+$data = $this->view->data;
+$role = $_SESSION['ROLE'];
+$canView    = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('privileges'));
+$canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('privileges'));
+?>
+<?php if ($canView): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-9">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-user"></i>
+                        <?php echo $this->view->user['name']; ?> - Permissões
+                    </h1>
+                </div>
+                <div class="col-3">
+                    <ol class="breadcrumb float-right">
+                        <li class="breadcrumb-item">
+                            <button type="button" class="btn btn-primary btn-flat"
+                                onclick="openDetails('<?php echo $this->view->user['uuid']; ?>');">
+                                <i class="fas fa-arrow-left pr-1"></i> Voltar
+                            </button>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table_acl_users" style="width: 99.9%;">
+                                    <thead>
+                                        <tr class="text-center" style="height: 30px;">
+                                            <th style="font-size: 14px;">Ação</th>
+                                            <th style="font-size: 14px;">Módulo</th>
+                                            <th style="font-size: 14px;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($data as $entity): ?>
+                                            <tr class="text-center" style="height: 30px; cursor: pointer;">
+                                                <td style="font-size: 15px">
+                                                    <?php echo $entity['resourceName']; ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php echo $entity['moduleName']; ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <?php if ($canUpdate): ?>
+                                                        <input type="checkbox" id="my-checkbox-<?php echo $entity['uuid']; ?>"
+                                                            data-bootstrap-switch data-off-color="danger" 
+                                                            data-on-color="success" onchange="getVal('<?php echo $entity['uuid']; ?>');"
+                                                            <?php echo ($entity['status'] == 1) ? 'checked' : ''; ?>>
+                                                    <?php else: ?>
+                                                        <?php echo ($entity['status'] == 1) ? 'Ativo' : 'Inativo'; ?>
+                                                    <?php endif; ?>
+                                                </td> 
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        
+        $(document).ready(function() {
+            $("input[data-bootstrap-switch]").each(function(){
+                $(this).bootstrapSwitch();
+            });
+
+            let buttonCommon = {
+                exportOptions: {
+                    format: {
+                        body: function ( data ) {
+                            return data;
+                        }
+                    }
+                }
+            };	
+
+            $('#table_acl_users').DataTable({
+                "sDom": 'fltip',
+                searching: true,
+                buttons: [
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'excel',
+                        title: 'PRIVILÉGIOS DE ACESSO',
+                        exportOptions: {columns: [0,1]}
+                    }), 
+                    {extend: 'pdf', 
+                        title: 'PRIVILÉGIOS DE ACESSO',
+                        orientation: 'landscape',
+                        pageSize: 'LEGAL',
+                        exportOptions: {columns: [0,1]}
+                    }
+                ],
+                order: [ [1, "asc"] ],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 10,
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+    </script>
+    <?php if ($canUpdate): ?>
+        <script>
+            function getVal(uuid) {
+                let status_acl;
+                if ($('#my-checkbox-' + uuid).is(":checked")) {
+                    status_acl = 1;    
+                } else {
+                    status_acl = 0;
+                }
+                
+                $("#baseLoader").show();
+                $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>usuarios/altera-permissao",
+                    data: {
+                        uuid: uuid,
+                        status: status_acl
+                    },
+                    dataType: 'json',
+                    async: true
+                }).done(function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    $("#baseLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert(); 
+                    $("#baseLoader").hide();   
+                }); 
+            }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

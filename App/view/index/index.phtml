@@ -1,0 +1,121 @@
+<?php
+$canViewSchedules = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('schedules'));
+$canViewCustomers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('customers'));
+$canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'));
+$canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('expenses'));
+?>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-12">
+                <h1 style="position: relative; top: 5px">
+                    <i class="fas fa-home"></i>
+                    Início
+                </h1>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content" style="margin-left: 9px; margin-right: 9px;">
+    <div class="container-fluid">
+        <div class="row">
+            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewSchedules): ?>
+                <div class="col-12 col-md-6 col-lg-6">
+                    <div class="small-box bg-primary" onclick="openModule('agendamentos')" style="cursor: pointer;">
+                        <div class="inner">
+                            <p>Agendamentos Pendentes</p>
+                            <h3><?php echo $this->view->total_pending_schedules; ?></h3>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-calendar text-white"></i>
+                        </div>
+                        <a class="small-box-footer" style="cursor: pointer;">
+                            Mais informações <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewSchedules): ?>
+                <div class="col-12 col-md-6 col-lg-6">
+                    <div class="small-box bg-primary" onclick="openModule('agendamentos')" style="cursor: pointer;">
+                        <div class="inner">
+                            <p>Agendamentos Concluídos</p>
+                            <h3><?php echo $this->view->total_finished_schedules; ?></h3>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-calendar text-white"></i>
+                        </div>
+                        <a class="small-box-footer" style="cursor: pointer;">
+                            Mais informações <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewCustomers): ?>
+                <div class="col-12 col-md-6 col-lg-6">
+                    <div class="small-box bg-primary" onclick="openModule('agendamentos')" style="cursor: pointer;">
+                        <div class="inner">
+                            <p>Entradas do Mês</p>
+                            <h3>R$ <?php echo number_format($this->view->total_schedules, 2, ",", "."); ?></h3>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-money-bill-wave text-white"></i>
+                        </div>
+                        <a class="small-box-footer" style="cursor: pointer;">
+                            Mais informações <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewExpenses): ?>
+                <div class="col-12 col-md-6 col-lg-6">
+                    <div class="small-box bg-primary" onclick="openModule('despesas')" style="cursor: pointer;">
+                        <div class="inner">
+                            <p>Despesas do Mês</p>
+                            <h3>R$ <?php echo number_format($this->view->total_expenses, 2, ",", "."); ?></h3>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-file-invoice-dollar text-white"></i>
+                        </div>
+                        <a class="small-box-footer" style="cursor: pointer;">
+                            Mais informações <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewCustomers): ?>
+                <div class="col-12 col-md-6 col-lg-6">
+                    <div class="small-box bg-primary" onclick="openModule('clientes')" style="cursor: pointer;">
+                        <div class="inner">
+                            <p>Clientes Cadastrados</p>
+                            <h3><?php echo $this->view->total_customers; ?></h3>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        <a class="small-box-footer" style="cursor: pointer;">
+                            Mais informações <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewServices): ?>
+                <div class="col-12 col-md-6 col-lg-6">
+                    <div class="small-box bg-primary" onclick="openModule('servicos')" style="cursor: pointer;">
+                        <div class="inner">
+                            <p>Serviços Cadastrados</p>
+                            <h3><?php echo $this->view->total_services; ?></h3>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-cubes text-white"></i>
+                        </div>
+                        <a class="small-box-footer" style="cursor: pointer;">
+                            Mais informações <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>

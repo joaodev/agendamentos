@@ -1,0 +1,16 @@
+.idea*
+_config/conf.php
+vendor/Core/Init/Bootstrap.php
+
+public/uploads/about*
+public/uploads/banner*
+public/uploads/blog*
+public/uploads/categories*
+public/uploads/expenses*
+public/uploads/logo*
+public/uploads/partners*
+public/uploads/products*
+public/uploads/team*
+public/uploads/testimonials*
+public/uploads/users*
+public/uploads/footer*

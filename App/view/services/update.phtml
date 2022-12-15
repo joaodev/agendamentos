@@ -1,0 +1,118 @@
+<?php 
+$entity = $this->view->entity; 
+$role = $_SESSION['ROLE'];
+?>
+<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('services'))): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-pen-square pr-1"></i>
+                        Editar Serviço
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" name="formUpdateService" id="formUpdateService">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="name">Nome*</label>
+                                            <input type="text" class="form-control" name="title" id="title" required
+                                                value="<?php echo $entity['title']; ?>"
+                                                   placeholder="Nome do Serviço">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="price">Valor*</label>
+                                            <input type="text" class="form-control" name="price" id="price" placeholder="0,00" required
+                                                   value="<?php echo number_format($entity['price'], 2,",","."); ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="title">Descrição*</label>
+                                            <textarea name="description" id="description" class="form-control" rows="10" required
+                                                      placeholder="Descrição completa do Serviço"><?php echo $entity['description']; ?></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <div class="form-group">
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Serviço ativo</option>
+                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>Serviço inativo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 text-right mt-3 mb-2">
+                                        <input type="hidden" name="uuid" id="id_mesa" value="<?php echo $entity['uuid']; ?>">
+                                        <button type="button" class="btn btn-default mr-3"
+                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                            <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function(){
+            $('#formUpdateService').validate({
+                rules: {
+                    title: {
+                        remote: { 
+                            type: "post",
+                            url: "<?php echo baseUrl; ?>servicos/valor-existente",
+                            data: {uuid: '<?php echo $_POST['uuid']; ?>'}
+                        }
+                    },
+                },
+                messages: {
+                    title: {
+                        remote: "Serviço já cadastrado"
+                    },
+                },
+                submitHandler: function( form ){
+                    let dados = $( form ).serialize();
+
+                    $("#baseLoader").show();
+                    $("#btnSubmit").show('disabled', true);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>servicos/processa-edicao",
+                        data: dados,
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#baseLoader").hide();
+                        $("#btnSubmit").attr('disabled', false);
+                    }).fail(function() {
+                        showInternalErrorAlert();
+                        $("#baseLoader").hide();
+                        $("#btnSubmit").attr('disabled', false);
+                    });
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

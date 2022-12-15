@@ -1,0 +1,179 @@
+<?php 
+$entity = $this->view->entity; 
+$role = $_SESSION['ROLE'];
+
+$canView    = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('configs'));
+$canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('configs'));
+?>
+<?php if ($canView): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-cogs pr-1"></i>
+                        Configurações
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" name="formUpdateConfig" id="formUpdateConfig" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="" class="form-control-label">Logo</label><br>
+                                        <?php if (!empty($entity['logo'])): ?>
+                                            <div class="mb-3">
+                                                <a href="<?php echo baseUrl . 'public/uploads/logo/'
+                                                    . $entity['logo']; ?>" target="_blank">
+                                                    <img src="<?php echo baseUrl . 'public/uploads/logo/'
+                                                        . $entity['logo']; ?>" alt="" style="max-height: 100px;">
+                                                </a>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if ($canUpdate): ?>
+                                            <input type="file" class="form-control" name="logo" id="logo">
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="" class="form-control-label">Logo - Ícone</label><br>
+                                        <?php if (!empty($entity['logo_icon'])): ?>
+                                            <div class="mb-3">
+                                                <a href="<?php echo baseUrl . 'public/uploads/logo/'
+                                                    . $entity['logo_icon']; ?>" target="_blank">
+                                                    <img src="<?php echo baseUrl . 'public/uploads/logo/'
+                                                        . $entity['logo_icon']; ?>" alt="" style="max-height: 100px;">
+                                                </a>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if ($canUpdate): ?>
+                                            <input type="file" class="form-control" name="logo_icon" id="logo_icon">
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="primary_color" class="form-control-label">Cor Primária</label><br>
+                                        <input type="text" name="primary_color" id="primary_color" maxlength="7"
+                                            value="<?php echo $entity['primary_color']; ?>" readonly />
+                                        <?php if ($canUpdate): ?>
+                                            <div id="colorpicker_primary"></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="secondary_color" class="form-control-label">Cor Secundária</label><br>
+                                        <input type="text" name="secondary_color" id="secondary_color" maxlength="7"
+                                            value="<?php echo $entity['secondary_color']; ?>" readonly />
+                                        <?php if ($canUpdate): ?>
+                                            <div id="colorpicker_secondary"></div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="form-group row">
+                                    <label for="site_title" class="col-sm-2 form-control-label">Título</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="site_title" id="site_title" maxlength="100"
+                                            value="<?php echo $entity['site_title']; ?>" <?php echo ($canUpdate) ? 'required' : 'readonly'; ?>>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="col-md-4 offset-md-4 text-center">
+                                    <label for="file_menu" class="form-control-label">Imagem de Fundo para o Menu</label><br>
+                                    <?php if (!empty($entity['file_menu'])): ?>
+                                        <div class="mb-3 text-center">
+                                            <a href="<?php echo baseUrl . 'public/uploads/menu/'
+                                                . $entity['file_menu']; ?>" target="_blank">
+                                                <img src="<?php echo baseUrl . 'public/uploads/menu/'
+                                                    . $entity['file_menu']; ?>" alt="" style="max-height: 200px;">
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($canUpdate): ?>
+                                        <input type="file" class="form-control" name="file_menu" id="file_menu">
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($canUpdate): ?>
+                                    <div class="row">
+                                        <div class="col-12 mt-2"><hr></div>
+                                        <div class="col-md-12 text-center mt-2 mb-2">
+                                            <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                                <i class="fa fa-save pr-1"></i> Atualizar Configurações
+                                            </button>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <link rel="stylesheet" href="<?php echo baseUrl; ?>public/app/farbtastic/farbtastic.css" type="text/css" />
+    <script type="text/javascript" src="<?php echo baseUrl; ?>public/app/farbtastic/farbtastic.js"></script>
+    <script>
+          $(document).ready(function(){
+
+            $('#colorpicker_primary').farbtastic('#primary_color');
+            $('#colorpicker_secondary').farbtastic('#secondary_color');
+
+          });
+    </script>
+    <?php if ($canUpdate): ?>
+        <script>
+            $(document).ready(function() {
+
+                $('#formUpdateConfig').validate({
+                    submitHandler: function() {
+                        let logo = $('#logo').prop('files')[0];
+                        let logo_icon = $('#logo_icon').prop('files')[0];
+                        let file_menu = $('#file_menu').prop('files')[0];
+                        let form_data = new FormData();     
+                        
+                        form_data.append('uuid', '<?php echo $entity['uuid']; ?>');
+                        form_data.append('site_title', $("#site_title").val());
+
+                        form_data.append('primary_color', $("#primary_color").val());
+                        form_data.append('secondary_color', $("#secondary_color").val());
+
+                        form_data.append('logo', logo);    
+                        form_data.append('logo_icon', logo_icon);
+                        form_data.append('file_menu', file_menu);
+
+                        $("#baseLoader").show();
+                        $("#btnSubmit").attr('disabled', true);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "<?php echo baseUrl; ?>configuracoes/processa-edicao",
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: form_data,
+                            dataType: 'json',
+                            async: true
+                        }).done(function(data) {
+                            showAlert(data.type, data.title, data.msg, data.pos);
+                            window.location.href = "<?php echo baseUrl; ?>?mod=configuracoes";
+                        }).fail(function() {
+                            showInternalErrorAlert(); 
+                            $("#baseLoader").hide();   
+                            $("#btnSubmit").attr('disabled', false);
+                        }); 
+
+                        return false;
+                    }
+                });
+            });
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

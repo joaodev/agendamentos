@@ -1,0 +1,280 @@
+<?php 
+$data = $this->view->data; 
+
+$isAdmin = $_SESSION['ROLE_ADM'] == '1';
+$role    = $_SESSION['ROLE'];
+
+$canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('expenses'));
+$canCreate  = $isAdmin || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('expenses'));
+$canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('expenses'));
+$canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('expenses'));
+?>
+<?php if ($canView): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-8">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-file-invoice-dollar pr-1"></i>
+                        Despesas
+                    </h1>
+                </div>
+                <div class="col-4">
+                    <?php if ($canCreate): ?>
+                        <ol class="breadcrumb float-right">
+                            <li class="breadcrumb-item">
+                                <button type="button" class="btn btn-primary btn-flat"
+                                    onclick="createExpense();" style="position: relative; top: 3px">
+                                    <i class="fas fa-plus pr-1"></i> Adicionar
+                                </button>
+                            </li>
+                        </ol>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 p-3">
+                    <div class="row">
+                        <div class="col-md-4 bg-primary text-center py-3">
+                            <span style="font-size: 1em">Pendentes</span> <br>
+                            <h3>R$ <?php echo number_format($this->getTotalExpenses('1'), 2, ",","."); ?></h3>
+                        </div>
+                        <div class="col-md-4 bg-secondary text-center py-3">
+                            <span style="font-size: 1em">Concluídas</span> <br>
+                            <h3>R$ <?php echo number_format($this->getTotalExpenses('2'), 2, ",","."); ?></h3>
+                        </div>
+                        <div class="col-md-4 bg-primary text-center py-3">
+                            <span style="font-size: 1em">Canceladas</span> <br>
+                            <h3>R$ <?php echo number_format($this->getTotalExpenses('3'), 2, ",","."); ?></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table_despesas" style="width: 99.9%;">
+                                    <thead>
+                                        <tr class="text-center" style="height: 30px;">
+                                            <th style="font-size: 14px;">Data</th>
+                                            <th style="font-size: 14px;">Despesa</th>
+                                            <th style="font-size: 14px;">Valor</th>
+                                            <th style="font-size: 14px;">Status</th>
+                                            <th style="display: none;">Descrição</th>
+                                            <th style="display: none;">Forma de Pagamento</th>
+                                            <th style="display: none;">Cliente</th>
+                                            <th style="display: none;">Status</th>
+                                            <th style="display: none;">Cadastrado em</th>
+                                            <th style="display: none;">Atualizado em</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($data as $entity): ?>
+                                            <tr class="text-center" style="cursor: pointer;" 
+                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
+                                                <td style="font-size: 15px">
+                                                    <?php echo $this->formatDate($entity['expense_date']); ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php echo $entity['title']; ?>
+                                                </td> 
+                                                <td style="font-size: 15px">
+                                                    <?php echo number_format($entity['amount'], 2, ",","."); ?>
+                                                </td> 
+                                                <td style="width: 80px;">
+                                                    <?php if ($entity['status'] == '1'): ?>
+                                                        <i class="fa fa-circle" style="color: orange;"></i>
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '2'): ?>
+                                                        <i class="fa fa-circle" style="color: green;"></i>
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '3'): ?>
+                                                        <i class="fa fa-circle" style="color: red;"></i>
+                                                    <?php endif; ?>
+                                                </td>  
+                                                <td style="display: none;">
+                                                    <?php echo $entity['description']; ?>
+                                                </td> 
+                                                <td style="display: none;">
+                                                    <?php echo $entity['paymentTypeName']; ?>   
+                                                </td> 
+                                                <td style="display: none;">
+                                                    <?php echo $entity['customerName']; ?>
+                                                </td>
+                                                <td style="display: none;">
+                                                    <?php echo ($entity['status'] == '1') ? 'Pendente' : ''; ?>
+                                                    <?php echo ($entity['status'] == '2') ? 'Concluída' : ''; ?>
+                                                    <?php echo ($entity['status'] == '3') ? 'Cancelada' : ''; ?>
+                                                </td> 
+                                                <td style="display: none;">
+                                                    <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                                </td> 
+                                                <td style="display: none;">
+                                                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                                </td> 
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let buttonCommon = {
+                exportOptions: {
+                    format: {
+                        body: function ( data, row, column ) {
+                            return  column === 2  ?
+                                parseFloat(data.replace(/[.]/g, '' ).replace( ',', '.' )).toLocaleString('en-IN',
+                                {minimumFractionDigits: 2 , maximumFractionDigits: 2}) : data;
+                        }
+                    }
+                }
+            };	
+
+            $('#table_despesas').DataTable({
+                "sDom": 'flBtip',
+                searching: true,
+                buttons: [
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'excel',
+                        title: 'Despesas',
+                        exportOptions: {columns: [0,1,2,4,5,6,7,8,9]}
+                    })
+                ],
+                order: [ [0, "desc"] ],
+                columnDefs: [
+                    {type: 'date-eu', targets: [0]},
+                    {type: 'valoresemreais', targets: [2]},
+                    {orderable: false, targets: [3]},
+                ],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+
+        function openDetails(uuid) {
+            $("#baseLoader").show();
+            $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>despesas/detalhes",
+                data: {uuid:uuid},
+                async: true
+            }).done(function(data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").hide();
+            }).fail(function() {
+                showInternalErrorAlert();
+                $("#baseLoader").hide();
+            });
+        }
+    </script>
+    <?php if ($canCreate): ?>
+        <script>
+            function createExpense() {
+                $("#baseLoader").show();
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>despesas/cadastrar",
+                    async: true
+                }).done(function(data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#baseLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canUpdate): ?>
+        <script>
+            function updateExpense(uuid) {
+                $("#baseLoader").show();
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>despesas/editar",
+                    data: {uuid:uuid},
+                    async: true
+                }).done(function(data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#baseLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canDelete): ?>
+        <script>
+            function deleteExpense(uuid) {
+                $("#modalXL").modal('hide');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Despesa');
+                $("#modalDeleteLoader").hide();
+                $("#modalDelete").modal('show');
+                $("#modalDeleteResult").html('<button type="button" class="btn btn-default" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }   
+
+            function runDelete(uuid) {
+                if (uuid !== null) {
+                    $("#modalDeleteLoader").show();
+
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>despesas/excluir",
+                        data: {uuid: uuid},
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#modalDelete").modal('hide');
+                        $("#modalXL").modal('hide');
+                        openModule('despesas');
+                    }).fail(function() {
+                        showInternalErrorAlert();
+                        $("#modalDeleteLoader").hide();
+                    });
+                }
+            }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

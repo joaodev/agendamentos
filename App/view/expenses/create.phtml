@@ -1,0 +1,154 @@
+<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('expenses'))): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <h1 style="position: relative; top: 5px">
+                        <i class="fas fa-plus-square pr-1"></i>
+                        Adicionar Despesa
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" name="formCreateExpense" id="formCreateExpense"
+                                enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="title">Título da Despesa*</label>
+                                            <input type="text" class="form-control" name="title" id="title" required maxlength="100">
+                                        </div>
+                                    </div>   
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="description">Descrição completa</label>
+                                            <textarea name="description" id="description" class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="form-group">
+                                            <label for="amount">Valor*</label>
+                                            <input type="text" class="form-control" name="amount" id="amount" required placeholder="0,00">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="form-group">
+                                            <label for="payment_type_uuid">Forma de Pagamento*</label>
+                                            <select name="payment_type_uuid" id="payment_type_uuid" class="form-control" required>
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->paymentTypes as $paymentType): ?>    
+                                                    <option value="<?php echo $paymentType['uuid']; ?>">
+                                                        <?php echo $paymentType['name']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="form-group">
+                                            <label for="expense_date">Data*</label>
+                                            <input type="date" class="form-control" name="expense_date" id="expense_date" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <div class="col-12 col-md-12">
+                                        <div class="form-group">
+                                            <label for="customer_uuid">Atribuir Cliente</label>
+                                            <select name="customer_uuid" id="customer_uuid" class="form-control">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->customers as $customer): ?>
+                                                    <option value="<?php echo $customer['uuid']; ?>">
+                                                        <?php echo $customer['name']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="user_uuid">Anexar Arquivo:</label>
+                                            <input type="file" class="form-control" name="file" id="file">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <div class="form-group">
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1">Pendente</option>
+                                                <option value="2">Concluída</option>
+                                                <option value="3">Cancelada</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 text-right mt-3 mb-2">
+                                        <button type="button" class="btn btn-default mr-3"
+                                                onclick="openModule('despesas');">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                            <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function(){
+            $("input[id=amount]").maskMoney({allowNegative: false, thousands:'.', decimal:',', affixesStay: true});
+
+            $('#formCreateExpense').validate({
+               
+                submitHandler: function() {
+                    let file_data = $('#file').prop('files')[0];
+                    let form_data = new FormData();         
+
+                    form_data.append('file', file_data);    
+                    form_data.append('title', $("#title").val());    
+                    form_data.append('description', $("#description").val());    
+                    form_data.append('amount', $("#amount").val());    
+                    form_data.append('payment_type_uuid', $("#payment_type_uuid").val());    
+                    form_data.append('expense_date', $("#expense_date").val());    
+                    form_data.append('customer_uuid', $("#customer_uuid").val());    
+                    form_data.append('status', $("#status_1").val());
+
+                    $("#baseLoader").show();
+                    $("#btnSubmit").attr('disabled', true);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>despesas/processa-cadastro",
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: form_data,
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#baseLoader").hide();
+                        $("#btnSubmit").attr('disabled', false);
+                        $('#formCreateExpense').trigger("reset");
+                    }).fail(function() {
+                        showInternalErrorAlert(); 
+                        $("#baseLoader").hide();   
+                        $("#btnSubmit").attr('disabled', false);
+                    }); 
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

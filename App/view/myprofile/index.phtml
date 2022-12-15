@@ -1,0 +1,171 @@
+<?php 
+$entity = $this->view->entity; 
+?>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-12">
+                <h1 style="position: relative; top: 5px">
+                    <i class="fas fa-user pr-1"></i>
+                    Meu Perfil
+                </h1>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content" style="margin-left: 9px; margin-right: 9px;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="post" name="formUpdateMyProfile" id="formUpdateMyProfile" enctype="multipart/form-data" onsubmit="hashPass(this);">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="title">Imagem de Perfil</label>
+                                        <?php if (!empty($entity['file'])): ?><br>
+                                            <img src="<?php echo baseUrl . 'public/uploads/users/'
+                                                . $entity['file']; ?>" style="max-height: 200px; margin-bottom: 15px;" alt="<?php echo $entity['name']; ?>">
+                                                
+                                        <?php endif; ?>
+                                        <input type="file" class="form-control" name="file" id="file">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label for="name">Nome</label>
+                                        <input type="text" class="form-control" name="name" id="name" required maxlength="100"
+                                            value="<?php echo $entity['name']; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="job_role">Cargo</label>
+                                        <input type="text" class="form-control" name="job_role" id="job_role" required maxlength="50"
+                                            value="<?php echo $entity['job_role']; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="phone">Telefone</label>
+                                        <input type="text" class="form-control" name="phone" id="phone" maxlength="13"
+                                            value="<?php echo $entity['phone']; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="cellphone">Celular</label>
+                                        <input type="text" class="form-control" name="cellphone" id="cellphone" maxlength="14"
+                                            value="<?php echo $entity['cellphone']; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="whatsapp">WhatsApp</label>
+                                        <input type="text" class="form-control" name="whatsapp" id="whatsapp" maxlength="14"
+                                            value="<?php echo $entity['whatsapp']; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-12"><hr></div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" name="email" id="email" required maxlength="100"
+                                            value="<?php echo $entity['email']; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="password">Nova senha</label>
+                                            <input type="password" class="form-control" name="password" id="password" minlength="8" maxlength="100">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="confirmation">Confirmar senha</label>
+                                        <input type="password" class="form-control" name="confirmation" id="confirmation" minlength="8"  maxlength="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right mt-3 mb-2">
+                                    <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                        <i class="fa fa-save pr-1"></i> Salvar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="<?php echo baseUrl; ?>public/js/md5.min.js"></script>
+<script>
+    function hashPass(form) {
+        if (form.password.value !== '') {
+            form.password.value = md5(form.password.value);
+        }
+
+        if (form.confirmation.value !== '') {
+            form.confirmation.value = md5(form.confirmation.value);
+        }
+    }
+</script>
+<script>
+    $(document).ready(function() {
+        $("#phone").mask("(99)9999-9999");
+        $("#cellphone").mask("(99)99999-9999");
+        $("#whatsapp").mask("(99)99999-9999");
+
+        $('#formUpdateMyProfile').validate({
+            submitHandler: function() {
+                let file_data = $('#file').prop('files')[0];
+                let form_data = new FormData();         
+
+                form_data.append('file', file_data);    
+                form_data.append('name', $("#name").val());    
+                form_data.append('job_role', $("#job_role").val());    
+                form_data.append('email', $("#email").val());    
+                form_data.append('phone', $("#phone").val());    
+                form_data.append('cellphone', $("#cellphone").val());    
+                form_data.append('whatsapp', $("#whatsapp").val());    
+                form_data.append('password', $("#password").val());    
+                form_data.append('confirmation', $("#confirmation").val());    
+
+                $("#baseLoader").show();
+                $("#btnSubmit").attr('disabled', true);
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>meu-perfil/processa-edicao",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    dataType: 'json',
+                    async: true
+                }).done(function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    if(data.type === 'success') {
+                        window.location.href = "<?php echo baseUrl; ?>?mod=meu-perfil";
+                    } else {
+                        $("#btnSubmit").attr('disabled', false);
+                        $("#baseLoader").hide();   
+                    }
+                }).fail(function() {
+                    showInternalErrorAlert(); 
+                    $("#baseLoader").hide();   
+                    $("#btnSubmit").attr('disabled', false);
+                }); 
+
+                return false;
+            }
+        });
+    });
+</script>
