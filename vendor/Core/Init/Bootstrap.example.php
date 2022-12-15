@@ -2,13 +2,15 @@
 /*
 namespace Core\Init;
 
+use App\Controller\LoginController;
 use Core\Adapter\AuthAdpter;
 use Core\Controller\ActionController;
+use PDO;
 
 class Bootstrap
 {
-    private $project_url;
-    private $routes;
+    private mixed $project_url;
+    private mixed $routes;
 
     public function __construct($routes, $projectUrl)
     {
@@ -17,36 +19,41 @@ class Bootstrap
         $this->run($this->getUrl());
     }
 
-    protected function run($url)
+    protected function run($url): void
     {
         foreach ($this->routes as $namespace => $route) {
             array_walk($this->routes[$namespace], function ($router) use ($url) {
                 $request_url = $this->project_url . $router['route'];
-    
+
                 if ($request_url == $url) {
-                    if ($router['namespace'] == "admin") {
-     
-                        if ($url == $this->project_url . "/painel/login")
-                            return header("Location: " . $this->project_url);
+                    if ($router['namespace'] == "app") {
+
+                        if ($url == $this->project_url . "/login")
+                            header("Location: " . $this->project_url);
 
                         $auth = new AuthAdpter();
                         if (!$auth->getIdentity()) {
-                            $login = new \Admin\Controller\LoginController();
+                            $login = new LoginController();
 
-                            if ($url != $this->project_url . "/painel/auth") {
-                                if ($url != $this->project_url . "/painel/esqueci-a-senha") {
-                                    if ($url != $this->project_url . "/painel/validar-codigo") {
-                                        if ($url != $this->project_url . "/painel/alterar-senha") {
-                                            return $login->indexAction();
+                            if ($url != $this->project_url . "/auth") {
+                                if ($url != $this->project_url . "/esqueci-a-senha") {
+                                    if ($url != $this->project_url . "/validar-codigo") {
+                                        if ($url != $this->project_url . "/alterar-senha") {
+                                            if ($url != $this->project_url . "/validar-token") {
+                                                if ($url != $this->project_url . "/cancelar-token") {
+                                                    $login->indexAction();
+                                                    return;
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             } else {
-                                return $login->authAction();
+                                $login->authAction();
                             }
                         } else {
-                            if ($url == $this->project_url . "/painel/auth")
-                                return ActionController::redirect('/painel/inicio');
+                            if ($url == $this->project_url . "/auth")
+                                ActionController::redirect('/inicio');
                         }
                     }
 
@@ -73,14 +80,16 @@ class Bootstrap
                     }
 
                     $action = $actionName . "Action";
-                    
+
                     return $controller->$action();
+                } else {
+                    return false;
                 }
             });
         }
     }
 
-    public function setProjectUrl($projectUrl)
+    public function setProjectUrl($projectUrl): void
     {
         $this->project_url = $projectUrl;
     }
@@ -90,30 +99,30 @@ class Bootstrap
         return $this->routes;
     }
 
-    public function setRoutes(array $routes)
+    public function setRoutes(array $routes): void
     {
         $this->routes = $routes;
     }
 
-    protected function getUrl()
+    protected function getUrl(): bool|int|array|string|null
     {
         return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     }
 
-    public static function getDb()
+    public static function getDb(): PDO
     {
         $server = '';
         $db     = '';
         $user   = '';
-        $pass   = ''; 
-        $port   = ''; 
+        $pass   = '';
+        $port   = '';
 
-        $db = new \PDO(
-            "mysql:host={$server};port={$port};dbname={$db}", $user, $pass
+        $db = new PDO(
+            "mysql:host=$server;port=$port;dbname=$db", $user, $pass
         );
 
-        $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $db->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, "SET NAMES 'utf8'");   
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $db->setAttribute(PDO::MYSQL_ATTR_INIT_COMMAND, "SET NAMES 'utf8'");
 
         return $db;
     }
