@@ -223,7 +223,7 @@ class LoginController extends ActionController
                 }
             } 
             
-            self::redirect('painel/validar-codigo');
+            self::redirect('validar-codigo');
         } else {
             $this->render('forgot-password', false);
         }
@@ -246,10 +246,10 @@ class LoginController extends ActionController
                     $this->view->code = $code;
                     $this->render('change-password', false);
                 } else {
-                    self::redirect('painel/validar-codigo', 'codigo-invalido');
+                    self::redirect('validar-codigo', 'codigo-invalido');
                 }
             } else {
-                self::redirect('painel/validar-codigo', 'codigo-invalido');
+                self::redirect('validar-codigo', 'codigo-invalido');
             }
         } else {
             $this->render('code-validation', false);
@@ -260,7 +260,7 @@ class LoginController extends ActionController
     {
         if (!empty($_POST)) {
             if (empty($_POST['info'])) {
-                self::redirect('painel/validar-codigo', 'codigo-invalido');
+                self::redirect('validar-codigo', 'codigo-invalido');
             } else {
                 if ($_POST['password'] != $_POST['confirmation']) {
                     $this->view->code = $_POST['info'];
@@ -271,7 +271,7 @@ class LoginController extends ActionController
                     if ($userUuid > 0) {
                         $user = $this->userModel->find($userUuid, 'uuid, email, password, code, code_validated', 'uuid');
                         if ($user['code'] != $_POST['info'] || $user['code_validated'] != '1') {
-                            self::redirect('painel/validar-codigo', 'codigo-invalido');
+                            self::redirect('validar-codigo', 'codigo-invalido');
                         } else {
                             $crud = new Crud();
                             $crud->setTable($this->userModel->getTable());
@@ -304,16 +304,16 @@ class LoginController extends ActionController
                                     self::redirect('', 'usuario-invalido');
                                 }
                             } else {
-                                self::redirect('painel/validar-codigo', 'codigo-invalido');
+                                self::redirect('validar-codigo', 'codigo-invalido');
                             }
                         }
                     } else {
-                        self::redirect('painel/validar-codigo', 'codigo-invalido');
+                        self::redirect('validar-codigo', 'codigo-invalido');
                     }
                 }
             }
         } else {
-            self::redirect('painel/validar-codigo', 'codigo-invalido');
+            self::redirect('validar-codigo', 'codigo-invalido');
         }
     }
 
@@ -411,7 +411,7 @@ class LoginController extends ActionController
                                                                 <tr>
                                                                     <td style="padding:0 0 10px 0;color:#153643;">
                                                                         <p>Olá, '.$user['name'].', tudo bem? </p>
-                                                                        <p>Este é o seu token para validar seu acesso ao painel:</p>
+                                                                        <p>Este é o seu token para validar seu acesso ao sistema:</p>
                                                                         <br>
                                                                         <h1 style="font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;">'.$code.'</h1>
                                                                     </td>
@@ -473,9 +473,9 @@ class LoginController extends ActionController
 
                 try {
                     if ($mail->send()) {
-                        $this->toLog("{$user['name']} solicitou um token para acessar o painel.");
+                        $this->toLog("{$user['name']} solicitou um token para acessar o sistema.");
                     } else {
-                        $this->toLog("{$user['name']} tentou solicitar um token para acessar o painel.");
+                        $this->toLog("{$user['name']} tentou solicitar um token para acessar o sistema.");
                     }
                 } catch (phpmailerException $e) {
                     $this->toLog("Erro ao enviar: $e");
