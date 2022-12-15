@@ -4,19 +4,8 @@ $canViewCustomers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
 $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'));
 $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('expenses'));
 ?>
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-12">
-                <h1 style="position: relative; top: 5px">
-                    <i class="fas fa-home"></i>
-                    Início
-                </h1>
-            </div>
-        </div>
-    </div>
-</section>
-<section class="content" style="margin-left: 9px; margin-right: 9px;">
+
+<section class="content mt-4" style="margin-left: 9px; margin-right: 9px;">
     <div class="container-fluid">
         <div class="row">
             <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewSchedules): ?>

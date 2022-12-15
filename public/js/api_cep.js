@@ -6,7 +6,7 @@ $(function() {
         $("#city").val("");
         $("#state").val("");
         
-        $("#postal_code").val("").focus();
+        $("#postal_code").val("");
         //$("#ibge").val("");
     }
     

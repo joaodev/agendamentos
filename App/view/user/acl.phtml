@@ -7,19 +7,19 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
 <?php if ($canView): ?>
     <section class="content-header">
         <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-9">
-                    <h1 style="position: relative; top: 5px">
-                        <i class="fas fa-user"></i>
+            <div class="row">
+                <div class="col-11" >
+                    <h1 style="position: relative; top: 5px; font-size: 25px;">
+                        <i class="fas fa-pen-square pr-1"></i>
                         <?php echo $this->view->user['name']; ?> - Permissões
                     </h1>
                 </div>
-                <div class="col-3">
+                <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary btn-flat"
-                                onclick="openDetails('<?php echo $this->view->user['uuid']; ?>');">
-                                <i class="fas fa-arrow-left pr-1"></i> Voltar
+                            <button type="button" class="btn btn-primary"
+                                onclick="openDetails('<?php echo $_POST['uuid']; ?>');" style="width: 100%;">
+                                <i class="fas fa-arrow-left"></i> 
                             </button>
                         </li>
                     </ol>

@@ -12,20 +12,20 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
 <?php if ($canView): ?>
     <section class="content-header">
         <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-8">
-                    <h1 style="position: relative; top: 5px">
-                        <i class="fas fa-th-list pr-1"></i>
+            <div class="row">
+                <div class="col-11" >
+                    <h1 style="position: relative; top: 5px; font-size: 25px;">
+                        <i class="fas fa-users pr-1"></i>
                         Clientes
                     </h1>
                 </div>
-                <div class="col-4">
+                <div class="col-1">
                     <?php if ($canCreate): ?>
                         <ol class="breadcrumb float-right">
                             <li class="breadcrumb-item">
-                                <button type="button" class="btn btn-primary btn-flat"
-                                    onclick="createCustomer();" style="position: relative; top: 3px">
-                                    <i class="fas fa-plus pr-1"></i> Adicionar
+                                <button type="button" class="btn btn-primary"
+                                    onclick="createCustomer();" style="width: 100%;">
+                                    <i class="fas fa-plus"></i> 
                                 </button>
                             </li>
                         </ol>
