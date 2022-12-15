@@ -12,6 +12,7 @@ $canViewPayments = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
 $canViewSmtp = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('smtp'));
 $canViewSchedules = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('schedules'));
 $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'));
+$canViewFinancial = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('financial'));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -149,7 +150,7 @@ $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
         <aside class="main-sidebar sidebar-dark-primary elevation-4 text-center" style="<?php echo $bgStyle; ?> !important;">
             <div class="bg-white">
                 <a href="<?php echo baseUrl; ?>" class="">
-                    <img src="<?php echo baseUrl . 'public/uploads/logo/' . $config['logo']; ?>" alt="logo" style="width: 50%; margin-top: 10px; margin-bottom: 10px;">
+                    <img src="<?php echo baseUrl . 'public/uploads/logo/' . $config['logo']; ?>" alt="logo" style="width: 100%;">
                 </a>
             </div>
             <div class="sidebar">
@@ -231,6 +232,16 @@ $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                                                 <i class="nav-icon fas fa-file-invoice-dollar"></i>
                                                 <p>
                                                     Despesas
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewFinancial): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('financeiro');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-cash-register"></i>
+                                                <p>
+                                                    Financeiro
                                                 </p>
                                             </a>
                                         </li>

@@ -33,13 +33,14 @@ class SchedulesController extends ActionController implements CrudInterface
 
     public function createAction(): void
     {
-        $customers = $this->customersModel->findAllActives('uuid, name');
+        $customers = $this->customersModel->findAllActivesBy('uuid, name', 'user_uuid', $_SESSION['COD']);
         $this->view->customers = $customers;
 
         $paymentTypes = $this->paymentTypesModel->getAllActives();
         $this->view->paymentTypes = $paymentTypes;
 
-        $services = $this->servicesModel->findAllActives('uuid, title, description, price');
+        $stringFields = 'uuid, title, description, price';
+        $services = $this->servicesModel->findAllActivesBy($stringFields, 'user_uuid', $_SESSION['COD']);
         $this->view->services = $services;
 
         $this->render('create', false);
@@ -50,6 +51,7 @@ class SchedulesController extends ActionController implements CrudInterface
         if (!empty($_POST)) {
             $uuid = $this->model->NewUUID();
             $_POST['uuid'] = $uuid;
+            $_POST['user_uuid'] = $_SESSION['COD'];
 
             if (!empty($_FILES)) {
                 $image_name  = $_FILES["file"]["name"];

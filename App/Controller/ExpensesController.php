@@ -45,6 +45,7 @@ class ExpensesController extends ActionController implements CrudInterface
         if (!empty($_POST)) {
             $uuid = $this->model->NewUUID();
             $_POST['uuid'] = $uuid;
+            $_POST['user_uuid'] = $_SESSION['COD'];
 
             if (!empty($_FILES)) {
                 $image_name  = $_FILES["file"]["name"];

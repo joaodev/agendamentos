@@ -321,6 +321,7 @@ class ActionController
             'smtp' => '2d1503eb-46bc-5386-957a-ec2def778c4e',
             'schedules' => 'd9aa7c33-60a9-4012-888f-bccb96ddf51d',
             'services' => '62430c22-1a3d-42ff-8921-fca074a676dc',
+            'financial' => 'c2262430-8921-1a3d-42ff-074a676fcadc',
         ];
 
         return $codes[$key];

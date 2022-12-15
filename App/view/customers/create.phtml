@@ -21,7 +21,7 @@ $role = $_SESSION['ROLE'];
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form method="post" name="formCreateCustomer" id="formCreateCustomer" onsubmit="hashPass(this);">
+                            <form method="post" name="formCreateCustomer" id="formCreateCustomer">
                                 <div class="row">
                                     <div class="col-md-12" style="border-radius: 5px;">
                                         <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
@@ -57,22 +57,10 @@ $role = $_SESSION['ROLE'];
                                             <input type="text" class="form-control" name="cellphone" id="cellphone">
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="email">Email</label>
                                             <input type="email" class="form-control" name="email" id="email" required maxlength="100">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="password">Nova senha</label>
-                                                <input type="password" class="form-control" name="password" id="password" required minlength="8" maxlength="100">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="confirmation">Confirmar senha</label>
-                                            <input type="password" class="form-control" name="confirmation" id="confirmation" required minlength="8"  maxlength="100">
                                         </div>
                                     </div>
                                     <div class="col-md-12" style="border-radius: 5px;">
@@ -138,18 +126,6 @@ $role = $_SESSION['ROLE'];
             </div>
         </div>
     </section>
-    <script src="<?php echo baseUrl; ?>public/js/md5.min.js"></script>
-    <script>
-        function hashPass(form) {
-            if (form.password.value !== '') {
-                form.password.value = md5(form.password.value);
-            }
-
-            if (form.confirmation.value !== '') {
-                form.confirmation.value = md5(form.confirmation.value);
-            }
-        }
-    </script>
     <script src="<?php echo baseUrl; ?>public/js/api_cep.js"></script>
     <script src="<?php echo baseUrl; ?>public/js/documents_validators.js"></script>
     <script>

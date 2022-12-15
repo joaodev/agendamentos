@@ -33,39 +33,28 @@ class CustomersController extends ActionController implements CrudInterface
     public function createProcessAction(): bool
     {
         if (!empty($_POST)) {
-            if ($_POST['password'] != $_POST['confirmation']) {
+            $_POST['uuid'] = $this->model->NewUUID();
+            $_POST['user_uuid'] = $_SESSION['COD'];
+            
+            $crud = new Crud();
+            $crud->setTable($this->model->getTable());
+            $transaction = $crud->create($_POST);
+
+            if ($transaction){
+                $this->toLog("Cadastrou o Cliente {$_POST['uuid']}");
+                $data  = [
+                    'title' => 'Sucesso!', 
+                    'msg'   => 'Cliente cadastrado.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right'
+                ];
+            } else {
                 $data  = [
                     'title' => 'Erro!', 
-                    'msg' => 'Senhas incorretas.',
+                    'msg' => 'O Cliente não foi cadastrado.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
-            } else {
-                unset($_POST['confirmation']);
-                
-                $_POST['uuid'] = $this->model->NewUUID();
-                $_POST['password'] = Bcrypt::hash($_POST['password']);
-                
-                $crud = new Crud();
-                $crud->setTable($this->model->getTable());
-                $transaction = $crud->create($_POST);
-
-                if ($transaction){
-                    $this->toLog("Cadastrou o Cliente {$_POST['uuid']}");
-                    $data  = [
-                        'title' => 'Sucesso!', 
-                        'msg'   => 'Cliente cadastrado.',
-                        'type'  => 'success',
-                        'pos'   => 'top-right'
-                    ];
-                } else {
-                    $data  = [
-                        'title' => 'Erro!', 
-                        'msg' => 'O Cliente não foi cadastrado.',
-                        'type' => 'error',
-                        'pos'   => 'top-center'
-                    ];
-                }
             }
 
             echo json_encode($data);

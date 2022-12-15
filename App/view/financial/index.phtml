@@ -1,0 +1,186 @@
+<?php 
+$isAdmin = $_SESSION['ROLE_ADM'] == '1';
+$role    = $_SESSION['ROLE'];
+
+$canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('financial'));
+?>
+<?php if ($canView): ?>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-8" >
+                    <h1 style="position: relative; top: 5px; font-size: 25px;">
+                        <i class="fas fa-cash-register pr-1"></i>
+                        Financeiro
+                    </h1>
+                </div>
+                <div class="col-4">
+                    <ol class="breadcrumb float-right">
+                        <li class="breadcrumb-item">
+                            <button type="button" class="btn btn-primary"
+                                onclick="changeMonth();" style="width: 100%;">
+                                <i class="fas fa-sync  pr-1"></i> 12/2022
+                            </button>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 p-3">
+                    <div class="row">
+                        <div class="col-md-4 bg-primary text-center py-3">
+                            <span style="font-size: 1em">Despesas</span> <br>
+                            <h3>R$ <?php echo number_format($this->view->total_expenses, 2, ",","."); ?></h3>
+                        </div>
+                        <div class="col-md-4 bg-secondary text-center py-3">
+                            <span style="font-size: 1em">Receitas</span> <br>
+                            <h3>R$ <?php echo number_format($this->view->total_schedules, 2, ",","."); ?></h3>
+                        </div>
+                        <div class="col-md-4 bg-primary text-center py-3">
+                            <span style="font-size: 1em">Caixa</span> <br>
+                            <h3>R$ <?php echo number_format(($this->view->total_schedules - $this->view->total_expenses), 2, ",","."); ?></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table_fn" style="width: 99.9%;">
+                                    <thead>
+                                        <tr class="text-center" style="height: 30px;">
+                                            <th style="font-size: 14px;">Data</th>
+                                            <th style="font-size: 14px;">Tipo</th>
+                                            <th style="font-size: 14px;">Descrição</th>
+                                            <th style="font-size: 14px;">Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($this->view->schedules as $entity): ?>
+                                            <tr class="text-center" style="cursor: pointer;" 
+                                                onclick="openScheduleDetails('<?php echo $entity['uuid']; ?>');">
+                                                <td style="font-size: 15px">
+                                                    <?php echo $this->formatDate($entity['schedule_date']); ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    Receita
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php echo $entity['serviceName']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
+                                                </td> 
+                                                <td style="font-size: 15px">
+                                                    <?php echo number_format($entity['amount'], 2, ",","."); ?>
+                                                </td> 
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        <?php foreach ($this->view->expenses as $entity): ?>
+                                            <tr class="text-center" style="cursor: pointer;" 
+                                                onclick="openExpenseDetails('<?php echo $entity['uuid']; ?>');">
+                                                <td style="font-size: 15px">
+                                                    <?php echo $this->formatDate($entity['expense_date']); ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    Despesa
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php echo $entity['title']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
+                                                </td> 
+                                                <td style="font-size: 15px">
+                                                    <?php echo number_format($entity['amount'], 2, ",","."); ?>
+                                                </td> 
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let buttonCommon = {
+                exportOptions: {
+                    format: {
+                        body: function ( data, row, column ) {
+                            return  column === 3  ?
+                                parseFloat(data.replace(/[.]/g, '' ).replace( ',', '.' )).toLocaleString('en-IN',
+                                {minimumFractionDigits: 2 , maximumFractionDigits: 2}) : data;
+                        }
+                    }
+                }
+            };	
+
+            $('#table_fn').DataTable({
+                "sDom": 'flBtip',
+                searching: true,
+                buttons: [
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'excel',
+                        title: 'Receitas e Despesas do Mês 12/22',
+                        exportOptions: {columns: [0,1,2,3]}
+                    })
+                ],
+                order: [ [0, "desc"] ],
+                columnDefs: [
+                    {type: 'date-eu', targets: [0]},
+                    {type: 'valoresemreais', targets: [3]},
+                    {orderable: false, targets: [0,1,2,3]},
+                ],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+
+        function openDetails(uuid) {
+            $("#baseLoader").show();
+            $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>despesas/detalhes",
+                data: {uuid:uuid},
+                async: true
+            }).done(function(data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").hide();
+            }).fail(function() {
+                showInternalErrorAlert();
+                $("#baseLoader").hide();
+            });
+        }
+    </script>
+<?php endif; ?>

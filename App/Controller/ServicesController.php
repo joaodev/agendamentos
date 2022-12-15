@@ -19,7 +19,8 @@ class ServicesController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        $data = $this->model->findAll('uuid, title, description, price, status, created_at, updated_at');
+        $stringFields = 'uuid, title, description, price, status, created_at, updated_at';
+        $data = $this->model->findAllBy($stringFields, 'user_uuid', $_SESSION['COD']);
         $this->view->data = $data;
 
         $this->render('index', false);
@@ -35,6 +36,7 @@ class ServicesController extends ActionController implements CrudInterface
         if (!empty($_POST)) {
             $uuid = $this->model->NewUUID();
             $_POST['uuid'] = $uuid;
+            $_POST['user_uuid'] = $_SESSION['COD'];
             $_POST['price'] = $this->moneyToDb($_POST['price']);
 
             $crud = new Crud();

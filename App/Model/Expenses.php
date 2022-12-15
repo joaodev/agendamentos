@@ -28,11 +28,14 @@ class Expenses extends Model
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
-                        WHERE o.uuid = :uuid AND o.deleted = :deleted";
+                        WHERE o.uuid = :uuid 
+                            AND o.deleted = :deleted
+                            AND o.user_uuid = :user_uuid";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":uuid", $uuid);
             $stmt->bindValue(":deleted", "0");
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -61,10 +64,12 @@ class Expenses extends Model
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
-                        WHERE o.deleted = :deleted";
+                        WHERE o.deleted = :deleted
+                            AND o.user_uuid = :user_uuid";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", "0");
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -88,13 +93,15 @@ class Expenses extends Model
                         FROM expenses 
                         WHERE status = :status
                         AND deleted = :deleted
+                        AND user_uuid = :user_uuid
                         AND expense_date BETWEEN :d1 AND :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
-            $stmt->bindValue(":deleted", '0');
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);

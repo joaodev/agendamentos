@@ -26,7 +26,7 @@ class IndexController extends ActionController
         $total_customers = $this->customersModel->totalCustomers();
         $this->view->total_customers = $total_customers;
 
-        $total_services = $this->servicesModel->totalData($this->servicesModel->getTable());
+        $total_services = $this->servicesModel->totalData($this->servicesModel->getTable(), $_SESSION['COD']);
         $this->view->total_services = $total_services;
 
         $total_pending_schedules = $this->schedulesModel->getTotalByStatus('1');

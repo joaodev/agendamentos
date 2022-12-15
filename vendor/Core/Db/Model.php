@@ -160,6 +160,34 @@ class Model extends InitDb
         }
     }
 
+    public function findAllActivesBy($stringFields, $whereField, $whereValue): bool|array|string
+    {
+        try {
+            $query = "
+                SELECT $stringFields
+                FROM {$this->getTable()}
+                WHERE 
+                    $whereField = :whereValue
+                    AND deleted = :deleted
+                    AND status = :status
+            ";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":whereValue", $whereValue);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":status", '1');
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+
+            return $result;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
     public function fieldExists($field, $value, $uuidField, $uuid = null): bool|string
     {
         try {
@@ -242,16 +270,21 @@ class Model extends InitDb
             . self::UuidGenerator(12);
     }
 
-    public function totalData($table): int|string
+    public function totalData($table, $user): int|string
     {
         try {
             $query = "
                 SELECT uuid
                 FROM $table 
-                WHERE deleted = '0'
+                WHERE deleted = :deleted
+                AND user_uuid = :user_uuid
             ";
 
-            $stmt = $this->openDb()->query($query);
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $user);
+            $stmt->execute();
+            
             $result = $stmt->rowCount();
 
             $stmt = null;

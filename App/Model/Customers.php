@@ -22,12 +22,15 @@ class Customers extends Model
                         number, complement, neighborhood, city, state,
                         status, created_at, updated_at
                 FROM customers
-                WHERE uuid = :uuid AND deleted = :deleted
+                WHERE uuid = :uuid 
+                    AND deleted = :deleted 
+                    AND user_uuid = :user_uuid
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":uuid", $uuid);
             $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -50,12 +53,14 @@ class Customers extends Model
                         number, complement, neighborhood, city, state,
                         status, created_at, updated_at
                 FROM customers
-                WHERE deleted = :deleted
+                WHERE deleted = :deleted 
+                    AND user_uuid = :user_uuid
                 ORDER BY name 
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -78,13 +83,16 @@ class Customers extends Model
                         number, complement, neighborhood, city, state,
                         status, created_at, updated_at
                 FROM customers
-                WHERE deleted = :deleted AND status = :status
+                WHERE deleted = :deleted 
+                    AND status = :status
+                    AND user_uuid = :user_uuid
                 ORDER BY name 
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", '0');
             $stmt->bindValue(":status", '1');
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -104,7 +112,7 @@ class Customers extends Model
             $query = "
                 SELECT uuid, name
                 FROM customers
-                WHERE name LIKE '%$postData%' OR id LIKE '%$postData%'
+                WHERE user_uuid = {$_SESSION['COD']} AND  name LIKE '%$postData%' OR id LIKE '%$postData%'
                 ORDER BY name  LIMIT 5
             ";
 
@@ -126,10 +134,15 @@ class Customers extends Model
             $query = "
                 SELECT uuid
                 FROM customers 
-                WHERE deleted = '0'
+                WHERE deleted = :deleted
+                    AND user_uuid = :user_uuid
             ";
 
-            $stmt = $this->openDb()->query($query);
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":deleted", "0");
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->execute();
+            
             $result = $stmt->rowCount();
 
             $stmt = null;
