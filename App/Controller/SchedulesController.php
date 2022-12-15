@@ -208,4 +208,26 @@ class SchedulesController extends ActionController implements CrudInterface
             return false;
         }
     }
+
+    public function serviceDetailsAction(): bool
+    {
+        if (!empty($_POST)) {
+            $fields = "description, price";
+            $entity = $this->servicesModel->find($_POST['uuid'], $fields, 'uuid');
+
+            if ($entity){
+                $data =  number_format($entity['price'], 2, ",", ".");
+            } else {
+                $data  = [
+                    'Erro ao consultar valor'
+                ];
+            }
+
+            echo $data;
+            return true;
+        } else {
+            echo 'Erro ao consultar valor';
+            return false;
+        }
+    }
 }

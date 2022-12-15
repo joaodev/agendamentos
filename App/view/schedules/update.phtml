@@ -27,7 +27,8 @@ $role = $_SESSION['ROLE'];
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="service_uuid">Atribuir Serviço*</label>
-                                            <select name="service_uuid" id="service_uuid" class="form-control" required>
+                                            <select name="service_uuid" id="service_uuid" class="form-control" required
+                                                onchange="getServiceDescription();">
                                                 <option value="">Selecione</option>
                                                 <?php foreach ($this->view->services as $service): ?>
                                                     <option value="<?php echo $service['uuid']; ?>"
@@ -182,5 +183,23 @@ $role = $_SESSION['ROLE'];
                 }
             });
         });
+
+        function getServiceDescription() {
+            let serviceUuid = $("#service_uuid").val();
+            if (serviceUuid !== '') {
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>agendamentos/detalhes-servico",
+                    data: {uuid: serviceUuid},
+                    async: true
+                }).done(function(data) {
+                    $("#amount").val(data);
+                }).fail(function() {
+                    $("#amount").val('0,00');
+                });
+            } else {
+                $("#amount").val('0,00');
+            }
+        }
     </script>
 <?php endif; ?>

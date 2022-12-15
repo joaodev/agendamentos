@@ -19,7 +19,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                         <li class="breadcrumb-item">
                             <button type="button" class="btn btn-primary"
                                 onclick="changeMonth();" style="width: 100%;">
-                                <i class="fas fa-sync  pr-1"></i> 12/2022
+                                <i class="fas fa-sync  pr-1"></i> <?php echo $this->view->month; ?>
                             </button>
                         </li>
                     </ol>
@@ -63,8 +63,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                     </thead>
                                     <tbody>
                                         <?php foreach ($this->view->schedules as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;" 
-                                                onclick="openScheduleDetails('<?php echo $entity['uuid']; ?>');">
+                                            <tr class="text-center" style="cursor: pointer;">
                                                 <td style="font-size: 15px">
                                                     <?php echo $this->formatDate($entity['schedule_date']); ?>
                                                 </td>
@@ -80,8 +79,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                             </tr>
                                         <?php endforeach; ?>
                                         <?php foreach ($this->view->expenses as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;" 
-                                                onclick="openExpenseDetails('<?php echo $entity['uuid']; ?>');">
+                                            <tr class="text-center" style="cursor: pointer;">
                                                 <td style="font-size: 15px">
                                                     <?php echo $this->formatDate($entity['expense_date']); ?>
                                                 </td>
@@ -125,7 +123,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                 buttons: [
                     $.extend( true, {}, buttonCommon, {
                         extend: 'excel',
-                        title: 'Receitas e Despesas do Mês 12/22',
+                        title: 'Receitas e Despesas do Mês <?php echo $this->view->month; ?>',
                         exportOptions: {columns: [0,1,2,3]}
                     })
                 ],
@@ -133,7 +131,6 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                 columnDefs: [
                     {type: 'date-eu', targets: [0]},
                     {type: 'valoresemreais', targets: [3]},
-                    {orderable: false, targets: [0,1,2,3]},
                 ],
                 responsive: true,
                 info: true,
@@ -181,6 +178,20 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                 showInternalErrorAlert();
                 $("#baseLoader").hide();
             });
+        }
+
+        function changeMonth() {
+            $("#modalMonthTitle").html('<i class="fa fa-info-circle pr-2"></i> Alterar Mês');
+            $("#modalMonthLoader").hide();
+            $("#modalMonth").modal('show');           
+        }
+
+        function selectMonth() {
+            let month = $("#f_month").val();
+            $("#modalMonthLoader").show();
+            openModule('financeiro?m=' + month);
+            $("#modalMonthLoader").hide();
+            $("#modalMonth").modal('hide');    
         }
     </script>
 <?php endif; ?>

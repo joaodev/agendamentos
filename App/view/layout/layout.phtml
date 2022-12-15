@@ -374,6 +374,32 @@ $canViewFinancial = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="modalMonth" data-keyboard="false">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="overlay" id="modalMonthLoader">
+                            <i class="fas fa-2x fa-sync fa-spin"></i>
+                        </div>
+                        <div class="modal-header text-white bg-primary">
+                            <h4 class="modal-title" id="modalMonthTitle"></h4>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="modalMonthResult">
+                            <div class="form-group">
+                                <label for="month">Informe o Mês</label>
+                                <input type="month" id="f_month" class="form-control" required
+                                    value="<?php echo date('Y-m'); ?>">
+                            </div>
+                            <button type="button" class="btn btn-primary"
+                                onclick="selectMonth();" style="width: 100%;">
+                                <i class="fas fa-filter pr-1"></i> FILTRAR
+                            </button>            
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="modal fade" id="modalXL" >
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
