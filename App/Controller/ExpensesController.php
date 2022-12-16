@@ -23,7 +23,15 @@ class ExpensesController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        $data = $this->model->getAll();
+        if (!empty($_GET['m'])) {
+            $month = $_GET['m'];
+        } else {
+            $month = date('Y-m');
+        }
+
+        $this->view->month = self::formatMonth($month);
+
+        $data = $this->model->getAllByMonth('0', $month);
         $this->view->data = $data;
 
         $this->render('index', false);

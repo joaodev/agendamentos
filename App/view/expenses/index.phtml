@@ -39,7 +39,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                             <div class="card bg-info">
                                 <div class="card-body">
                                     <span style="font-size: 1em"><i class="fa fa-clock pr-1"></i> Pendentes</span> 
-                                    <h3>R$ <?php echo number_format($this->getTotalExpenses('1'), 2, ",","."); ?></h3>
+                                    <h3>R$ <?php echo number_format($this->getTotalExpensesByMonth('1', $this->view->month), 2, ",","."); ?></h3>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +47,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                             <div class="card bg-success">
                                 <div class="card-body">
                                     <span style="font-size: 1em"><i class="fa fa-check-circle pr-1"></i> Concluídas</span> 
-                                    <h3>R$ <?php echo number_format($this->getTotalExpenses('2'), 2, ",","."); ?></h3>
+                                    <h3>R$ <?php echo number_format($this->getTotalExpensesByMonth('2', $this->view->month), 2, ",","."); ?></h3>
                                 </div>
                             </div>
                         </div>
@@ -55,9 +55,14 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                             <div class="card bg-danger">
                                 <div class="card-body">
                                     <span style="font-size: 1em"><i class="fa fa-minus-circle pr-1"></i> Canceladas</span> 
-                                    <h3>R$ <?php echo number_format($this->getTotalExpenses('3'), 2, ",","."); ?></h3>
+                                    <h3>R$ <?php echo number_format($this->getTotalExpensesByMonth('3', $this->view->month), 2, ",","."); ?></h3>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-12 col-md-4 offset-md-4 mb-3 text-center">
+                            <a onclick="changeMonth();" style="width: 100%; cursor: pointer;" title="Alterar Mês">
+                                <i class="fas fa-sync  pr-1"></i> Mês Atual: <?php echo $this->view->month; ?>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -213,6 +218,20 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 showInternalErrorAlert();
                 $("#baseLoader").hide();
             });
+        }
+
+        function changeMonth() {
+            $("#modalMonthTitle").html('<i class="fa fa-info-circle pr-2"></i> Alterar Mês');
+            $("#modalMonthLoader").hide();
+            $("#modalMonth").modal('show');           
+        }
+
+        function selectMonth() {
+            let month = $("#f_month").val();
+            $("#modalMonthLoader").show();
+            openModule('despesas?m=' + month);
+            $("#modalMonthLoader").hide();
+            $("#modalMonth").modal('hide');    
         }
     </script>
     <?php if ($canCreate): ?>

@@ -327,15 +327,22 @@ class ActionController
         return $codes[$key];
     }
 
-    public function getTotalExpenses($status)
+    public function getTotalExpensesByMonth($status, $month)
     {
         $expensesModel = Container::getClass("Expenses", "app");
-        return $expensesModel->getTotalByStatus($status);
+        return $expensesModel->getTotalByStatusByMonth($status, $month);
     }
 
-    public function getTotalSchedules($status)
+    public function getTotalSchedulesByMonth($status, $month)
     {
         $expensesModel = Container::getClass("Schedules", "app");
-        return $expensesModel->getTotalByStatus($status);
+        return $expensesModel->getTotalByStatusByMonth($status, $month);
     }    
+
+    public function formatMonth($month): string
+    {
+        $exp = explode('-', $month, 2);
+
+        return $exp[1] . '/' . $exp[0];
+    }
 }

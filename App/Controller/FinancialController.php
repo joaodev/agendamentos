@@ -33,19 +33,12 @@ class FinancialController extends ActionController
         $total_schedules = $this->schedulesModel->getTotalAmountByMonth($month);
         $this->view->total_schedules = $total_schedules;
 
-        $schedules = $this->schedulesModel->getAllByMonth($month);
+        $schedules = $this->schedulesModel->getAllByMonth('2', $month);
         $this->view->schedules = $schedules;
 
-        $expenses = $this->expensesModel->getAllByMonth($month);
+        $expenses = $this->expensesModel->getAllByMonth('2', $month);
         $this->view->expenses = $expenses;
 
         $this->render('index', false);
-    }
-
-    private function formatMonth($month): string
-    {
-        $exp = explode('-', $month, 2);
-
-        return $exp[1] . '/' . $exp[0];
     }
 }

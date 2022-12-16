@@ -93,11 +93,16 @@ class Schedules extends Model
         }
     }
    
-    public function getAllByMonth($month): bool|array|string
+    public function getAllByMonth($status, $month): bool|array|string
     {
         try {
             $d1 = $month . '-01';
             $d2 = $month . '-31';
+
+            $whereStatus = "";
+            if ($status != '0') {
+                $whereStatus = ' o.status = :status AND ';
+            }
 
             $query = "SELECT o.id, o.uuid, o.title, o.description,
                                 o.customer_uuid, o.amount, 
@@ -114,11 +119,14 @@ class Schedules extends Model
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
-                        WHERE o.deleted = :deleted
+                        WHERE $whereStatus o.deleted = :deleted
                             AND o.user_uuid = :user_uuid
                             AND o.schedule_date BETWEEN :d1 AND :d2";
 
             $stmt = $this->openDb()->prepare($query);
+            if ($status != '0') {
+                $stmt->bindValue(":status", $status);
+            }
             $stmt->bindValue(":deleted", "0");
             $stmt->bindValue(":user_uuid", $_SESSION['COD']);
             $stmt->bindValue(":d1", $d1);
@@ -141,6 +149,43 @@ class Schedules extends Model
         try {
             $d1 = date('Y-m') . '-01';
             $d2 = date('Y-m') . '-31';
+
+            $query = "SELECT COUNT(uuid) as total
+                        FROM schedules 
+                        WHERE status = :status
+                        AND deleted = :deleted
+                        AND user_uuid = :user_uuid
+                        AND schedule_date BETWEEN :d1 AND :d2";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":status", $status);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":d1", $d1);
+            $stmt->bindValue(":d2", $d2);
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+            
+            if ($result) {
+                return $result['total'];
+            } else {
+                return 0;
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function getTotalByStatusByMonth($status, $month)
+    {
+        try {
+            $month = explode("/", $month, 2);
+            $d1 = $month[1] . '-' . $month[0] . '-01';
+            $d2 = $month[1] . '-' . $month[0] . '-31';
 
             $query = "SELECT COUNT(uuid) as total
                         FROM schedules 
