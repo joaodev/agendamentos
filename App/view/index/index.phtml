@@ -42,7 +42,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
             <?php endif; ?>
             <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewCustomers): ?>
                 <div class="col-12 col-md-6 col-lg-6">
-                    <div class="small-box bg-primary" onclick="openModule('agendamentos')" style="cursor: pointer;">
+                    <div class="small-box bg-primary" onclick="openModule('financeiro')" style="cursor: pointer;">
                         <div class="inner">
                             <p>Entradas do Mês</p>
                             <h3>R$ <?php echo number_format($this->view->total_schedules, 2, ",", "."); ?></h3>

@@ -15,7 +15,7 @@ $role = $_SESSION['ROLE'];
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
+                            <button type="button" class="btn btn-outline-primary" title="Voltar para Detalhamento"
                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -33,121 +33,118 @@ $role = $_SESSION['ROLE'];
                         <div class="card-body">
                             <form method="post" name="formUpdateUser" id="formUpdateUser">
                                 <div class="row">
-                                    <div class="col-md-12" style="border-radius: 5px;">
-                                        <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
-                                        <hr>
-                                    </div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="name">Nome</label>
+                                            <label for="name">Situação*</label>
+                                            <select name="status" id="status" class="form-control" required>
+                                                <option value="1" <?php echo ($entity['status'] == '1') ? 'selected' : ''; ?>>Ativo no sistema</option>
+                                                <option value="0" <?php echo ($entity['status'] == '0') ? 'selected' : ''; ?>>Inativo no sistema</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div> 
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="name">Nome*</label>
                                             <input type="text" class="form-control" name="name" id="name" required
-                                                value="<?php echo $entity['name']; ?>" maxlength="100">
+                                                value="<?php echo $entity['name']; ?>" maxlength="100" placeholder="Nome completo do Cliente/Empresa">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="email">Email*</label>
+                                            <input type="email" class="form-control" name="email" id="email" required maxlength="100"
+                                                value="<?php echo $entity['email']; ?>" placeholder="cliente@exemplo.com">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3">
                                         <div class="form-group">
                                             <label for="document_1">CPF</label>
                                             <input type="text" class="form-control" name="document_1" id="document_1" 
-                                                value="<?php echo $entity['document_1']; ?>" onchange="validateCPF();">
+                                                value="<?php echo $entity['document_1']; ?>" onchange="validateCPF();" placeholder="000.000.000-00">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3">
                                         <div class="form-group">
                                             <label for="document_2">CNPJ</label>
                                             <input type="text" class="form-control" name="document_2" id="document_2" 
-                                                value="<?php echo $entity['document_2']; ?>" onchange="validateCNPJ();">
+                                                value="<?php echo $entity['document_2']; ?>" onchange="validateCNPJ();" placeholder="00.000.000/0000-00">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3">
                                         <div class="form-group">
                                             <label for="phone">Telefone</label>
                                             <input type="text" class="form-control" name="phone" id="phone"
-                                                value="<?php echo $entity['phone']; ?>">
+                                                value="<?php echo $entity['phone']; ?>" placeholder="(00)0000-0000">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3">
                                         <div class="form-group">
                                             <label for="cellphone">Celular</label>
                                             <input type="text" class="form-control" name="cellphone" id="cellphone" 
-                                                value="<?php echo $entity['cellphone']; ?>">
+                                                value="<?php echo $entity['cellphone']; ?>" placeholder="(00)00000-0000">
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control" name="email" id="email" required maxlength="100"
-                                                value="<?php echo $entity['email']; ?>">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12" style="border-radius: 5px;">
-                                        <h5 class="pt-2"><i class="fas fa-map-marker-alt pr-1"></i> Localização</h5>
-                                        <hr>
-                                    </div>
+                                    <div class="col-12"><hr></div> 
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="postal_code">CEP</label>
                                             <input type="text" class="form-control" name="postal_code" id="postal_code" 
-                                                value="<?php echo $entity['postal_code']; ?>">
+                                                value="<?php echo $entity['postal_code']; ?>" placeholder="00000-000">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="address">Endereço</label>
                                             <input type="text" class="form-control" name="address" id="address"  maxlength="100"
-                                                value="<?php echo $entity['address']; ?>">
+                                                value="<?php echo $entity['address']; ?>" placeholder="Endereço completo">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="number">Número</label>
                                             <input type="text" class="form-control" name="number" id="number"  maxlength="50"
-                                                value="<?php echo $entity['number']; ?>">
+                                                value="<?php echo $entity['number']; ?>" placeholder="000">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="complement">Complemento</label>
                                             <input type="text" class="form-control" name="complement" id="complement"  maxlength="50"
-                                                value="<?php echo $entity['complement']; ?>">
+                                                value="<?php echo $entity['complement']; ?>" placeholder="Complemento adicional">
                                         </div>
                                     </div>
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="neighborhood">Bairro</label>
                                             <input type="text" class="form-control" name="neighborhood" id="neighborhood"  maxlength="100"
-                                                value="<?php echo $entity['neighborhood']; ?>">
+                                                value="<?php echo $entity['neighborhood']; ?>" placeholder="Nome do Bairro">
                                         </div>
                                     </div>
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="city">Cidade</label>
                                             <input type="text" class="form-control" name="city" id="city"  maxlength="100"
-                                                value="<?php echo $entity['city']; ?>">
+                                                value="<?php echo $entity['city']; ?>" placeholder="Nome da Cidade">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="state">UF</label>
                                             <input type="text" class="form-control" name="state" id="state"  maxlength="2"
-                                                value="<?php echo $entity['state']; ?>">
+                                                value="<?php echo $entity['state']; ?>" placeholder="Estado">
                                         </div>
                                     </div>
-                                    <div class="col-md-3 text-right mt-3 mb-2">
-                                        <div class="form-group text-center">
-                                            <select name="status" id="status" class="form-control text-center" required>
-                                                <option value="1" <?php echo ($entity['status'] == '1') ? 'selected' : ''; ?>>Ativo no sistema</option>
-                                                <option value="0" <?php echo ($entity['status'] == '0') ? 'selected' : ''; ?>>Inativo no sistema</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-9 text-right mt-3 mb-2">
-                                        <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                    <div class="col-md-8 mt-3 mb-2">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Cliente">
                                             <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
+                                        <button type="button" class="btn btn-outline-primary mr-3 w-100"
+                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');" title="Voltar para Detalhamento">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
                                 </div>

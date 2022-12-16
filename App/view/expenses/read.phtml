@@ -12,7 +12,7 @@
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
+                            <button type="button" class="btn btn-outline-primary"
                                 onclick="openModule('despesas');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -120,20 +120,20 @@
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <button type="button" class="btn btn-primary" onclick="openModule('despesas');" style="width: 100%;">
+                                            <button type="button" class="btn btn-outline-primary" onclick="openModule('despesas');" style="width: 100%;">
                                                 <i class="fas fa-arrow-left pr-1"></i> Voltar
                                             </button>
                                         </div>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('expenses'))): ?>
-                                                <button type="button" class="btn btn-primary" onclick="updateExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                <button type="button" class="btn btn-outline-primary" onclick="updateExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-pen pr-1"></i> Editar
                                                 </button>
                                             <?php endif; ?>
                                         </div>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('expenses'))): ?>
-                                                <button type="button" class="btn btn-primary" onclick="deleteExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                <button type="button" class="btn btn-outline-primary" onclick="deleteExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-trash"></i> Remover
                                                 </button>
                                             <?php endif; ?>

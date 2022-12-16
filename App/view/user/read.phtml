@@ -22,7 +22,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
+                            <button type="button" class="btn btn-outline-primary"
                                 onclick="openModule('usuarios');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -195,7 +195,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                         <i class="fas fa-arrow-left pr-1"></i> Voltar
                                     </button>
                                     <?php if ($canUpdate): ?>
-                                        <button type="button" class="btn btn-primary" onclick="updateUser('<?php echo $entity['uuid']; ?>');">
+                                        <button type="button" class="btn btn-outline-primary" onclick="updateUser('<?php echo $entity['uuid']; ?>');">
                                             <i class="fa fa-pen pr-1"></i> Editar
                                         </button>
                                     <?php endif; ?>

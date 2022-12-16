@@ -12,7 +12,7 @@
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
+                            <button type="button" class="btn btn-outline-primary" title="Voltar para Clientes"
                                 onclick="openModule('clientes');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -29,124 +29,109 @@
                     <div class="card">
                         <div class="card-body"> 
                             <div class="row">
-                                <div class="col-12 col-md-6">
-                                    <div class="form-group">
-                                        <label for="name">Nome</label>
-                                        <p><?php echo $entity['name']; ?></p>
-                                    </div>
+                                <div class="col-md-12">
+                                    <b>Situação:</b>
+                                    <?php if ($entity['status'] == '1'): ?>
+                                            <i class="fa fa-circle pl-1" style="color: green;"></i> Ativo no sistema
+                                    <?php endif; ?>
+                                    <?php if ($entity['status'] == '2'): ?>
+                                            <i class="fa fa-circle pl-1" style="color: red;"></i> Inativo no sistema
+                                    <?php endif; ?>
+                                    <hr>
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <div class="form-group">
-                                        <label for="name">Email</label>
-                                        <p><?php echo $entity['email']; ?></p>
-                                    </div>
+                                    <b>Nome</b>
+                                    <p><?php echo $entity['name']; ?></p>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <b>Email</b>
+                                    <p><?php echo $entity['email']; ?></p>
                                 </div>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">CPF</label>
-                                        <p><?php echo $entity['document_1']; ?></p>
-                                    </div>
+                                    <b>CPF</b>
+                                    <p><?php echo (!empty($entity['document_1']) ? $entity['document_1'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">CNPJ</label>
-                                        <p><?php echo $entity['document_2']; ?></p>
-                                    </div>
+                                    <b>CNPJ</b>
+                                    <p><?php echo (!empty($entity['document_2']) ? $entity['document_2'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">Telefone</label>
-                                        <p><?php echo $entity['phone']; ?></p>
-                                    </div>
+                                    <b>Telefone</b>
+                                    <p><?php echo (!empty($entity['phone']) ? $entity['phone'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">Celular</label>
-                                        <p><?php echo $entity['cellphone']; ?></p>
-                                    </div>
+                                    <b>Celular</b>
+                                    <p><?php echo (!empty($entity['cellphone']) ? $entity['cellphone'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">CEP</label>
-                                        <p><?php echo $entity['postal_code']; ?></p>
-                                    </div>
+                                    <b>CEP</b>
+                                    <p><?php echo (!empty($entity['postal_code']) ? $entity['postal_code'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">Endereço</label>
-                                        <p><?php echo $entity['address']; ?></p>
-                                    </div>
+                                    <b>Endereço</b>
+                                    <p><?php echo (!empty($entity['address']) ? $entity['address'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">Número</label>
-                                        <p><?php echo $entity['number']; ?></p>
-                                    </div>
+                                    <b>Número</b>
+                                    <p><?php echo (!empty($entity['number']) ? $entity['number'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">Complemento</label>
-                                        <p><?php echo $entity['complement']; ?></p>
-                                    </div>
+                                    <b>Complemento</b>
+                                    <p><?php echo (!empty($entity['complement']) ? $entity['complement'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">Bairro</label>
-                                        <p><?php echo $entity['neighborhood']; ?></p>
-                                    </div>
+                                    <b>Bairro</b>
+                                    <p><?php echo (!empty($entity['neighborhood']) ? $entity['neighborhood'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">Cidade</label>
-                                        <p><?php echo $entity['city']; ?></p>
-                                    </div>
+                                    <b>Cidade</b>
+                                    <p><?php echo (!empty($entity['city']) ? $entity['city'] : 'Não informada'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">UF</label>
-                                        <p><?php echo $entity['state']; ?></p>
-                                    </div>
+                                    <b>UF</b>
+                                    <p><?php echo (!empty($entity['state']) ? $entity['state'] : 'Não informado'); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="form-group">
-                                        <label for="name">Status</label>
-                                        <p><?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?></p>
-                                    </div>
+                                    <b>Status</b>
+                                    <p><?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?></p>
                                 </div>
                                 <div class="col-md-12"><hr></div>
-                                <div class="col-6 col-md-6 text-left">
-                                    <span>Cadastrado em:</span> <br>
-                                    <b><?php echo $this->formatDateTime($entity['created_at']); ?></b>
+                                <div class="col-12 col-md-6">
+                                    <b>Cadastrado em: </b> 
+                                    <span><?php echo $this->formatDateTime($entity['created_at']); ?></span>
                                 </div>
-                                <div class="col-6 col-md-6 text-right">
+                                <div class="col-12 col-md-6 ">
                                     <?php if (!empty($entity['updated_at'])): ?>
-                                        <span>Atualizado em:</span> <br>
-                                        <b><?php echo $this->formatDateTime($entity['updated_at']); ?></b>
+                                        <b>Atualizado em: </b>
+                                        <span><?php echo $this->formatDateTime($entity['updated_at']); ?></span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <button type="button" class="btn btn-primary" onclick="openModule('clientes');" style="width: 100%;">
-                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                            </button>
+                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('customers'))): ?>
+                                                <button type="button" class="btn btn-outline-danger" title="Remover Cliente"
+                                                    onclick="deleteCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                    <i class="fa fa-trash"></i> Remover
+                                                </button>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('customers'))): ?>
-                                                <button type="button" class="btn btn-primary" onclick="updateCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                <button type="button" class="btn btn-outline-success" title="Editar Cliente"
+                                                    onclick="updateCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-pen pr-1"></i> Editar
                                                 </button>
                                             <?php endif; ?>
                                         </div>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('customers'))): ?>
-                                                <button type="button" class="btn btn-primary" onclick="deleteCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-trash"></i> Remover
-                                                </button>
-                                            <?php endif; ?>
+                                            <button type="button" class="btn btn-outline-primary" onclick="openModule('clientes');" 
+                                                style="width: 100%;" title="Voltar para Clientes">
+                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

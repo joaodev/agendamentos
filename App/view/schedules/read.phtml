@@ -12,7 +12,7 @@
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary"
+                            <button type="button" class="btn btn-outline-primary" title="Voltar para Agendamentos"
                                 onclick="openModule('agendamentos');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -94,12 +94,12 @@
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-12 col-md-6">
                                     <b>Cadastrado em: </b> 
-                                    <b><?php echo $this->formatDateTime($entity['created_at']); ?></b>
+                                    <p><?php echo $this->formatDateTime($entity['created_at']); ?></p>
                                 </div>
                                 <div class="col-12 col-md-6 ">
                                     <?php if (!empty($entity['updated_at'])): ?>
                                         <b>Atualizado em: </b>
-                                        <b><?php echo $this->formatDateTime($entity['updated_at']); ?></b>
+                                        <p><?php echo $this->formatDateTime($entity['updated_at']); ?></p>
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12"><hr></div>
@@ -108,26 +108,30 @@
                                         <?php if ($entity['status'] == '1'): ?>
                                             <div class="col-md-4 col-lg-4 mt-2 mb-2">
                                                 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('schedules'))): ?>
-                                                    <button type="button" class="btn btn-outline-danger" onclick="deleteSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                    <button type="button" class="btn btn-outline-danger"  title="Remover Agendamento"
+                                                        onclick="deleteSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                         <i class="fa fa-trash"></i> Remover
                                                     </button>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="col-md-4 col-lg-4 mt-2 mb-2">
                                                 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('schedules'))): ?>
-                                                    <button type="button" class="btn btn-outline-success" onclick="updateSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                    <button type="button" class="btn btn-outline-success"  title="Editar Agendamento"
+                                                        onclick="updateSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                         <i class="fa fa-pen pr-1"></i> Editar
                                                     </button>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="col-md-4 col-lg-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary" onclick="openModule('agendamentos');" style="width: 100%;">
+                                                <button type="button" class="btn btn-outline-primary" title="Voltar para Agendamentos"
+                                                    onclick="openModule('agendamentos');" style="width: 100%;">
                                                     <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
                                             </div>
                                         <?php else: ?>
                                             <div class="col-md-4 offset-md-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary" onclick="openModule('agendamentos');" style="width: 100%;">
+                                                <button type="button" class="btn btn-outline-primary" title="Voltar para Agendamentos"
+                                                    onclick="openModule('agendamentos');" style="width: 100%;">
                                                     <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
                                             </div>

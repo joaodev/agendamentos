@@ -12,7 +12,7 @@
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
+                            <button type="button" class="btn btn-outline-primary"
                                 onclick="createRole();" style="width: 100%;">
                                 <i class="fas fa-plus"></i> 
                             </button>
@@ -180,7 +180,7 @@
             $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Perfil de Acesso');
             $("#modalDeleteLoader").hide();
             $("#modalDelete").modal('show');
-            $("#modalDeleteResult").html('<button type="button" class="btn btn-default" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
         }   
 
         function runDelete(uuid) {

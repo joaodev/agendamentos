@@ -14,7 +14,7 @@ $role = $_SESSION['ROLE'];
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
+                            <button type="button" class="btn btn-outline-primary" title="Voltar para Clientes"
                                 onclick="openModule('clientes');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -32,99 +32,101 @@ $role = $_SESSION['ROLE'];
                         <div class="card-body">
                             <form method="post" name="formCreateCustomer" id="formCreateCustomer">
                                 <div class="row">
-                                    <div class="col-md-12" style="border-radius: 5px;">
-                                        <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
-                                        <hr>
-                                    </div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="name">Nome</label>
-                                            <input type="text" class="form-control" name="name" id="name" required maxlength="100">
+                                            <label for="name">Nome*</label>
+                                            <input type="text" class="form-control" name="name" id="name" required maxlength="100" placeholder="Nome completo do Cliente/Empresa">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="email">Email*</label>
+                                            <input type="email" class="form-control" name="email" id="email" required maxlength="100"
+                                            placeholder="cliente@exemplo.com">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3">
                                         <div class="form-group">
                                             <label for="document_1">CPF</label>
-                                            <input type="text" class="form-control" name="document_1" id="document_1" onchange="validateCPF();">
+                                            <input type="text" class="form-control" name="document_1" id="document_1" onchange="validateCPF();"
+                                                placeholder="000.000.000-00">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3">
                                         <div class="form-group">
                                             <label for="document_2">CNPJ</label>
-                                            <input type="text" class="form-control" name="document_2" id="document_2" onchange="validateCNPJ();">
+                                            <input type="text" class="form-control" name="document_2" id="document_2" onchange="validateCNPJ();"
+                                                placeholder="00.000.000/0000-00">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3">
                                         <div class="form-group">
                                             <label for="phone">Telefone</label>
-                                            <input type="text" class="form-control" name="phone" id="phone">
+                                            <input type="text" class="form-control" name="phone" id="phone"
+                                                placeholder="(00)0000-0000">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3">
                                         <div class="form-group">
                                             <label for="cellphone">Celular</label>
-                                            <input type="text" class="form-control" name="cellphone" id="cellphone">
+                                            <input type="text" class="form-control" name="cellphone" id="cellphone"
+                                                placeholder="(00)00000-0000">
                                         </div>
                                     </div>
                                     <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control" name="email" id="email" required maxlength="100">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12" style="border-radius: 5px;">
-                                        <h5 class="pt-2"><i class="fas fa-map-marker-alt pr-1"></i> Localização</h5>
                                         <hr>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="postal_code">CEP</label>
-                                            <input type="text" class="form-control" name="postal_code" id="postal_code">
+                                            <input type="text" class="form-control" name="postal_code" id="postal_code" placeholder="00000-000">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="address">Endereço</label>
-                                            <input type="text" class="form-control" name="address" id="address"  maxlength="100">
+                                            <input type="text" class="form-control" name="address" id="address"  maxlength="100" placeholder="Endereço completo">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="number">Número</label>
-                                            <input type="text" class="form-control" name="number" id="number"  maxlength="50">
+                                            <input type="text" class="form-control" name="number" id="number"  maxlength="50" placeholder="000">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="complement">Complemento</label>
-                                            <input type="text" class="form-control" name="complement" id="complement"  maxlength="50">
+                                            <input type="text" class="form-control" name="complement" id="complement"  maxlength="50" placeholder="Complemento adicional">
                                         </div>
                                     </div>
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="neighborhood">Bairro</label>
-                                            <input type="text" class="form-control" name="neighborhood" id="neighborhood"  maxlength="100">
+                                            <input type="text" class="form-control" name="neighborhood" id="neighborhood"  maxlength="100" placeholder="Nome do Bairro">
                                         </div>
                                     </div>
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="city">Cidade</label>
-                                            <input type="text" class="form-control" name="city" id="city"  maxlength="100">
+                                            <input type="text" class="form-control" name="city" id="city"  maxlength="100" placeholder="Nome da Cidade">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="state">UF</label>
-                                            <input type="text" class="form-control" name="state" id="state"  maxlength="2">
+                                            <input type="text" class="form-control" name="state" id="state"  maxlength="2" placeholder="Estado">
                                         </div>
                                     </div>
-                                    <div class="col-md-12 text-right mt-3 mb-2">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openModule('clientes');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                    <div class="col-md-8 mt-3 mb-2">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Cliente">
                                             <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <button type="button" class="btn btn-outline-primary mr-3 w-100"
+                                                onclick="openModule('clientes');" title="Voltar para Clientes">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
                                 </div>

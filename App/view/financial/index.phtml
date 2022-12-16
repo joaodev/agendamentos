@@ -78,7 +78,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                                 <td style="font-size: 15px">
                                                     Receita
                                                 </td>
-                                                <td style="font-size: 15px">
+                                                <td style="font-size: 15px; width: 60%;">
                                                     <?php echo $entity['serviceName']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
                                                 </td> 
                                                 <td style="font-size: 15px">
@@ -94,7 +94,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                                 <td style="font-size: 15px">
                                                     Despesa
                                                 </td>
-                                                <td style="font-size: 15px">
+                                                <td style="font-size: 15px; width: 60%;">
                                                     <?php echo $entity['title']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
                                                 </td> 
                                                 <td style="font-size: 15px">
