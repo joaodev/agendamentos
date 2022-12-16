@@ -123,17 +123,15 @@ $role = $_SESSION['ROLE'];
                                         </div>
                                     </div>
                                     <div class="col-12"><hr></div>
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-group">
                                             <label for="description">Informações Adicionais</label>
-                                            <input type="text" class="form-control" name="description" id="description" maxlength="255"
-                                                value="<?php echo $entity['description']; ?>"
-                                                placeholder="Informações adicionais para o agendamento">
+                                            <textarea rows="1" class="form-control" name="description" id="description"
+                                                placeholder="Informações adicionais para o agendamento"><?php echo $entity['description']; ?></textarea>
                                         </div>
                                     </div>   
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-group">
-                                            <hr>
                                             <label for="user_uuid">Anexar Arquivo:</label>
                                             <input type="file" class="form-control" name="file" id="file">
                                         </div>
