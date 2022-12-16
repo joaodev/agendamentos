@@ -43,13 +43,17 @@ class ServicesController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->create($_POST);
 
-            if ($transaction){
+            if ($transaction){ 
                 $this->toLog("Cadastrou o serviço $uuid");
                 $data  = [
                     'title' => 'Sucesso!',
                     'msg'   => 'Serviço cadastrado.',
                     'type'  => 'success',
-                    'pos'   => 'top-right'
+                    'pos'   => 'top-right',
+                    'uuid'  => $uuid,
+                    'titlesv' => $_POST['title'],
+                    'price' => number_format($_POST['price'], 2, ",",".")
+
                 ];
             } else {
                 $data  = [

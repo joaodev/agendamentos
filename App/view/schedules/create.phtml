@@ -32,9 +32,9 @@
                                 <div class="row">
                                     <div class="col-12 col-md-4">
                                         <div class="form-group">
-                                            <label for="service_uuid">Situação*</label>
+                                            <label for="service_uuid">Situação do Agendamento*</label>
                                             <select name="status" id="status_1" class="form-control" required>
-                                                <option value="1">Agendar</option>
+                                                <option value="1">Agendar no Sistema</option>
                                                 <option value="2">Concluído</option>
                                                 <option value="3">Cancelado</option>
                                             </select>
@@ -43,7 +43,13 @@
                                     <div class="col-12"><hr></div>
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
-                                            <label for="service_uuid">Atribuir Serviço*</label>
+                                            <label for="service_uuid">
+                                                Atribuir Serviço*
+                                            </label>
+                                            <a onclick="newService();" class="text-success" 
+                                                style="cursor: pointer; float: right" title="Adicionar Serviço">
+                                                <span class="fa fa-plus-circle"></span>
+                                            </a> 
                                             <select name="service_uuid" id="service_uuid" class="form-control" required
                                                 onchange="getServiceDescription();">
                                                 <option value="">Selecione</option>
@@ -58,6 +64,10 @@
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="customer_uuid">Atribuir Cliente</label>
+                                            <a onclick="newCustomer();" class="text-success" 
+                                                style="cursor: pointer; float: right" title="Adicionar Serviço">
+                                                <span class="fa fa-plus-circle"></span>
+                                            </a> 
                                             <select name="customer_uuid" id="customer_uuid" class="form-control">
                                                 <option value="">Selecione</option>
                                                 <?php foreach ($this->view->customers as $customer): ?>
@@ -101,15 +111,14 @@
                                         </div>
                                     </div>
                                     <div class="col-12"><hr></div>
-                                    <div class="col-12">
+                                    <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="description">Informações Adicionais</label>
-                                            <input type="text" class="form-control" name="description" id="description" maxlength="255"
-                                                placeholder="Informações adicionais para o agendamento">
+                                            <textarea rows="1" class="form-control" name="description" id="description"
+                                                placeholder="Informações adicionais para o agendamento"></textarea>
                                         </div>
                                     </div>   
-                                    <div class="col-12">
-                                        <hr>
+                                    <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="user_uuid">Anexar Arquivo:</label>
                                             <input type="file" class="form-control" name="file" id="file">
@@ -196,6 +205,46 @@
             } else {
                 $("#amount").val('0,00');
             }
+        }
+
+        function newService() {
+            $("#modalGreenLargeResult").empty();
+            $("#modalGreenLarge").modal('hide');
+            $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Serviço');
+            $("#modalGreenLargeLoader").show();
+            $("#modalGreenLarge").modal('show');
+
+            $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>agendamentos/cadastrar-servico",
+                async: true
+            }).done(function(data) {
+                $("#modalGreenLargeResult").html(data);
+                $("#modalGreenLargeLoader").hide();
+            }).fail(function() {
+                showInternalErrorAlert();
+                $("#modalGreenLargeLoader").hide();
+            });
+        }
+
+        function newCustomer() {
+            $("#modalGreenLargeResult").empty();
+            $("#modalGreenLarge").modal('hide');
+            $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Cliente');
+            $("#modalGreenLargeLoader").show();
+            $("#modalGreenLarge").modal('show');
+
+            $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>agendamentos/cadastrar-cliente",
+                async: true
+            }).done(function(data) {
+                $("#modalGreenLargeResult").html(data);
+                $("#modalGreenLargeLoader").hide();
+            }).fail(function() {
+                showInternalErrorAlert();
+                $("#modalGreenLargeLoader").hide();
+            });
         }
     </script>
 <?php endif; ?>

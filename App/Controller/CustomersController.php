@@ -46,7 +46,9 @@ class CustomersController extends ActionController implements CrudInterface
                     'title' => 'Sucesso!', 
                     'msg'   => 'Cliente cadastrado.',
                     'type'  => 'success',
-                    'pos'   => 'top-right'
+                    'pos'   => 'top-right',
+                    'uuid'  => $_POST['uuid'],
+                    'name'  => $_POST['name']
                 ];
             } else {
                 $data  = [

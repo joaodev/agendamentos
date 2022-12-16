@@ -238,4 +238,14 @@ class SchedulesController extends ActionController implements CrudInterface
             return false;
         }
     }
+
+    public function createServiceAction(): void
+    {
+        $this->render('create-service', false);
+    }
+
+    public function createCustomerAction(): void
+    {
+        $this->render('create-customer', false);
+    }
 }

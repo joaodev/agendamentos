@@ -107,6 +107,9 @@ $router['app'] = [
     ['namespace' => 'app', 'route' => '/agendamentos/excluir', 'controller' => 'schedules', 'action' => 'delete'],
     ['namespace' => 'app', 'route' => '/agendamentos/detalhes-servico', 'controller' => 'schedules', 'action' => 'service-details'],
 
+	['namespace' => 'app', 'route' => '/agendamentos/cadastrar-servico', 'controller' => 'schedules', 'action' => 'create-service'],
+	['namespace' => 'app', 'route' => '/agendamentos/cadastrar-cliente', 'controller' => 'schedules', 'action' => 'create-customer'],
+
     ['namespace' => 'app', 'route' => '/financeiro', 'controller' => 'financial', 'action' => 'index'],
     ['namespace' => 'app', 'route' => '/financeiro/cadastrar', 'controller' => 'financial', 'action' => 'create'],
     ['namespace' => 'app', 'route' => '/financeiro/processa-cadastro', 'controller' => 'financial', 'action' => 'create-process'],
