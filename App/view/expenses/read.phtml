@@ -12,7 +12,7 @@
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary"
+                            <button type="button" class="btn btn-outline-primary" title="Voltar para Despesas"
                                 onclick="openModule('despesas');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -30,114 +30,105 @@
                         <div class="card-body"> 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="name">Despesa</label>
-                                        <p><?php echo $entity['title']; ?></p>
-                                    </div>
+                                    <b>Situação:</b>
+                                    <?php if ($entity['status'] == '1'): ?>
+                                        <i class="fa fa-circle pl-1" style="color: orange;"></i> Pendente
+                                    <?php endif; ?>
+                                    <?php if ($entity['status'] == '2'): ?>
+                                        <i class="fa fa-circle pl-1" style="color: green;"></i> Concluída
+                                    <?php endif; ?>
+                                    <?php if ($entity['status'] == '3'): ?>
+                                        <i class="fa fa-circle pl-1" style="color: red;"></i> Cancelada
+                                    <?php endif; ?>
+                                    <hr>
+                                </div>
+                                <div class="col-md-12">
+                                    <b>Despesa</b>
+                                    <p><?php echo $entity['title']; ?></p>
                                 </div>
                                 <?php if (!empty($entity['description'])): ?>
                                     <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="name">Descrição</label>
-                                            <p><?php echo $entity['description']; ?></p>
-                                        </div>
+                                        <b>Descrição</b>
+                                        <p><?php echo $entity['description']; ?></p>
                                     </div>
                                 <?php endif; ?>
                                 <?php if (!empty($entity['customerName'])): ?>
                                     <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="name">Cliente</label>
-                                            <p><?php echo $entity['customerName']; ?></p>
-                                        </div>
+                                        <b>Cliente</b>
+                                        <p><?php echo $entity['customerName']; ?></p>
                                     </div>
                                 <?php endif; ?>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="name">Data</label>
-                                        <p><?php echo $this->formatDate($entity['expense_date']); ?></p>
-                                    </div>
+                                    <b>Data</b>
+                                    <p><?php echo $this->formatDate($entity['expense_date']); ?></p>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="name">Valor</label>
-                                        <p>R$ <?php echo number_format($entity['amount'], 2, ",", "."); ?></p>
-                                    </div>
+                                    <b>Valor</b>
+                                    <p>R$ <?php echo number_format($entity['amount'], 2, ",", "."); ?></p>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="name">Forma de Pagamento</label>
-                                        <p>
+                                    <b>Forma de Pagamento</b>
+                                    <p>
                                         <?php echo $entity['paymentTypeName']; ?>    
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="name">Status</label>
-                                        <?php if ($entity['status'] == '1'): ?>
-                                            <p>
-                                                <i class="fa fa-circle" style="color: orange;"></i> Pendente
-                                            </p>
-                                        <?php endif; ?>
-                                        <?php if ($entity['status'] == '2'): ?>
-                                            <p>
-                                                <i class="fa fa-circle" style="color: green;"></i> Concluída
-                                            </p>
-                                        <?php endif; ?>
-                                        <?php if ($entity['status'] == '3'): ?>
-                                            <p>
-                                                <i class="fa fa-circle" style="color: red;"></i> Cancelada
-                                            </p>
-                                        <?php endif; ?>
-                                    </div>
+                                    </p>
                                 </div>
                                 <?php if (!empty($entity['file'])): ?>
                                     <div class="col-md-12"><hr></div>
                                     <div class="col-12 text-center">
-                                        <div class="form-group">
-                                            <label for="name">Anexo</label>
-                                            <p>
-                                                <a href="<?php echo baseUrl . 'public/uploads/expenses/' . $entity['file']; ?>" target="_blank">
-                                                    <?php echo $entity['file']; ?>
-                                                </a>
-                                            </p>
-                                        </div>
+                                        <b>Anexo</b>
+                                        <p>
+                                            <a href="<?php echo baseUrl . 'public/uploads/expenses/' . $entity['file']; ?>" target="_blank">
+                                                <?php echo $entity['file']; ?>
+                                            </a>
+                                        </p>
                                     </div>
                                 <?php endif; ?>
                                 <div class="col-md-12"><hr></div>
-                                <div class="col-6 col-md-6 text-left">
-                                    <span>Cadastrada em:</span> <br>
-                                    <b><?php echo $this->formatDateTime($entity['created_at']); ?></b>
+                                <div class="col-12 col-md-6">
+                                    <b>Cadastrada em: </b> 
+                                    <p><?php echo $this->formatDateTime($entity['created_at']); ?></p>
                                 </div>
-                                <div class="col-6 col-md-6 text-right">
+                                <div class="col-12 col-md-6 ">
                                     <?php if (!empty($entity['updated_at'])): ?>
-                                        <span>Atualizada em:</span> <br>
-                                        <b><?php echo $this->formatDateTime($entity['updated_at']); ?></b>
+                                        <b>Atualizada em: </b>
+                                        <p><?php echo $this->formatDateTime($entity['updated_at']); ?></p>
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <button type="button" class="btn btn-outline-primary" onclick="openModule('despesas');" style="width: 100%;">
-                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                            </button>
-                                        </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('expenses'))): ?>
-                                                <button type="button" class="btn btn-outline-primary" onclick="updateExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-pen pr-1"></i> Editar
+                                        <?php if ($entity['status'] == '1'): ?>
+                                            <div class="col-md-4 col-lg-4 mt-2 mb-2">
+                                                <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('expenses'))): ?>
+                                                    <button type="button" class="btn btn-outline-danger"  title="Remover Despesa"
+                                                        onclick="deleteExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                        <i class="fa fa-trash"></i> Remover
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="col-md-4 col-lg-4 mt-2 mb-2">
+                                                <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('expenses'))): ?>
+                                                    <button type="button" class="btn btn-outline-success"  title="Editar Despesa"
+                                                        onclick="updateExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                        <i class="fa fa-pen pr-1"></i> Editar
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="col-md-4 col-lg-4 mt-2 mb-2">
+                                                <button type="button" class="btn btn-outline-primary" title="Voltar para Despesas"
+                                                    onclick="openModule('despesas');" style="width: 100%;">
+                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('expenses'))): ?>
-                                                <button type="button" class="btn btn-outline-primary" onclick="deleteExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-trash"></i> Remover
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="col-md-4 offset-md-4 mt-2 mb-2">
+                                                <button type="button" class="btn btn-outline-primary" title="Voltar para Despesas"
+                                                    onclick="openModule('despesas');" style="width: 100%;">
+                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
-                                            <?php endif; ?>
-                                        </div>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>

@@ -4,7 +4,6 @@ $canViewCustomers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
 $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'));
 $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('expenses'));
 ?>
-
 <section class="content mt-4" style="margin-left: 9px; margin-right: 9px;">
     <div class="container-fluid">
         <div class="row">
@@ -72,7 +71,6 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                     </div>
                 </div>
             <?php endif; ?>
-
             <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewCustomers): ?>
                 <div class="col-12 col-md-6 col-lg-6">
                     <div class="small-box bg-primary" onclick="openModule('clientes')" style="cursor: pointer;">

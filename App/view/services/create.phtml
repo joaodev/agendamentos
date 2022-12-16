@@ -45,16 +45,19 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="title">Descrição*</label>
-                                            <textarea name="description" id="description" class="form-control" rows="10" required placeholder="Descrição completa do Serviço"></textarea>
+                                            <textarea name="description" id="description" class="form-control" rows="5" required 
+                                                placeholder="Descrição completa do Serviço"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 text-right mt-3 mb-2">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openModule('servicos');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                    <div class="col-md-8 mt-3 mb-2">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Serviço">
                                             <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <button type="button" class="btn btn-outline-primary mr-3 w-100"
+                                                onclick="openModule('servicos');" title="Voltar para Serviços">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
                                 </div>

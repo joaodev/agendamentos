@@ -15,7 +15,7 @@ $role = $_SESSION['ROLE'];
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary"
+                            <button type="button" class="btn btn-outline-primary" title="Voltar para Detalhamento"
                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -34,18 +34,29 @@ $role = $_SESSION['ROLE'];
                             <form method="post" name="formUpdateExpense" id="formUpdateExpense"
                                 enctype="multipart/form-data">
                                 <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="title">Situação*</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Pendente</option>
+                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Concluída</option>
+                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Cancelada</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-12">
+                                        <hr>
                                         <div class="form-group">
                                             <label for="title">Título da Despesa*</label>
                                             <input type="text" class="form-control" name="title" id="title" required maxlength="100"
-                                                value="<?php echo $entity['title']; ?>">
+                                                value="<?php echo $entity['title']; ?>" placeholder="Nome da Despesa a ser paga">
                                         </div>
                                     </div>   
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label for="description">Descrição completa</label>
                                             <textarea name="description" id="description" class="form-control"
-                                                rows="3"><?php echo $entity['title']; ?></textarea>
+                                                rows="3" placeholder="Informe a descrição completo caso necessário"><?php echo $entity['title']; ?></textarea>
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-4">
@@ -100,23 +111,16 @@ $role = $_SESSION['ROLE'];
                                             <input type="file" class="form-control" name="file" id="file">
                                         </div>
                                     </div>
-                                    <div class="col-md-4 mt-3 mb-2">
-                                        <div class="form-group">
-                                            <select name="status" id="status_1" class="form-control">
-                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Pendente</option>
-                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Concluída</option>
-                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Cancelada</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8 text-right mt-3 mb-2">
-                                        <input type="hidden" name="uuid" id="id_despesa" value="<?php echo $entity['uuid']; ?>">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                    <div class="col-md-8 mt-3 mb-2">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Despesa">
                                             <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <input type="hidden" name="uuid" id="id_despesa" value="<?php echo $entity['uuid']; ?>">
+                                        <button type="button" class="btn btn-outline-primary mr-3 w-100"
+                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');" title="Voltar para Detalhamento">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
                                 </div>

@@ -30,16 +30,29 @@
                             <form method="post" name="formCreateExpense" id="formCreateExpense"
                                 enctype="multipart/form-data">
                                 <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="title">Situação*</label>
+                                            <select name="status" id="status_1" class="form-control" required>
+                                                <option value="1">Pendente</option>
+                                                <option value="2">Concluída</option>
+                                                <option value="3">Cancelada</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-12">
+                                        <hr>
                                         <div class="form-group">
                                             <label for="title">Título da Despesa*</label>
-                                            <input type="text" class="form-control" name="title" id="title" required maxlength="100">
+                                            <input type="text" class="form-control" name="title" id="title" required maxlength="100"
+                                                placeholder="Nome da Despesa a ser paga">
                                         </div>
                                     </div>   
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label for="description">Descrição completa</label>
-                                            <textarea name="description" id="description" class="form-control" rows="3"></textarea>
+                                            <textarea name="description" id="description" class="form-control" rows="3"
+                                                placeholder="Informe a descrição completo caso necessário"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-4">
@@ -88,22 +101,15 @@
                                             <input type="file" class="form-control" name="file" id="file">
                                         </div>
                                     </div>
-                                    <div class="col-md-4 mt-3 mb-2">
-                                        <div class="form-group">
-                                            <select name="status" id="status_1" class="form-control">
-                                                <option value="1">Pendente</option>
-                                                <option value="2">Concluída</option>
-                                                <option value="3">Cancelada</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8 text-right mt-3 mb-2">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openModule('despesas');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                    <div class="col-md-8 mt-3 mb-2">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Despesa">
                                             <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <button type="button" class="btn btn-outline-primary mr-3 w-100"
+                                                onclick="openModule('despesas');" title="Voltar para Despesas">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
                                 </div>
