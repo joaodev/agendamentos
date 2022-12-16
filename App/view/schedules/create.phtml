@@ -11,8 +11,8 @@
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
-                                onclick="openModule('agendamentos');" style="width: 100%;">
+                            <button type="button" class="btn btn-outline-primary"
+                                onclick="openModule('agendamentos');" style="width: 100%;" title="Voltar para Agendamentos">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
                         </li>
@@ -30,6 +30,17 @@
                             <form method="post" name="formCreateSchedule" id="formCreateSchedule"
                                 enctype="multipart/form-data">
                                 <div class="row">
+                                    <div class="col-12 col-md-4">
+                                        <div class="form-group">
+                                            <label for="service_uuid">Situação*</label>
+                                            <select name="status" id="status_1" class="form-control" required>
+                                                <option value="1">Agendar</option>
+                                                <option value="2">Concluído</option>
+                                                <option value="3">Cancelado</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="service_uuid">Atribuir Serviço*</label>
@@ -97,27 +108,21 @@
                                         </div>
                                     </div>   
                                     <div class="col-12">
+                                        <hr>
                                         <div class="form-group">
                                             <label for="user_uuid">Anexar Arquivo:</label>
                                             <input type="file" class="form-control" name="file" id="file">
                                         </div>
                                     </div>
-                                    <div class="col-md-4 mt-3 mb-2">
-                                        <div class="form-group">
-                                            <select name="status" id="status_1" class="form-control">
-                                                <option value="1">Agendar</option>
-                                                <option value="2">Concluído</option>
-                                                <option value="3">Cancelado</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8 text-right mt-3 mb-2">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openModule('agendamentos');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                    <div class="col-md-8 mt-3 mb-2">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit">
                                             <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <button type="button" class="btn btn-outline-primary mr-3 w-100"
+                                                onclick="openModule('agendamentos');" title="Voltar para Agendamentos">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
                                 </div>
@@ -131,9 +136,7 @@
     <script>
         $(document).ready(function(){
             $("input[id=amount]").maskMoney({allowNegative: false, thousands:'.', decimal:',', affixesStay: true});
-
             $('#formCreateSchedule').validate({
-               
                 submitHandler: function() {
                     let file_data = $('#file').prop('files')[0];
                     let form_data = new FormData();         

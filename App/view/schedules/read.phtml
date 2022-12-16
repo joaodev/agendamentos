@@ -12,7 +12,7 @@
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
+                            <button type="button" class="btn btn-outline-primary"
                                 onclick="openModule('agendamentos');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
@@ -29,123 +29,109 @@
                     <div class="card">
                         <div class="card-body"> 
                             <div class="row">
+                                <div class="col-md-12">
+                                    <b>Situação:</b>
+                                    <?php if ($entity['status'] == '1'): ?>
+                                            <i class="fa fa-circle pl-1" style="color: orange;"></i> Agendado
+                                    <?php endif; ?>
+                                    <?php if ($entity['status'] == '2'): ?>
+                                            <i class="fa fa-circle pl-1" style="color: green;"></i> Concluído
+                                    <?php endif; ?>
+                                    <?php if ($entity['status'] == '3'): ?>
+                                            <i class="fa fa-circle pl-1" style="color: red;"></i> Cancelado
+                                    <?php endif; ?>
+                                    <hr>
+                                </div>
                                 <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="name">Serviço</label>
-                                            <p>
-                                                <?php echo $entity['serviceName']; ?> 
-                                                <br> 
-                                                <?php echo $entity['serviceDescription']; ?>
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <b>Serviço:</b>
+                                    <p>
+                                        <?php echo $entity['serviceName']; ?> 
+                                        <br> 
+                                        <?php echo $entity['serviceDescription']; ?>
+                                    </p>
+                                </div>
                                 <?php if (!empty($entity['customerName'])): ?>
                                     <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="name">Dados do Cliente:</label>
-                                            <p>
-                                                <?php echo $entity['customerName']; ?><br>
-                                                <?php echo $entity['customerEmail'] ?? 'Não informado'; ?><br>
-                                                <?php echo $entity['customerCellphone'] ?? 'Não informado'; ?>
-                                            </p>
-                                        </div>
+                                        <b>Dados do Cliente:</b>
+                                        <p>
+                                            <?php echo $entity['customerName']; ?><br>
+                                            <?php echo $entity['customerEmail'] ?? 'Não informado'; ?><br>
+                                            <?php echo $entity['customerCellphone'] ?? 'Não informado'; ?>
+                                        </p>
                                     </div>
                                 <?php endif; ?>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="name">Data do Agendamento</label>
-                                        <p><?php echo $this->formatDate($entity['schedule_date']); ?> - <?php echo substr($entity['schedule_time'], 0, 5); ?></p>
-                                    </div>
+                                    <b>Data do Agendamento:</b>
+                                    <p><?php echo $this->formatDate($entity['schedule_date']); ?> - <?php echo substr($entity['schedule_time'], 0, 5); ?></p>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="name">Valor</label>
-                                        <p>R$ <?php echo number_format($entity['amount'], 2, ",", "."); ?></p>
-                                    </div>
+                                    <b>Valor</b>
+                                    <p>R$ <?php echo number_format($entity['amount'], 2, ",", "."); ?></p>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="name">Forma de Pagamento</label>
-                                        <p>
-                                            <?php echo $entity['paymentTypeName'] ?? 'Não informada'; ?>    
-                                        </p>
-                                    </div>
+                                    <b>Forma de Pagamento:</b>
+                                    <p>
+                                        <?php echo $entity['paymentTypeName'] ?? 'Não informada'; ?>    
+                                    </p>
                                 </div>
-                                <div class="col-md-12"><hr></div>
                                 <?php if (!empty($entity['description'])): ?>
-                                    <div class="col-md-12 text-center">
-                                        <div class="form-group">
-                                            <label for="name">Informações Adicionais</label>
-                                            <p><?php echo $entity['description']; ?></p>
-                                        </div>
+                                    <div class="col-md-12">
+                                        <hr>
+                                        <b>Informações Adicionais: </b>
+                                        <?php echo $entity['description']; ?>
                                     </div>
                                 <?php endif; ?>
                                 <?php if (!empty($entity['file'])): ?>
-                                    <div class="col-12 text-center">
-                                        <div class="form-group">
-                                            <label for="name">Anexo</label>
-                                            <p>
-                                                <a href="<?php echo baseUrl . 'public/uploads/schedules/' . $entity['file']; ?>" target="_blank">
-                                                    <?php echo $entity['file']; ?>
-                                                </a>
-                                            </p>
-                                        </div>
+                                    <div class="col-12">
+                                        <hr>
+                                        <b>Anexo: </b>
+                                        <a href="<?php echo baseUrl . 'public/uploads/schedules/' . $entity['file']; ?>" target="_blank">
+                                            <?php echo $entity['file']; ?>
+                                        </a>
                                     </div>
                                 <?php endif; ?>
-                                <div class="col-md-12 text-center">
-                                    <div class="form-group">
-                                        <label for="name">Status</label><br>
-                                        <?php if ($entity['status'] == '1'): ?>
-                                            <p>
-                                                <i class="fa fa-circle" style="color: orange;"></i> Agendado
-                                            </p>
-                                        <?php endif; ?>
-                                        <?php if ($entity['status'] == '2'): ?>
-                                            <p>
-                                                <i class="fa fa-circle" style="color: green;"></i> Concluído
-                                            </p>
-                                        <?php endif; ?>
-                                        <?php if ($entity['status'] == '3'): ?>
-                                            <p>
-                                                <i class="fa fa-circle" style="color: red;"></i> Cancelado
-                                            </p>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
                                 <div class="col-md-12"><hr></div>
-                                <div class="col-6 col-md-6 text-left">
-                                    <span>Cadastrada em:</span> <br>
+                                <div class="col-12 col-md-6">
+                                    <b>Cadastrado em: </b> 
                                     <b><?php echo $this->formatDateTime($entity['created_at']); ?></b>
                                 </div>
-                                <div class="col-6 col-md-6 text-right">
+                                <div class="col-12 col-md-6 ">
                                     <?php if (!empty($entity['updated_at'])): ?>
-                                        <span>Atualizada em:</span> <br>
+                                        <b>Atualizado em: </b>
                                         <b><?php echo $this->formatDateTime($entity['updated_at']); ?></b>
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <button type="button" class="btn btn-primary" onclick="openModule('agendamentos');" style="width: 100%;">
-                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                            </button>
-                                        </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('schedules'))): ?>
-                                                <button type="button" class="btn btn-primary" onclick="updateSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-pen pr-1"></i> Editar
+                                        <?php if ($entity['status'] == '1'): ?>
+                                            <div class="col-md-4 col-lg-4 mt-2 mb-2">
+                                                <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('schedules'))): ?>
+                                                    <button type="button" class="btn btn-outline-danger" onclick="deleteSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                        <i class="fa fa-trash"></i> Remover
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="col-md-4 col-lg-4 mt-2 mb-2">
+                                                <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('schedules'))): ?>
+                                                    <button type="button" class="btn btn-outline-success" onclick="updateSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                        <i class="fa fa-pen pr-1"></i> Editar
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="col-md-4 col-lg-4 mt-2 mb-2">
+                                                <button type="button" class="btn btn-outline-primary" onclick="openModule('agendamentos');" style="width: 100%;">
+                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('schedules'))): ?>
-                                                <button type="button" class="btn btn-primary" onclick="deleteSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-trash"></i> Remover
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="col-md-4 offset-md-4 mt-2 mb-2">
+                                                <button type="button" class="btn btn-outline-primary" onclick="openModule('agendamentos');" style="width: 100%;">
+                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
-                                            <?php endif; ?>
-                                        </div>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>

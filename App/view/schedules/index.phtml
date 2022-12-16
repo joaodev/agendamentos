@@ -23,8 +23,8 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     <?php if ($canCreate): ?>
                         <ol class="breadcrumb float-right">
                             <li class="breadcrumb-item">
-                                <button type="button" class="btn btn-primary"
-                                    onclick="createSchedule();" style="width: 100%;">
+                                <button type="button" class="btn btn-outline-success"
+                                    onclick="createSchedule();" style="width: 100%;" title="Novo Agendamento">
                                     <i class="fas fa-plus"></i> 
                                 </button>
                             </li>
@@ -35,16 +35,16 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             <div class="row">
                 <div class="col-12 p-3">
                     <div class="row">
-                        <div class="col-md-4 bg-secondary text-center py-2 pt-3">
-                            <span style="font-size: 1em">Agendados</span> <br>
+                        <div class="col-4 bg-secondary text-center py-2 pt-3">
+                            <span style="font-size: 0.9em">Agendados</span> <br>
                             <h3><?php echo $this->getTotalSchedules('1'); ?></h3>
                         </div>
-                        <div class="col-md-4 bg-primary text-center py-2 pt-3">
-                            <span style="font-size: 1em">Concluídos</span> <br>
+                        <div class="col-4 bg-primary text-center py-2 pt-3">
+                            <span style="font-size: 0.9em">Concluídos</span> <br>
                             <h3><?php echo $this->getTotalSchedules('2'); ?></h3>
                         </div>
-                        <div class="col-md-4 bg-secondary text-center py-2 pt-3">
-                            <span style="font-size: 1em">Cancelados</span> <br>
+                        <div class="col-4 bg-secondary text-center py-2 pt-3">
+                            <span style="font-size: 0.9em">Cancelados</span> <br>
                             <h3><?php echo $this->getTotalSchedules('3'); ?></h3>
                         </div>
                     </div>
@@ -59,7 +59,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table_agendamentos" style="width: 99.9%;">
+                                <table class="table table-bordered table-hover" id="table_agendamentos">
                                     <thead>
                                         <tr class="text-center" style="height: 30px;">
                                             <th style="font-size: 14px;">Data</th>
