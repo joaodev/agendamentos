@@ -113,7 +113,7 @@
                                     <div class="row">
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('customers'))): ?>
-                                                <button type="button" class="btn btn-outline-danger" title="Remover Cliente"
+                                                <button type="button" class="btn btn-outline-danger btn-lg" title="Remover Cliente"
                                                     onclick="deleteCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-trash"></i> Remover
                                                 </button>
@@ -121,14 +121,14 @@
                                         </div>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('customers'))): ?>
-                                                <button type="button" class="btn btn-outline-success" title="Editar Cliente"
+                                                <button type="button" class="btn btn-outline-success btn-lg" title="Editar Cliente"
                                                     onclick="updateCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-pen pr-1"></i> Editar
                                                 </button>
                                             <?php endif; ?>
                                         </div>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <button type="button" class="btn btn-outline-primary" onclick="openModule('clientes');" 
+                                            <button type="button" class="btn btn-outline-primary btn-lg" onclick="openModule('clientes');" 
                                                 style="width: 100%;" title="Voltar para Clientes">
                                                 <i class="fas fa-arrow-left pr-1"></i> Voltar
                                             </button>

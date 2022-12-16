@@ -108,7 +108,7 @@
                                         <?php if ($entity['status'] == '1'): ?>
                                             <div class="col-md-4 col-lg-4 mt-2 mb-2">
                                                 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('schedules'))): ?>
-                                                    <button type="button" class="btn btn-outline-danger"  title="Remover Agendamento"
+                                                    <button type="button" class="btn btn-outline-danger btn-lg"  title="Remover Agendamento"
                                                         onclick="deleteSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                         <i class="fa fa-trash"></i> Remover
                                                     </button>
@@ -116,21 +116,21 @@
                                             </div>
                                             <div class="col-md-4 col-lg-4 mt-2 mb-2">
                                                 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('schedules'))): ?>
-                                                    <button type="button" class="btn btn-outline-success"  title="Editar Agendamento"
+                                                    <button type="button" class="btn btn-outline-success btn-lg"  title="Editar Agendamento"
                                                         onclick="updateSchedule('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                         <i class="fa fa-pen pr-1"></i> Editar
                                                     </button>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="col-md-4 col-lg-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary" title="Voltar para Agendamentos"
+                                                <button type="button" class="btn btn-outline-primary btn-lg" title="Voltar para Agendamentos"
                                                     onclick="openModule('agendamentos');" style="width: 100%;">
                                                     <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
                                             </div>
                                         <?php else: ?>
                                             <div class="col-md-4 offset-md-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary" title="Voltar para Agendamentos"
+                                                <button type="button" class="btn btn-outline-primary btn-lg" title="Voltar para Agendamentos"
                                                     onclick="openModule('agendamentos');" style="width: 100%;">
                                                     <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
