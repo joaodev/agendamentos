@@ -116,6 +116,53 @@ $canViewFinancial = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
             background-color: <?php echo $config['primary_color']; ?> !important;;
             border-color: <?php echo $config['primary_color']; ?> !important;;
         }
+
+        
+        .btn-outline-primary {
+            color: <?php echo $config['primary_color']; ?>;
+            border-color: <?php echo $config['primary_color']; ?>;
+        }
+
+        .btn-outline-primary:hover {
+            color: #fff;
+            background-color: <?php echo $config['primary_color']; ?>;
+            border-color: <?php echo $config['primary_color']; ?>;
+        }
+
+        .btn-outline-primary.disabled, .btn-outline-primary:disabled {
+            color: <?php echo $config['primary_color']; ?>;
+            background-color: transparent;
+        }
+
+        .btn-outline-primary:not(:disabled):not(.disabled):active, .btn-outline-primary:not(:disabled):not(.disabled).active,
+        .show > .btn-outline-primary.dropdown-toggle {
+            color: #fff;
+            background-color: <?php echo $config['primary_color']; ?>;
+            border-color: <?php echo $config['primary_color']; ?>;
+        }
+
+        .btn-outline-secondary {
+            color: <?php echo $config['secondary_color']; ?>;
+            border-color: <?php echo $config['secondary_color']; ?>;
+        }
+
+        .btn-outline-secondary:hover {
+            color: #fff;
+            background-color: <?php echo $config['secondary_color']; ?>;
+            border-color: <?php echo $config['secondary_color']; ?>;
+        }
+
+        .btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
+            color: <?php echo $config['secondary_color']; ?>;
+            background-color: transparent;
+        }
+
+        .btn-outline-secondary:not(:disabled):not(.disabled):active, .btn-outline-secondary:not(:disabled):not(.disabled).active,
+        .show > .btn-outline-secondary.dropdown-toggle {
+            color: #fff;
+            background-color: <?php echo $config['secondary_color']; ?>;
+            border-color: <?php echo $config['secondary_color']; ?>;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">

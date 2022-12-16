@@ -28,7 +28,7 @@
   --secondary: #6c757d;
   --success: #28a745;
   --info: #17a2b8;
-  --warning: #333333;
+  --warning: #fd7e14;
   --danger: #dc3545;
   --light: #f8f9fa;
   --dark: #343a40;
@@ -2925,7 +2925,7 @@ fieldset:disabled a.btn {
 
 .btn-warning {
   color: #1f2d3d;
-  background-color: #333333;
+  background-color: #e0a800;
   border-color: #333333;
   box-shadow: none;
 }
@@ -7161,13 +7161,13 @@ button.bg-info:focus {
 }
 
 .bg-warning {
-  background-color: #333333 !important;
+  background-color: #e0a800 !important;
 }
 
 a.bg-warning:hover, a.bg-warning:focus,
 button.bg-warning:hover,
 button.bg-warning:focus {
-  background-color: #d39e00 !important;
+  background-color: #e0a800 !important;
 }
 
 .bg-danger {

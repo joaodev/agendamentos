@@ -23,7 +23,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     <?php if ($canCreate): ?>
                         <ol class="breadcrumb float-right">
                             <li class="breadcrumb-item">
-                                <button type="button" class="btn btn-primary"
+                                <button type="button" class="btn btn-outline-success" title="Adicionar Despesa"
                                     onclick="createExpense();" style="width: 100%;">
                                     <i class="fas fa-plus"></i> 
                                 </button>
@@ -33,27 +33,35 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 </div>
             </div>    
             <div class="row">
-                <div class="col-12 p-3">
+                <div class="col-12 mt-3">
                     <div class="row">
-                        <div class="col-md-4 bg-primary text-center py-3">
-                            <span style="font-size: 1em">Pendentes</span> <br>
-                            <h3>R$ <?php echo number_format($this->getTotalExpenses('1'), 2, ",","."); ?></h3>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-info">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-clock pr-1"></i> Pendentes</span> 
+                                    <h3>R$ <?php echo number_format($this->getTotalExpenses('1'), 2, ",","."); ?></h3>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4 bg-secondary text-center py-3">
-                            <span style="font-size: 1em">Concluídas</span> <br>
-                            <h3>R$ <?php echo number_format($this->getTotalExpenses('2'), 2, ",","."); ?></h3>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-success">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-check-circle pr-1"></i> Concluídas</span> 
+                                    <h3>R$ <?php echo number_format($this->getTotalExpenses('2'), 2, ",","."); ?></h3>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4 bg-primary text-center py-3">
-                            <span style="font-size: 1em">Canceladas</span> <br>
-                            <h3>R$ <?php echo number_format($this->getTotalExpenses('3'), 2, ",","."); ?></h3>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-danger">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-minus-circle pr-1"></i> Canceladas</span> 
+                                    <h3>R$ <?php echo number_format($this->getTotalExpenses('3'), 2, ",","."); ?></h3>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">

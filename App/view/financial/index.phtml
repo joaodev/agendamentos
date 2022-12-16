@@ -17,8 +17,8 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                 <div class="col-4">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-primary"
-                                onclick="changeMonth();" style="width: 100%;">
+                            <button type="button" class="btn btn-outline-primary"
+                                onclick="changeMonth();" style="width: 100%;" title="Alterar Mês">
                                 <i class="fas fa-sync  pr-1"></i> <?php echo $this->view->month; ?>
                             </button>
                         </li>
@@ -26,27 +26,35 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 p-3">
+                <div class="col-12 mt-3">
                     <div class="row">
-                        <div class="col-md-4 bg-primary text-center py-3">
-                            <span style="font-size: 1em">Despesas</span> <br>
-                            <h3>R$ <?php echo number_format($this->view->total_expenses, 2, ",","."); ?></h3>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-danger">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-minus-circle pr-1"></i> Despesas</span> 
+                                    <h3>R$ <?php echo number_format($this->view->total_expenses, 2, ",","."); ?></h3>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4 bg-secondary text-center py-3">
-                            <span style="font-size: 1em">Receitas</span> <br>
-                            <h3>R$ <?php echo number_format($this->view->total_schedules, 2, ",","."); ?></h3>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-success">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-plus-circle pr-1"></i> Receitas</span> 
+                                    <h3>R$ <?php echo number_format($this->view->total_schedules, 2, ",","."); ?></h3>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4 bg-primary text-center py-3">
-                            <span style="font-size: 1em">Caixa</span> <br>
-                            <h3>R$ <?php echo number_format(($this->view->total_schedules - $this->view->total_expenses), 2, ",","."); ?></h3>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-info">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-cash-register pr-1"></i> Caixa</span> 
+                                    <h3>R$ <?php echo number_format(($this->view->total_schedules - $this->view->total_expenses), 2, ",","."); ?></h3>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
