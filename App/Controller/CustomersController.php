@@ -22,6 +22,16 @@ class CustomersController extends ActionController implements CrudInterface
     {
         $data = $this->model->getAll();
         $this->view->data = $data;
+
+        $activePlan = self::getActivePlan();
+        $totalServices = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+        if ($totalServices >= $activePlan['total_customers']) {
+            $reached_limit = true;
+        } else {
+            $reached_limit = false;
+        }   
+        $this->view->reached_limit = $reached_limit;
+
         $this->render('index', false);
     }
 

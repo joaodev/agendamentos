@@ -69,6 +69,12 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             </div>
             <div class="row">
                 <div class="col-md-12">
+                    <?php if ($this->view->reached_limit): ?>
+                        <div class="alert alert-info" role="alert">
+                        Limite de cadastros atingido, <a onclick="openModule('planos-usuario');" 
+                            class="alert-link text-white" style="cursor: pointer;">altere seu plano</a> para aumentar o limite atual.
+                        </div>
+                    <?php endif; ?>
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">

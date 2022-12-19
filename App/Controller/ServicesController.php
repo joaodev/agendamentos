@@ -23,6 +23,15 @@ class ServicesController extends ActionController implements CrudInterface
         $data = $this->model->findAllBy($stringFields, 'user_uuid', $_SESSION['COD']);
         $this->view->data = $data;
 
+        $activePlan = self::getActivePlan();
+        $totalServices = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+        if ($totalServices >= $activePlan['total_services']) {
+            $reached_limit = true;
+        } else {
+            $reached_limit = false;
+        }   
+        $this->view->reached_limit = $reached_limit;
+        
         $this->render('index', false);
     }
 
