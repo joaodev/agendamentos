@@ -7,6 +7,9 @@ $router = [];
  */
 $router['app'] = [
 	['namespace' => 'app', 'route' => '/', 'controller' => 'index', 'action' => 'index'],
+
+    ['namespace' => 'app', 'route' => '/solicitar-demonstracao', 'controller' => 'demo', 'action' => 'index'],
+
 	['namespace' => 'app', 'route' => '/inicio', 'controller' => 'index', 'action' => 'index'],
 	
 	['namespace' => 'app', 'route' => '/login', 'controller' => 'login', 'action' => 'index'],
