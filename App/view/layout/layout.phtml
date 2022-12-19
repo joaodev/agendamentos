@@ -13,6 +13,7 @@ $canViewSmtp = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this
 $canViewSchedules = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('schedules'));
 $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'));
 $canViewFinancial = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('financial'));
+$canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('plans'));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -245,7 +246,9 @@ $canViewFinancial = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
                     </div>
                     <div class="info" style="margin-top: -10px;">
                         <a onclick="openModule('meu-perfil');" class="d-block text-white" style="cursor: pointer"><?php echo $_SESSION['NAME']; ?><br>
-                        <small><a onclick="openModule('meu-perfil');" class="d-block text-white" style="cursor: pointer">(<?php echo $_SESSION['ROLE_NAME']; ?>)</a></small></a>
+                        <small><a onclick="openModule('meu-perfil');" class="d-block text-white" style="cursor: pointer">
+                        (<?php echo $_SESSION['ROLE_NAME']; ?> - <?php echo (!empty($_SESSION['PLAN_NAME']) ? $_SESSION['PLAN_NAME'] : 'Plano Gratuito'); ?>)
+                    </a></small></a>
                     </div>
                 </div>
                 <nav class="mt-2 text-left">
@@ -344,7 +347,7 @@ $canViewFinancial = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
                             || $canViewConfigs
                             || $canViewSmtp
                             || $canViewLogs
-
+                            || $canViewPlans
                         ): ?>
                             <li class="nav-item">
                                 <a href="#" class="nav-link text-white">
@@ -391,6 +394,16 @@ $canViewFinancial = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
                                                 <i class="nav-icon fas fa-list"></i>
                                                 <p>
                                                     Logs
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPlans): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('planos');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-dollar-sign"></i>
+                                                <p>
+                                                    Planos
                                                 </p>
                                             </a>
                                         </li>

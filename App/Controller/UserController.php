@@ -14,6 +14,7 @@ class UserController extends ActionController implements CrudInterface
     private mixed $roleModel;
     private mixed $privilegeModel;
     private mixed $aclModel;
+    private mixed $plansModel;
 
     public function __construct()
     {
@@ -22,6 +23,7 @@ class UserController extends ActionController implements CrudInterface
         $this->roleModel      = Container::getClass("Role", "app");
         $this->privilegeModel = Container::getClass("Privilege", "app");
         $this->aclModel       = Container::getClass("Acl", "app");
+        $this->plansModel     = Container::getClass("Plans", "app");
     }
 
     public function indexAction(): void
@@ -35,6 +37,10 @@ class UserController extends ActionController implements CrudInterface
     {
         $roles = $this->roleModel->getAll(null);
         $this->view->roles = $roles;
+  
+        $plans = $this->plansModel->getAll(null);
+        $this->view->plans = $plans;
+      
         $this->render('create', false);
     }
 
@@ -136,6 +142,9 @@ class UserController extends ActionController implements CrudInterface
 
             $entity = $this->model->getOne($_POST['uuid']);
             $this->view->entity = $entity;
+
+            $plans = $this->plansModel->getAll(null);
+            $this->view->plans = $plans;
 
             $this->render('update', false);
         }

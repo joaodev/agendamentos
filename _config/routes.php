@@ -120,6 +120,15 @@ $router['app'] = [
     ['namespace' => 'app', 'route' => '/financeiro/editar', 'controller' => 'financial', 'action' => 'update'],
     ['namespace' => 'app', 'route' => '/financeiro/processa-edicao', 'controller' => 'financial', 'action' => 'update-process'],
     ['namespace' => 'app', 'route' => '/financeiro/excluir', 'controller' => 'financial', 'action' => 'delete'],
+
+	['namespace' => 'app', 'route' => '/planos', 'controller' => 'plans', 'action' => 'index'],
+	['namespace' => 'app', 'route' => '/planos/cadastrar', 'controller' => 'plans', 'action' => 'create'],
+	['namespace' => 'app', 'route' => '/planos/processa-cadastro', 'controller' => 'plans', 'action' => 'create-process'],
+	['namespace' => 'app', 'route' => '/planos/detalhes', 'controller' => 'plans', 'action' => 'read'],
+	['namespace' => 'app', 'route' => '/planos/editar', 'controller' => 'plans', 'action' => 'update'],
+	['namespace' => 'app', 'route' => '/planos/processa-edicao', 'controller' => 'plans', 'action' => 'update-process'],
+	['namespace' => 'app', 'route' => '/planos/excluir', 'controller' => 'plans', 'action' => 'delete'],
+	['namespace' => 'app', 'route' => '/planos/valor-existente', 'controller' => 'plans', 'action' => 'field-exists'],
 ];
 
 $systemDir = match ($_SERVER['HTTP_HOST']) {

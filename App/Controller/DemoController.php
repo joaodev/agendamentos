@@ -32,7 +32,7 @@ class DemoController extends ActionController
             if ($_POST['password'] != $_POST['confirmation']) {
                 self::redirect('', 'senhas-incorretas&n=' . $_POST['name'] . '&e=' . $_POST['email']);
             } else {
-                $role = 'a49b20de-eb00-f6e1-2ec9-475a95757a29';
+                $role = '4c139b44-a57f-4c53-0aa3-758080e8c95b';
                 if ($this->roleModel->getOne($role)) {
                     unset($_POST['confirmation']);
                     $passwordMd5 = $_POST['password'];
@@ -56,8 +56,6 @@ class DemoController extends ActionController
                             $crud->setTable($this->aclModel->getTable());
                             $crud->create($aclData);
                         }
-
-                        
 
                         $credentials = $this->model
 	        					->findByCrenditials($_POST['email'], $passwordMd5); 

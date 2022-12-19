@@ -45,7 +45,7 @@ class LoginController extends ActionController
 	        $credentials = $this->userModel
 	        					->findByCrenditials($email, $password); 
 
-	        if ($credentials) {
+            if ($credentials) {
                 $_SESSION['COD']         = $credentials['uuid'];
 	            $_SESSION['NAME']        = $credentials['name'];
 	            $_SESSION['EMAIL']       = $credentials['email'];
@@ -54,6 +54,8 @@ class LoginController extends ActionController
 	            $_SESSION['ROLE']        = $credentials['role_uuid'];
 	            $_SESSION['ROLE_ADM']    = $credentials['is_admin'];
 	            $_SESSION['PHOTO']       = $credentials['file'];
+	            $_SESSION['PLAN_NAME']   = $credentials['plan'];
+	            $_SESSION['PLAN']        = $credentials['plan_uuid'];
 
                 $currentDevice = $_SERVER["HTTP_USER_AGENT"];
                 $checkedDevices = $this->devicesModel->findAllBy('user_device', 'user_uuid', $credentials['uuid']);

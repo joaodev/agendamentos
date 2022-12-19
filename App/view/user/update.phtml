@@ -1,6 +1,7 @@
 <?php 
 $entity = $this->view->entity; 
 $roles = $this->view->roles; 
+$plans = $this->view->plans; 
 $role = $_SESSION['ROLE'];
 ?>
 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('user'))): ?>
@@ -37,6 +38,19 @@ $role = $_SESSION['ROLE'];
                                     <div class="col-md-12" style="border-radius: 5px;">
                                         <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
                                         <hr>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="plan_uuid">Plano</label>
+                                            <select class="form-control" name="plan_uuid" id="plan_uuid" required>
+                                                <option value="">-</option>
+                                                <?php foreach($plans as $plan): ?>
+                                                    <option value="<?php echo $plan['uuid']; ?>" <?php echo ($entity['plan_uuid'] == $plan['uuid']) ? 'selected' : ''; ?>>
+                                                        <?php echo $plan['name']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">

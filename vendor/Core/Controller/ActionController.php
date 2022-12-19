@@ -322,6 +322,7 @@ class ActionController
             'schedules' => 'd9aa7c33-60a9-4012-888f-bccb96ddf51d',
             'services' => '62430c22-1a3d-42ff-8921-fca074a676dc',
             'financial' => 'c2262430-8921-1a3d-42ff-074a676fcadc',
+            'plans' => '4b3ab6dc-16af-450b-a2e8-f4c006c8bf16',
         ];
 
         return $codes[$key];

@@ -7,14 +7,14 @@ use Core\Di\Container;
 use Core\Db\Crud;
 use App\Interfaces\CrudInterface;
 
-class PaymentTypesController extends ActionController implements CrudInterface
+class PlansController extends ActionController implements CrudInterface
 {
     private mixed $model;
 
     public function __construct()
     {
         parent::__construct();
-        $this->model = Container::getClass("PaymentTypes", "app");
+        $this->model = Container::getClass("Plans", "app");
     }
 
     public function indexAction(): void
@@ -34,23 +34,24 @@ class PaymentTypesController extends ActionController implements CrudInterface
         if (!empty($_POST)) {
             $uuid = $this->model->NewUUID();
             $_POST['uuid'] = $uuid;
-         
+            $_POST['price'] = $this->moneyToDb($_POST['price']);
+            
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->create($_POST);
            
             if ($transaction){
-                $this->toLog("Cadastrou a Forma de Pagamento $uuid");
+                $this->toLog("Cadastrou o Plano $uuid");
                 $data  = [
                     'title' => 'Sucesso!', 
-                    'msg'   => 'Forma de Pagamento cadastrada.',
+                    'msg'   => 'Plano cadastrado.',
                     'type'  => 'success',
                     'pos'   => 'top-right'
                 ];
             } else {
                 $data  = [
                     'title' => 'Erro!', 
-                    'msg' => 'A Forma de Pagamento não foi cadastrada.',
+                    'msg' => 'O Plano não foi cadastrado.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
@@ -76,23 +77,24 @@ class PaymentTypesController extends ActionController implements CrudInterface
     {
         if (!empty($_POST)) {
             $_POST['updated_at'] = date('Y-m-d H:i:s');
+            $_POST['price'] = $this->moneyToDb($_POST['price']);
 
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
             if ($transaction){
-                $this->toLog("Atualizou a Forma de Pagamento {$_POST['uuid']}");
+                $this->toLog("Atualizou o Plano {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
-                    'msg'   => 'Forma de Pagamento atualizada.',
+                    'msg'   => 'Plano atualizado.',
                     'type'  => 'success',
                     'pos'   => 'top-right'
                 ];
             } else {
                 $data  = [
                     'title' => 'Erro!', 
-                    'msg' => 'A Forma de Pagamento não foi atualizada.',
+                    'msg' => 'O Plano não foi atualizado.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
@@ -125,17 +127,17 @@ class PaymentTypesController extends ActionController implements CrudInterface
             ],$_POST['uuid'], 'uuid');
 
             if ($transaction){
-                $this->toLog("Removeu a Forma de Pagamento {$_POST['uuid']}");
+                $this->toLog("Removeu o Plano {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
-                    'msg'   => 'Forma de Pagamento removida.',
+                    'msg'   => 'Plano removido.',
                     'type'  => 'success',
                     'pos'   => 'top-right'
                 ];
             } else {
                 $data  = [
                     'title' => 'Erro!', 
-                    'msg' => 'A Forma de Pagamento não foi removida.',
+                    'msg' => 'O Plano não foi removido.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
