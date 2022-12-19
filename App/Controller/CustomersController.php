@@ -33,30 +33,41 @@ class CustomersController extends ActionController implements CrudInterface
     public function createProcessAction(): bool
     {
         if (!empty($_POST)) {
-            $_POST['uuid'] = $this->model->NewUUID();
-            $_POST['user_uuid'] = $_SESSION['COD'];
-            
-            $crud = new Crud();
-            $crud->setTable($this->model->getTable());
-            $transaction = $crud->create($_POST);
-
-            if ($transaction){
-                $this->toLog("Cadastrou o Cliente {$_POST['uuid']}");
+            $activePlan = self::getActivePlan();
+            $totalCustomers = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+            if ($totalCustomers >= $activePlan['total_customers']) {
                 $data  = [
-                    'title' => 'Sucesso!', 
-                    'msg'   => 'Cliente cadastrado.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right',
-                    'uuid'  => $_POST['uuid'],
-                    'name'  => $_POST['name']
-                ];
-            } else {
-                $data  = [
-                    'title' => 'Erro!', 
-                    'msg' => 'O Cliente não foi cadastrado.',
+                    'title' => 'Erro!',
+                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plano.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
+            } else {
+                $_POST['uuid'] = $this->model->NewUUID();
+                $_POST['user_uuid'] = $_SESSION['COD'];
+                
+                $crud = new Crud();
+                $crud->setTable($this->model->getTable());
+                $transaction = $crud->create($_POST);
+
+                if ($transaction){
+                    $this->toLog("Cadastrou o Cliente {$_POST['uuid']}");
+                    $data  = [
+                        'title' => 'Sucesso!', 
+                        'msg'   => 'Cliente cadastrado.',
+                        'type'  => 'success',
+                        'pos'   => 'top-right',
+                        'uuid'  => $_POST['uuid'],
+                        'name'  => $_POST['name']
+                    ];
+                } else {
+                    $data  = [
+                        'title' => 'Erro!', 
+                        'msg' => 'O Cliente não foi cadastrado.',
+                        'type' => 'error',
+                        'pos'   => 'top-center'
+                    ];
+                }
             }
 
             echo json_encode($data);

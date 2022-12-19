@@ -57,46 +57,57 @@ class SchedulesController extends ActionController implements CrudInterface
     public function createProcessAction(): bool
     {
         if (!empty($_POST)) {
-            $uuid = $this->model->NewUUID();
-            $_POST['uuid'] = $uuid;
-            $_POST['user_uuid'] = $_SESSION['COD'];
-
-            if (!empty($_FILES)) {
-                $image_name  = $_FILES["file"]["name"];
-                if ($image_name != null) {
-                    $ext_img = explode(".", $image_name, 2);
-                    $new_name  = 'Arquivo_Agendamento_'.date('dmY') . '.' . $ext_img[1];
-                    $dir1 = "../public/uploads/schedules/" . $new_name;
-                    $tmp_name1  =  $_FILES["file"]["tmp_name"];
-                    if (move_uploaded_file($tmp_name1, $dir1)) {
-                        $_POST['file'] = $new_name;
-                    }
-                }
-            } else {
-                unset($_POST['file']);
-            }
-
-            $_POST['amount'] = $this->moneyToDb($_POST['amount']);
- 
-            $crud = new Crud();
-            $crud->setTable($this->model->getTable());
-            $transaction = $crud->create($_POST);
- 
-            if ($transaction){
-                $this->toLog("Cadastrou o agendamento $uuid");
+            $activePlan = self::getActivePlan();
+            $totalSchedules = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+            if ($totalSchedules >= $activePlan['total_schedules']) {
                 $data  = [
-                    'title' => 'Sucesso!', 
-                    'msg'   => 'Agendamento cadastrado.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right'
-                ];
-            } else {
-                $data  = [
-                    'title' => 'Erro!', 
-                    'msg' => 'O Agendamento não foi cadastrado.',
+                    'title' => 'Erro!',
+                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plano.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
+            } else {
+                $uuid = $this->model->NewUUID();
+                $_POST['uuid'] = $uuid;
+                $_POST['user_uuid'] = $_SESSION['COD'];
+
+                if (!empty($_FILES)) {
+                    $image_name  = $_FILES["file"]["name"];
+                    if ($image_name != null) {
+                        $ext_img = explode(".", $image_name, 2);
+                        $new_name  = 'Arquivo_Agendamento_'.date('dmY') . '.' . $ext_img[1];
+                        $dir1 = "../public/uploads/schedules/" . $new_name;
+                        $tmp_name1  =  $_FILES["file"]["tmp_name"];
+                        if (move_uploaded_file($tmp_name1, $dir1)) {
+                            $_POST['file'] = $new_name;
+                        }
+                    }
+                } else {
+                    unset($_POST['file']);
+                }
+
+                $_POST['amount'] = $this->moneyToDb($_POST['amount']);
+    
+                $crud = new Crud();
+                $crud->setTable($this->model->getTable());
+                $transaction = $crud->create($_POST);
+    
+                if ($transaction){
+                    $this->toLog("Cadastrou o agendamento $uuid");
+                    $data  = [
+                        'title' => 'Sucesso!', 
+                        'msg'   => 'Agendamento cadastrado.',
+                        'type'  => 'success',
+                        'pos'   => 'top-right'
+                    ];
+                } else {
+                    $data  = [
+                        'title' => 'Erro!', 
+                        'msg' => 'O Agendamento não foi cadastrado.',
+                        'type' => 'error',
+                        'pos'   => 'top-center'
+                    ];
+                }
             }
 
             echo json_encode($data);

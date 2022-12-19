@@ -346,4 +346,24 @@ class ActionController
 
         return $exp[1] . '/' . $exp[0];
     }
+
+    public function getActivePlan(): array
+    {
+        if ($_SESSION['PLAN']) {
+            $plansModel = Container::getClass("Plans", "app");
+            $plans = $plansModel->getOne($_SESSION['PLAN']);
+   
+            return [
+                'total_customers' => $plans['total_customers'],
+                'total_services'  => $plans['total_services'],
+                'total_schedules' => $plans['total_schedules'],
+            ];
+        } else {
+            return [
+                'total_customers' => 1,
+                'total_services' => 3,
+                'total_schedules' => 20
+            ];
+        }
+    }
 }
