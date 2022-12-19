@@ -605,38 +605,6 @@ $cellphone = '5511940553740';
             </div>
         </div>
     </section>
-    <!--
-    <section class="w3l-index3 mb-5" id="about1">
-        <div class="midd-w3 py-5">
-            <div class="container py-md-3">
-                <div class="row">
-                    <div class="col-12 mb-5">
-                        <div class="header-title text-center">
-                            <h3 class="hny-title">Versões Disponíveis</h3>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 mb-lg-0 mb-md-5 mb-4">
-                        <img src="<?php echo baseUrl . 'public/app/dist/img/desc_1.png'; ?>" alt="sobre_nos"
-                             class="radius-image img-fluid" style="box-shadow: 0 0 0.5em <?php echo $config['secondary_color'] ?>;">
-                    </div>
-                    <div class="col-lg-6 pl-lg-5 text-justify">
-                        <h3>Acesso Único</h3>
-                                            </div>
-
-                </div>
-                <div class="row mt-3 mt-md-5">
-                    <div class="col-lg-6 pl-lg-5 text-justify">
-                        <h3 class="mt-3">Multi Acesso</h3>
-                                            </div>
-                    <div class="col-lg-6 mb-lg-0 mb-mt-5 mt-4">
-                        <img src="<?php echo baseUrl . 'public/app/dist/img/desc_2.png'; ?>" alt="sobre_nos"
-                             class="radius-image img-fluid" style="box-shadow: 0 0 0.5em <?php echo $config['secondary_color'] ?>;">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    -->
     <section class="w3l-index3" id="about1">
         <div class="midd-w3 mt-5">
             <div class="container py-md-3">
@@ -682,31 +650,58 @@ $cellphone = '5511940553740';
             </div>
         </div>
     </section>
-    <section class="w3l-footer-29-main" id="demonstracao" style="background: url('<?php echo baseUrl . 'public/app/dist/img/banner_footer.png'; ?>'); background-size: cover;">
+    <section class="w3l-footer-29-main" id="cadastro" style="background: url('<?php echo baseUrl . 'public/app/dist/img/banner_footer.png'; ?>'); background-size: cover;">
         <div class="footer-29 py-5">
             <div class="container py-lg-4">
                 <div class="row footer-top-29">
                     <div class="col-12">
-                        <form action="<?php echo baseUrl . 'solicitar-demonstracao'; ?>" method="post" id="formDemo">
-                            <h6 class="footer-title-29 text-center">Solicite uma Demonstração Grátis!</h6>
+                        <form action="<?php echo baseUrl . 'solicitar-demonstracao'; ?>" method="post" id="formDemo" onsubmit="hashRegister(this);">
+                            <h6 class="footer-title-29 text-center">Cria sua Conta Agora</h6>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6 offset-md-3">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" placeholder="Nome" id="name" name="name" required style="height: 53px">
+                                        <input type="text" class="form-control text-center" placeholder="Seu Nome ou Empresa" id="name" name="name" required style="height: 53px"
+                                            value="<?php echo (!empty($_GET['n']) ? $_GET['n'] : ''); ?>">
                                     </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <input type="email" class="form-control" placeholder="Email" id="email" name="email" required  style="height: 53px">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <button type="submit" class="btn btn-primary btn-style w-100" id="btnSubmit">Enviar</button>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6 offset-md-3">
+                                    <div class="form-group">
+                                        <input type="email" class="form-control text-center" placeholder="seuemail@dominio.com.br" id="email" name="email" required  style="height: 53px"
+                                            value="<?php echo (!empty($_GET['e']) ? $_GET['e'] : ''); ?>">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 offset-md-3">
+                                    <div class="form-group">
+                                        <input type="password" class="form-control text-center" placeholder="Senha" id="password" name="password" required  style="height: 53px">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 offset-md-3">
+                                    <div class="form-group">
+                                        <input type="password" class="form-control text-center" placeholder="Confirme a Senha" id="confirmation" name="confirmation" required  style="height: 53px">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 offset-md-3">
+                                    <button type="submit" class="btn btn-primary btn-style w-100" id="btnSubmitRegister">Enviar</button>
+                                </div>
+                            </div> 
+                            <div class="row">
+                                <div class="col-md-6 offset-md-3 text-center py-3">
+                                    <a href="<?php echo baseUrl . 'politica-de-privacidade'; ?>">Política de Privacidade</a>
+                                    <br>
+                                    <a href="<?php echo baseUrl . 'termos-de-uso'; ?>">Termos de Uso</a>
+                                </div>
+                            </div> 
                         </form>
                     </div> 
-                    <div class="col-12 col-md-8 offset-md-2 text-center footer-list-29 footer-1">
+                    <div class="col-12 col-md-8 offset-md-2 text-center footer-list-29 footer-1 mt-3">
                         <div class="footer-logo mb-3 mt-5">
                             <h6 class="footer-title-29">Compartilhe nas Redes Sociais:</h6>
                         </div>
@@ -798,21 +793,21 @@ $cellphone = '5511940553740';
     </div>
 
     <script>
-        $(document).ready(function() {
-            $("#btnSubmit").click(function() {
-                let name = $("#name").val();
-                let email = $("#email").val();
-
-                if (name && email) {
-                    $("#btnSubmit").attr('disabled', true);
-                    $("#modalLoad").modal('show');
-                    $("#formDemo").submit();
-                } else {
-                    $("#btnSubmit").attr('disabled', false);
-                    $("#modalLoad").modal('hide ');
-                }
-            });
-        });
+        function hashRegister(form) {
+            if (form.password.value !== '' 
+                && form.email.value !== ''
+                && form.name.value !== ''
+                && form.confirmation.value !== ''
+            ) {
+                form.password.value = md5(form.password.value);
+                form.confirmation.value = md5(form.confirmation.value);
+                $("#btnSubmitRegister").attr('disabled', true);
+                $("#modalLoad").modal('show');
+            } else {
+                $("#btnSubmitRegister").attr('disabled', false);
+                $("#modalLoad").modal('hide');
+            }
+        }
     </script>
     <?php if (!empty($_GET['msg']) && $_GET['msg'] == 'enviado'): ?>
         <!-- Modal Mid -->
@@ -850,9 +845,9 @@ $cellphone = '5511940553740';
         <div class="modal fade" id="modalAlert" data-keyboard="false">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header text-white bg-primary">
-                        <h4 class="modal-title text-white" id="modalAlertTitle"><span class="fa fa-remove"></span> Demonstração Não Solicitada!</h4>
-                        <a href="<?php echo baseUrl; ?>#demonstracao" class="close text-white" >
+                    <div class="modal-header text-white bg-danger">
+                        <h4 class="modal-title text-white" id="modalAlertTitle"><span class="fa fa-remove"></span> Erro Inesperado!</h4>
+                        <a href="<?php echo baseUrl . '?n=' . $_GET['n'] . '&e=' . $_GET['e']; ?>#cadastro" class="close text-white" >
                             <span aria-hidden="true">&times;</span>
                         </a>
                     </div>
@@ -862,8 +857,38 @@ $cellphone = '5511940553740';
                         </h5>
                         <div>
                             <hr>
-                            <a href="<?php echo baseUrl; ?>#demonstracao">
+                            <a href="<?php echo baseUrl . '?n=' . $_GET['n'] . '&e=' . $_GET['e']; ?>#cadastro" class="btn btn-danger">
                                 <span class="fa fa-refresh pr-1"></span> Atualizar a página
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function() {
+                $("#modalAlert").modal('show');
+            });
+        </script>
+    <?php endif; ?>
+    <?php if (!empty($_GET['msg']) && $_GET['msg'] == 'senhas-incorretas'): ?>
+        <div class="modal fade" id="modalAlert" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header text-white bg-danger">
+                        <h4 class="modal-title text-white" id="modalAlertTitle"><span class="fa fa-remove"></span> Erro no Cadastro!</h4>
+                        <a href="<?php echo baseUrl . '?n=' . $_GET['n'] . '&e=' . $_GET['e']; ?>#cadastro" class="close text-white" >
+                            <span aria-hidden="true">&times;</span>
+                        </a>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h5 class="mt-2">
+                            As senhas enviadas não são iguais, <br> realize o cadastro novamente.
+                        </h5>
+                        <div>
+                            <hr>
+                            <a href="<?php echo baseUrl . '?n=' . $_GET['n'] . '&e=' . $_GET['e']; ?>#cadastro" class="btn btn-danger">
+                                <span class="fa fa-refresh pr-1"></span> Corrigir o Cadastro
                             </a>
                         </div>
                     </div>
