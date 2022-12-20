@@ -360,9 +360,9 @@ class ActionController
             ];
         } else {
             return [
-                'total_customers' => 1,
+                'total_customers' => 10,
                 'total_services' => 3,
-                'total_schedules' => 1
+                'total_schedules' => 20
             ];
         }
     }
