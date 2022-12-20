@@ -8,7 +8,6 @@ $router = [];
 $router['app'] = [
 	['namespace' => 'app', 'route' => '/', 'controller' => 'index', 'action' => 'index'],
 	['namespace' => 'app', 'route' => '/politica-de-privacidade', 'controller' => 'politics', 'action' => 'user-view'],
-	['namespace' => 'app', 'route' => '/termos-de-uso', 'controller' => 'terms', 'action' => 'user-view'],
 
     ['namespace' => 'app', 'route' => '/solicitar-demonstracao', 'controller' => 'demo', 'action' => 'index'],
 
@@ -132,6 +131,7 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/planos/processa-edicao', 'controller' => 'plans', 'action' => 'update-process'],
 	['namespace' => 'app', 'route' => '/planos/excluir', 'controller' => 'plans', 'action' => 'delete'],
 	['namespace' => 'app', 'route' => '/planos/valor-existente', 'controller' => 'plans', 'action' => 'field-exists'],
+	['namespace' => 'app', 'route' => '/planos/plano-selecionado', 'controller' => 'plans', 'action' => 'selected-plan'],
 	
 ];
 

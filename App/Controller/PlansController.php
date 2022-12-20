@@ -173,4 +173,15 @@ class PlansController extends ActionController implements CrudInterface
         $this->view->data = $data;
         $this->render('user-plans', false);
     }
+
+    public function selectedPlanAction(): void
+    {
+        if (!empty($_POST['uuid'])) {
+            $entity = $this->model->getOne($_POST['uuid']);
+            if ($entity) {
+                $this->view->entity = $entity;
+                $this->render('selected-plan', false);
+            }
+        }
+    }
 }

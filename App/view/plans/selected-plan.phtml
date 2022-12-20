@@ -1,0 +1,72 @@
+<?php $entity = $this->view->entity; ?>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-11" >
+                <h1 style="position: relative; top: 5px; font-size: 25px;">
+                    <i class="fas fa-sync pr-1"></i>
+                    Alterar Plano
+                </h1>
+            </div>
+            <div class="col-1">
+                <ol class="breadcrumb float-right">
+                    <li class="breadcrumb-item">
+                        <button type="button" class="btn btn-outline-primary" title="Voltar para Planos"
+                            onclick="openModule('planos-usuario');" style="width: 100%;">
+                            <i class="fas fa-arrow-left"></i> 
+                        </button>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content" style="margin-left: 9px; margin-right: 9px;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body"> 
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name">Plano Selecionado:</label>
+                                    <h3><?php echo $entity['name']; ?></h3>
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Valor</label>
+                                    <h3>R$ <?php echo number_format($entity['price'], 2, ",","."); ?></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                        <label for="name">Descrição do Plano:</label>
+                                        <p><?php echo $entity['description']; ?></p>
+                                    </div>
+                                </div>
+                            <div class="col-md-12"><hr></div>
+                            <div class="col-12 col-md-4 offset-md-4 text-center">
+                                <label>Forma de Pagamento:</label> <br>
+                                <select name="payment_type" id="payment_type" class="form-control text-center" required
+                                    onchange="setPaymentType();">
+                                    <option value="">Selecione uma opção</option>
+                                    <option value="1">Cartão de Crédito</option>
+                                    <option value="2">Boleto</option>
+                                    <option value="3">PIX</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12"><hr></div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    function setPaymentType() {
+        let paymentType = $("#payment_type").val();
+        alert(paymentType.val());
+    }
+</script>

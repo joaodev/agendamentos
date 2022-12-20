@@ -24,9 +24,10 @@
                                 <p><?php echo $entity['description']; ?></p>
                                 <h2>R$ <?php echo number_format($entity['price'], 2, ",","."); ?> /mês</h2>
                             </div>
-                            <button type="button" class="btn btn-default btn-lg w-100 mt-3">
-                                <span class="fa fa-clock pr-1"></span>
-                                EM BREVE
+                            <button type="button" class="btn btn-outline-success btn-lg w-100 mt-3"
+                                onclick="selectPlan('<?php echo $entity['uuid']; ?>');" >
+                                <span class="fa fa-check pr-1"></span>
+                                SELECIONAR
                             </button>
                         </div>
                     </div>
@@ -35,3 +36,20 @@
         </div>
     </div>
 </section>
+<script>
+    function selectPlan(uuid) {
+        $("#baseLoader").show();
+        $.ajax({
+            type: 'post',
+            url: "<?php echo baseUrl; ?>planos/plano-selecionado",
+            data: {uuid:uuid},
+            async: true
+        }).done(function(data) {
+            $("#sis_content").html(data);
+            $("#baseLoader").hide();
+        }).fail(function() {
+            showInternalErrorAlert();
+            $("#baseLoader").hide();
+        });
+    }
+</script>
