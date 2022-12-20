@@ -457,7 +457,7 @@ $cellphone = '5511940553740';
                             &nbsp;
                         </li>
                         <li class="nav-item">
-                            <button type="button" class="btn btn-primary text-white" id="btnLogin">
+                            <button type="button" class="btn btn-primary text-white" id="btnLogin" style="border-radius: 15px;">
                                 <span class="fa fa-user pr-1"></span> ACESSAR O SISTEMA
                             </button>
                         </li>
@@ -475,11 +475,11 @@ $cellphone = '5511940553740';
                         <div class="banner-info">
                             <div class="container">
                                 <div class="banner-info-bg">
-                                    <h5>Sistema de Agendamentos</h5>
+                                    <h5>Agendamentos</h5>
                                     <p class="mt-4 pr-lg-4">
                                         Gerencie os agendamentos de forma prática e rápida, garantindo a facilidade nas operações diárias. Este sistema foi desenvolvido para ser utilizando em todos os tipos de dispositivos.
                                     </p>
-                                    <a class="btn btn-style btn-primary mt-xl-5 mt-4 mr-2" href="#cadastro">
+                                    <a class="btn btn-style btn-primary mt-xl-5 mt-4 mr-2" href="#cadastro" style="border-radius: 15px;">
                                         Comece Agora
                                         <span class="fa fa-chevron-right ml-2" aria-hidden="true"></span>
                                     </a>
@@ -494,11 +494,11 @@ $cellphone = '5511940553740';
                         <div class="banner-info">
                             <div class="container">
                                 <div class="banner-info-bg">
-                                    <h5>Gerenciamento Mensal Inteligente</h5>
+                                    <h5>Gerenciamento Mensal</h5>
                                     <p class="mt-4 pr-lg-4">
                                         Controle os agendamentos de serviços para clientes, receitas e despesas, com buscas dinâmicas, emissão de relatórios. Tudo projeto para que sua gestão fique cada vez mais simplificada.
                                     </p>
-                                    <a class="btn btn-style btn-primary mt-xl-5 mt-4 mr-2" href="#cadastro">
+                                    <a class="btn btn-style btn-primary mt-xl-5 mt-4 mr-2" href="#cadastro" style="border-radius: 15px;">
                                         Comece Agora
                                         <span class="fa fa-chevron-right ml-2" aria-hidden="true"></span>
                                     </a>
@@ -519,7 +519,7 @@ $cellphone = '5511940553740';
                 </div>
                 <div class="col-md-8 content-1-right pl-lg-5 mt-lg-0 mt-4">
                     <div class="header-title mb-3">
-                        <h3 class="hny-title">Visão Geral do Sistema</h3>
+                        <h3 class="hny-title">Visão Geral</h3>
                     </div>
                     <p  class="text-justify" class="mt-3">
                         Gerencie os agendamentos de forma prática e rápida, garantindo a facilidade nas operações diárias.
@@ -667,37 +667,61 @@ $cellphone = '5511940553740';
                             <h6 class="footer-title-29 text-center">Cria sua Conta Agora</h6>
                             <div class="row">
                                 <div class="col-md-6 offset-md-3">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control text-center" placeholder="Seu Nome ou Empresa" id="name" name="name" required style="height: 53px"
+                                    <div class="input-group mb-3" style="border-radius: 5px">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text" style="border-radius: 15px 0 0 15px;">
+                                                <span class="fa fa-user" style="font-size: 22px"></span>
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control text-center" placeholder="Seu Nome ou Empresa" name="name" id="name" required
+                                            style="height: 50px; border-radius: 0 15px 15px 0;"
                                             value="<?php echo (!empty($_GET['n']) ? $_GET['n'] : ''); ?>">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 offset-md-3">
-                                    <div class="form-group">
-                                        <input type="email" class="form-control text-center" placeholder="seuemail@dominio.com.br" id="email" name="email" required  style="height: 53px"
+                                    <div class="input-group mb-3" style="border-radius: 5px">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text" style="border-radius: 15px 0 0 15px; padding: 10.5px">
+                                                <span class="fa fa-envelope" style="font-size: 19px; "></span>
+                                            </div>
+                                        </div>
+                                        <input type="email" class="form-control text-center" placeholder="seuemail@dominio.com.br" name="email" id="email" required
+                                            style="height: 50px; border-radius: 0 15px 15px 0;"
                                             value="<?php echo (!empty($_GET['e']) ? $_GET['e'] : ''); ?>">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 offset-md-3">
-                                    <div class="form-group">
-                                        <input type="password" class="form-control text-center" placeholder="Senha" id="password" name="password" required  style="height: 53px">
+                                    <div class="input-group mb-3" style="border-radius: 5px">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text" style="border-radius: 15px 0 0 15px;">
+                                                <span class="fa fa-lock" style="font-size: 25px"></span>
+                                            </div>
+                                        </div>
+                                        <input type="password" class="form-control text-center" placeholder="Senha" name="password" id="password" required
+                                            style="height: 50px; border-radius: 0 15px 15px 0;">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 offset-md-3">
-                                    <div class="form-group">
-                                        <input type="password" class="form-control text-center" placeholder="Confirme a Senha" id="confirmation" name="confirmation" required  style="height: 53px">
+                                    <div class="input-group mb-3" style="border-radius: 5px">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text" style="border-radius: 15px 0 0 15px;">
+                                                <span class="fa fa-lock" style="font-size: 25px"></span>
+                                            </div>
+                                        </div>
+                                        <input type="password" class="form-control text-center" placeholder="Confirme a Senha" name="confirmation" id="confirmation" required
+                                            style="height: 50px; border-radius: 0 15px 15px 0;">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 offset-md-3">
-                                    <button type="submit" class="btn btn-primary btn-style w-100" id="btnSubmitRegister">Enviar</button>
+                                    <button type="submit" class="btn btn-primary btn-style w-100" id="btnSubmitRegister" style="border-radius: 15px;">Finalizar Cadastro</button>
                                 </div>
                             </div> 
                             <div class="row">
@@ -757,29 +781,27 @@ $cellphone = '5511940553740';
                 <div class="modal-body text-center">
                     <form action="<?php echo baseUrl; ?>auth" method="post" onsubmit="hashPass(this);" id="formLogin">
                         <div class="input-group mb-3"  style="border-radius: 5px">
-                            
                             <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fa fa-envelope"></span>
+                                <div class="input-group-text" style="border-radius: 15px 0 0 15px; padding: 10.5px;">
+                                    <span class="fa fa-envelope" style="font-size: 19px"></span>
                                 </div>
                             </div>
                             <input type="email" class="form-control" placeholder="Seu Email" name="email" id="email" required
-                                style="height: 50px;">
+                                style="height: 50px; border-radius: 0 15px 15px 0;">
                         </div>
                         <div class="input-group mb-3"  style="border-radius: 5px">
-                           
                             <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fa fa-lock"></span>
+                                <div class="input-group-text" style="border-radius: 15px 0 0 15px;">
+                                    <span class="fa fa-lock" style="font-size: 25px"></span>
                                 </div>
                             </div>
                             <input type="password" class="form-control" placeholder="Sua Senha" name="password" id="password"
-                                   style="height: 50px;"
+                                   style="height: 50px; border-radius: 0 15px 15px 0;"
                                    minlength="8" required maxlength="100">
                         </div>
                         <div class="row">
                             <div class="col-md-6 mt-1 offset-md-3">
-                                <button type="submit" class="btn btn-primary btn-block" id="btnSubmitLogin">Entrar</button>
+                                <button type="submit" class="btn btn-primary btn-block" id="btnSubmitLogin" style="border-radius: 15px;">Entrar</button>
                             </div>
                             <div class="col-12 text-center mt-2">
                                 <a href="<?php echo baseUrl; ?>esqueci-a-senha" style=" color: #000;">
@@ -931,7 +953,7 @@ $cellphone = '5511940553740';
             }
         }
     </script>
-    <section class="w3l-copyright"  style="background: <?php echo $config['primary_color']; ?>;">
+    <section class="w3l-copyright" style="background: <?php echo $config['primary_color']; ?>;">
         <div class="container">
             <div class="row bottom-copies">
                 <p class="col-lg-12 text-center copy-footer-29">
