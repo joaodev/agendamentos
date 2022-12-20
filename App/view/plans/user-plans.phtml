@@ -1,0 +1,37 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" >
+                <h1 style="position: relative; top: 5px; font-size: 25px;">
+                    <i class="fas fa-dollar-sign pr-1"></i>
+                    Planos
+                </h1>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content" style="margin-left: 9px; margin-right: 9px;">
+    <div class="container-fluid">
+        <div class="row">
+            <?php foreach ($this->view->data as $entity): ?>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="bg-primary text-center py-3" style="border-radius: 10px;">
+                                <h3 class="text-center pt-2"><?php echo $entity['name']; ?></h3>
+                            </div>
+                            <div class="text-center mt-3">
+                                <p><?php echo $entity['description']; ?></p>
+                                <h2>R$ <?php echo number_format($entity['price'], 2, ",","."); ?> /mês</h2>
+                            </div>
+                            <button type="button" class="btn btn-default btn-lg w-100 mt-3">
+                                <span class="fa fa-clock pr-1"></span>
+                                EM BREVE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>

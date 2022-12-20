@@ -166,4 +166,11 @@ class PlansController extends ActionController implements CrudInterface
             }
         }
     }
+
+    public function userPlansAction(): void
+    {
+        $data = $this->model->getAllPlans();
+        $this->view->data = $data;
+        $this->render('user-plans', false);
+    }
 }
