@@ -748,36 +748,38 @@ $cellphone = '5511940553740';
     <div class="modal fade" id="modalLogin" data-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header text-white bg-primary">
-                    <h4 class="modal-title text-white" id="modalAlertTitle"><span class="fa fa-user"></span> Acessar o Sistema</h4>
-                    <a href="<?php echo baseUrl; ?>" class="close text-white" >
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modalAlertTitle"><span class="fa fa-user"></span> Acessar o Sistema</h4>
+                    <a href="<?php echo baseUrl; ?>" class="close " >
                         <span aria-hidden="true">&times;</span>
                     </a>
                 </div>
                 <div class="modal-body text-center">
                     <form action="<?php echo baseUrl; ?>auth" method="post" onsubmit="hashPass(this);" id="formLogin">
-                        <div class="input-group mb-3"  style="border: 1px solid <?php echo $config['primary_color']; ?>; border-radius: 5px">
-                            <input type="email" class="form-control" placeholder="Seu Email" name="email" id="email" required
-                                style="height: 50px;">
+                        <div class="input-group mb-3"  style="border-radius: 5px">
+                            
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fa fa-envelope"></span>
                                 </div>
                             </div>
+                            <input type="email" class="form-control" placeholder="Seu Email" name="email" id="email" required
+                                style="height: 50px;">
                         </div>
-                        <div class="input-group mb-3"  style="border: 1px solid <?php echo $config['primary_color']; ?>; border-radius: 5px">
-                            <input type="password" class="form-control" placeholder="Sua Senha" name="password" id="password"
-                                   style="height: 50px;"
-                                   minlength="8" required maxlength="100">
+                        <div class="input-group mb-3"  style="border-radius: 5px">
+                           
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fa fa-lock"></span>
                                 </div>
                             </div>
+                            <input type="password" class="form-control" placeholder="Sua Senha" name="password" id="password"
+                                   style="height: 50px;"
+                                   minlength="8" required maxlength="100">
                         </div>
                         <div class="row">
-                            <div class="col-12 mt-1">
-                                <button type="submit" class="btn btn-primary btn-block" id="btnSubmitLogin"><span class="fa fa-unlock"></span> Autenticar</button>
+                            <div class="col-md-6 mt-1 offset-md-3">
+                                <button type="submit" class="btn btn-primary btn-block" id="btnSubmitLogin">Entrar</button>
                             </div>
                             <div class="col-12 text-center mt-2">
                                 <a href="<?php echo baseUrl; ?>esqueci-a-senha" style=" color: #000;">
