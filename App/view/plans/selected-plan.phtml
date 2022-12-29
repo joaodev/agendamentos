@@ -1,4 +1,7 @@
-<?php $entity = $this->view->entity; ?>
+<?php 
+$entity = $this->view->entity; 
+require_once('../public/pagseguro-direct-payment-master/config.php');
+?>
 <section class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -55,18 +58,433 @@
                                     <option value="3">PIX</option>
                                 </select>
                             </div>
-                            <div class="col-md-12"><hr></div>
-                            
                         </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">  
+                                <div style="display: none;" id="paymentBox">
+                                    <div class="row mt-3" style="border: 1px solid #ccc; padding-top: 20px; padding-bottom:20px;">
+                                        <div class="col-md-12"><h3><span class="input-group-addon"><i class="fa fa-credit-card"></i></span> Cartão de Crédito:</h3></div>
+                                        <div class="col-md-12 mt-3">
+                                            <div class="form-group">
+                                                <label for="">Nome do Titular</label>
+                                                <input type="text" class="form-control" id="cardHolder"  name="cardHolder" placeholder="Nome impresso no cartão" maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="">CPF do Titular</label>
+                                                <input type="text" class="form-control" id="cardCCC"  name="cardCCC" placeholder="CPF do Titular" autocomplete="FALSE"
+                                                    onchange="validateCPFCart();">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-4">
+                                            <div class="form-group">
+                                                <label for="">DDD</label>
+                                                <input type="text" class="form-control" id="ddd"  name="ddd" placeholder="DDD" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5 col-8">
+                                            <div class="form-group">
+                                                <label for="">Celular</label>
+                                                <input type="text" class="form-control" id="cellphone"  name="cellphone"  placeholder="Meu celular"  required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="">Dt. Nascimento</label>
+                                                <input type="text" class="form-control" id="birthdate"  name="birthdate" placeholder="Meu aniversário" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="cardNumber">Nº Cartão</label>
+                                                <div class="input-group">
+                                                    <input type="tel" class="form-control" id="cardNumber"  name="cardNumber" placeholder="Número do cartão" autocomplete="cc-number"
+                                                        required  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="col-md-4 col-6">
+                                                    <div class="form-group">
+                                                        <label for="cardExpiry">Validade</label>
+                                                        <input type="tel" class="form-control" id="cardExpiry" name="cardExpiry" placeholder="MM / YYYY" autocomplete="cc-exp" required value=""/>
+                                                    </div>
+                                                </div>
+                                                <div class=" col-md-4 col-6">
+                                                    <div class="form-group">
+                                                        <label for="cardCVC">CVV</label>
+                                                        <input type="tel" class="form-control" id="cardCVC" name="cardCVC" placeholder="CVV" autocomplete="cc-csc" required value=""/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="installments">Parcelas</label>
+                                                        <div class="input-group">
+                                                            <select name="installments" id="select-installments" class="form-control">
+                                                                <option selected>...</option>
+                                                            </select>
+                                                            <input type="hidden" name="installmentValue">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div style=" display: none;" id="billingAddressBox">
+                                    <div class="row mt-3" style="border: 1px solid #ccc; padding-top: 20px; padding-bottom:20px;">
+                                        <div class="col-md-12 mb-3"><h3><span class="input-group-addon"><i class="fa fa-map-marker"></i></span> Endereço de Cobrança:</h3></div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label for="">CEP</label>
+                                                <input type="text" class="form-control" name="billing_postal_code"  id="billing_postal_code" required  placeholder="00000-000">
+                                            </div>
+                                        </div>
+                                        <div class="col-12"></div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="">Endereço</label>
+                                                <input type="text" class="form-control" name="billing_address"  id="billing_address" required placeholder="Endereço de cobrança" maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-6">
+                                            <div class="form-group">
+                                                <label for="">Número</label>
+                                                <input type="text" class="form-control" name="billing_number"  id="billing_number" required placeholder="Número" maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 col-6">
+                                            <div class="form-group">
+                                                <label for="">Complemento</label>
+                                                <input type="text" class="form-control" name="billing_complement" id="billing_complement" placeholder="Complemento" maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="">Bairro</label>
+                                                <input type="text" class="form-control" name="billing_neighborhood" id="billing_neighborhood" required placeholder="Bairro" maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-8">
+                                            <div class="form-group">
+                                                <label for="">Cidade</label>
+                                                <input type="text" class="form-control" name="billing_city" id="billing_city" required placeholder="Cidade" maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-12"></div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label for="">UF</label>
+                                                <input type="text" class="form-control" name="billing_state" id="billing_state" required placeholder="Unidade Federativa" maxlength="2">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3" style="display: none;" id="finishBox">
+                            <div class="col-12 text-center">
+                                <input type="hidden" name="brand">
+                                <input type="hidden" name="token">
+                                <input type="hidden" name="senderHash">
+                                <input type="hidden" name="shippingCoast" value="0">
+                                <input type="hidden" name="id" value="1">
+                                <input type="hidden" name="amount" value="<?php echo $entity['price']; ?>">
+                                <button class="subscribe btn btn-success btn-lg " type="button" id="btnFinish"
+                                        style=" font-size: 2em">
+                                    <span class="input-group-addon"><i class="fa fa-shopping-cart"></i></span> FINALIZAR PEDIDO
+                                </button>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+<script src="<?php echo baseUrl; ?>public/admin/plugins/jquery/jquery.min.js"></script>
+<script src="<?php echo baseUrl; ?>public/js/documents_validators.js"></script>
+<script type="text/javascript" src="<?php echo $JS_FILE_URL ?>"></script>
 <script>
+    $(document).ready(function() {
+        $("#billing_postal_code").mask('99999-999');
+        $("#cardCCC").mask('999.999.999-99');
+        $("#cardCVC").mask('999');
+        $("#cardNumber").mask('9999 9999 9999 9999');
+        $("#cardExpiry").mask('99/9999');
+        $("#ddd").mask('99');
+        $("#cellphone").mask('999999999');
+        $("#birthdate").mask('99/99/9999');
+
+        //Quando o campo cep de cobrança perde o foco.
+        $("#billing_postal_code").blur(function() {
+            //Nova variável "cep" somente com dígitos.
+            let billing_postal_code = $(this).val().replace(/\D/g, '');
+            //Verifica se campo cep possui valor informado.
+            if (billing_postal_code != "") {
+                //Expressão regular para validar o CEP.
+                let billingValidatePostalCode = /^[0-9]{8}$/;
+                //Valida o formato do CEP.
+                if(billingValidatePostalCode.test(billing_postal_code)) {
+                    //Preenche os campos com "..." enquanto consulta webservice.
+                    $("#billing_address").val("...");
+                    $("#billing_neighborhood").val("...");
+                    $("#billing_city").val("...");
+                    $("#billing_state").val("...");
+
+                    //Consulta o webservice viacep.com.br/
+                    $.getJSON("https://viacep.com.br/ws/"+ billing_postal_code +"/json/?callback=?", function(data) {
+                        if (!("erro" in data)) {
+                            //Atualiza os campos com os valores da consulta.
+                            $("#billing_address").val(data.logradouro);
+                            $("#billing_neighborhood").val(data.bairro);
+                            $("#billing_city").val(data.localidade);
+                            $("#billing_state").val(data.uf);
+                        } else {
+                            //CEP pesquisado não foi encontrado.
+                            cleanPostalCodeFormBilling();
+                            alert("CEP não encontrado.");
+                        }
+                    });
+                } else {
+                    //cep é inválido.
+                    cleanPostalCodeFormBilling();
+                    alert("Formato de CEP inválido.");
+                }
+            } else {
+                //cep sem valor, limpa formulário.
+                cleanPostalCodeFormBilling();
+            }
+        });
+
+        //SUBISTITUIR POR SUBMIT PADRÃO DO SISTEMA
+        $("#btnFinish").click(function(){
+            let type = $("#payment_type").val();
+
+            if (type == 1) {
+                if ($("#cardHolder").val() == "") {
+                    $("#cardHolder").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#cardCCC").val() == "") {
+                    $("#cardCCC").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#ddd").val() == "") {
+                    $("#ddd").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#cellphone").val() == "") {
+                    $("#cellphone").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#birthdate").val() == "") {
+                    $("#birthdate").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#cardNumber").val() == "") {
+                    $("#cardNumber").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#cardExpiry").val() == "") {
+                    $("#cardExpiry").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#cardCVC").val() == "") {
+                    $("#cardCVC").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#billing_postal_code").val() == "") {
+                    $("#billing_postal_code").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#billing_address").val() == "") {
+                    $("#billing_address").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#billing_number").val() == "") {
+                    $("#billing_number").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#billing_neighborhood").val() == "") {
+                    $("#billing_neighborhood").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#billing_city").val() == "") {
+                    $("#billing_city").attr('style', 'border: 2px solid red').focus();
+                } else if ($("#billing_state").val() == "") {
+                    $("#billing_state").attr('style', 'border: 2px solid red').focus();
+                } else {
+                    $("#baseLoader").show();
+
+                    let param = {
+                        cardNumber: $("input[name='cardNumber']").val().replace(/ /g,''),
+                        brand: $("input[name='brand']").val(),
+                        cvv: $("input[name='cardCVC']").val(),
+                        expirationMonth: $("input[name='cardExpiry']").val().split('/')[0],
+                        expirationYear: $("input[name='cardExpiry']").val().split('/')[1],
+                        success: function(json){
+                            let token = json.card.token;
+                            $("input[name='token']").val(token);
+                            let senderHash = PagSeguroDirectPayment.getSenderHash();
+                            if (senderHash) {
+                                $("input[name='senderHash']").val(senderHash);
+                                
+                                
+                                $.ajax({
+                                    type: "POST",
+                                    url: "<?php echo baseUrl; ?>planos/processa-pedido",
+                                    data: {
+                                        cardHolder: $("#cardHolder").val(), 
+                                        cardCCC: $("#cardCCC").val(), 
+                                        ddd: $("#ddd").val(), 
+                                        cellphone: $("#cellphone").val(), 
+                                        birthdate: $("#birthdate").val(), 
+                                        cardNumber: $("#cardNumber").val(), 
+                                        cardExpiry: $("#cardExpiry").val(), 
+                                        cardCVC: $("#cardCVC").val(), 
+                                        billing_postal_code: $("#billing_postal_code").val(), 
+                                        billing_address: $("#billing_address").val(), 
+                                        billing_number: $("#billing_number").val(), 
+                                        billing_neighborhood: $("#billing_neighborhood").val(), 
+                                        billing_city: $("#billing_city").val(), 
+                                        billing_state: $("#billing_state").val(), 
+                                    },
+                                    dataType: 'json',
+                                    async: true
+                                }).done(function(data) {
+                                    showAlert(data.type, data.title, data.msg, data.pos);
+                                    $("#baseLoader").hide();
+                                    $("#btnSubmit").attr('disabled', false);
+                                    $('#formCreatePlan').trigger("reset");
+                                }).fail(function() {
+                                    showInternalErrorAlert();
+                                    $("#baseLoader").hide();
+                                    $("#btnSubmit").attr('disabled', false);
+                                });
+
+
+                            } else {
+                                showAlert('error', 'Ops!', 'Erro ao processar pagamento, atualize a página...', 'top-center');
+                                $("#baseLoader").hide();
+                            }
+                        }, error: function(json){
+                            showAlert('error', 'Ops!', 'Erro ao processar pagamento, atualize a página...', 'top-center');
+                            $("#baseLoader").hide();
+                        }
+                    }
+
+                    PagSeguroDirectPayment.createCardToken(param);
+                }
+            }
+        });
+    });
+    
+    function cleanPostalCodeFormBilling() {
+        $("#billing_address").val("");
+        $("#billing_neighborhood").val("");
+        $("#billing_city").val("");
+        $("#billing_state").val("");
+        $("#billing_postal_code").val("");
+    }
+
+
     function setPaymentType() {
         let paymentType = $("#payment_type").val();
-        alert(paymentType.val());
+        
+        $("#cardCCC").val('');
+        $("#cardCVC").val('');
+        $("#cardNumber").val('');
+        $("#cardExpiry").val('');
+        
+        if (paymentType == 1) {
+            $("#paymentBox").show();
+            $("#billingAddressBox").show();
+            $("#finishBox").show();
+        }
+
+        if (paymentType == 2) {
+            $("#paymentBox").hide();
+            $("#billingAddressBox").hide();
+            $("#finishBox").hide();
+        }
+
+        if (paymentType == 3) {
+            $("#paymentBox").hide();
+            $("#billingAddressBox").hide();
+            $("#finishBox").hide();
+        }
+
+        if (paymentType == '') {
+            $("#paymentBox").hide();
+            $("#billingAddressBox").hide();
+            $("#finishBox").hide();
+        }
     }
+
+    jQuery(function($) {
+
+        var shippingCoast = parseFloat($("input[name='shippingCoast']").val());
+        var amount = parseFloat($("input[name='amount']").val());
+        $("input[name='installmentValue']").val(amount + shippingCoast);
+
+        $("#cardNumber").change(function() {
+            var cardNumber = $("input[name='cardNumber']").val();
+
+            //if creditcard number is finished, get installments
+            if(cardNumber.length != 19){
+                return;
+            }
+
+            $("#baseLoader").show();
+
+            $.ajax({
+                type: 'POST',
+                url: "<?php echo baseUrl; ?>util/api-session",
+                async: true,
+            }).done(function(sessionData) {
+                PagSeguroDirectPayment.setSessionId(sessionData);
+
+                PagSeguroDirectPayment.getBrand({
+                    cardBin: cardNumber.replace(/ /g,''),
+                    success: function(json){
+                        console.log(json);
+                        var brand = json.brand.name;
+                        $("input[name='brand']").val(brand);
+
+                        var amount = parseFloat($("input[name='amount']").val());
+                        var shippingCoast = parseFloat($("input[name='shippingCoast']").val());
+
+                        //The maximum installment qty with no extra fees (You must configure it on your PagSeguro dashboard with same value)
+                        var max_installment_no_extra_fees = 2;
+
+                        PagSeguroDirectPayment.getInstallments({
+                            amount: amount + shippingCoast,
+                            brand: brand,
+                            maxInstallmentNoInterest: max_installment_no_extra_fees,
+                            success: function(response) {
+                                installments = response.installments[brand];
+                                $("#select-installments").html("");
+                                let countIn = 0;
+                                for(var installment of installments){
+                                    countIn++;
+                                    if (countIn == 1) {
+                                        $("#select-installments").append("<option value='" + installment.quantity + "'>" + installment.quantity + " x R$ " + installment.installmentAmount + " - " + (installment.quantity <= max_installment_no_extra_fees? "Sem" : "Com")  + " Juros</option>");
+                                    }
+                                }
+
+                                $("#baseLoader").hide();
+                            }, error: function(response) {
+                                showAlert('error', 'Ops!', 'Erro ao listar parcelas, tente novamente.', 'top-center');
+                                $("#baseLoader").hide();
+                            }
+                        });
+
+                    }, error: function(json){
+                        showAlert('error', 'Ops!', 'Número do cartão inválido, tente novamente.', 'top-center');
+                        $("#baseLoader").hide();
+                    }
+                });
+
+
+            }).fail(function() {
+                showAlert('error', 'Ops!', 'Erro na requisição, tente novamente.', 'top-center');
+                $("#baseLoader").hide();
+            });
+        });
+    });
 </script>

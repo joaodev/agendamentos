@@ -132,7 +132,6 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/planos/excluir', 'controller' => 'plans', 'action' => 'delete'],
 	['namespace' => 'app', 'route' => '/planos/valor-existente', 'controller' => 'plans', 'action' => 'field-exists'],
 	['namespace' => 'app', 'route' => '/planos/plano-selecionado', 'controller' => 'plans', 'action' => 'selected-plan'],
-	
 ];
 
 $systemDir = match ($_SERVER['HTTP_HOST']) {

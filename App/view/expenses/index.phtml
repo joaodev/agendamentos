@@ -73,8 +73,9 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                         <div class="card-body">
                             <?php if (empty($_SESSION['PLAN'])): ?>
                                 <div class="alert alert-info" role="alert">
+                                    Você está no plano Gratuito, 
                                     <a onclick="openModule('planos-usuario');" 
-                                    class="alert-link text-white" style="cursor: pointer;">Altere seu plano</a> para realizar consultas e emissões de relatórios via Excel.
+                                    class="alert-link text-white" style="cursor: pointer;">altere seu plano</a> para liberar todos os recursos do sistema.
                                 </div>
                             <?php endif; ?>
                             <div class="table-responsive">

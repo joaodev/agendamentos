@@ -37,12 +37,18 @@ class SchedulesController extends ActionController implements CrudInterface
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
-        $totalServices = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
-        if ($totalServices >= $activePlan['total_schedules']) {
-            $reached_limit = true;
-        } else {
+        $totalSchedules = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+        
+        if ($activePlan['total_schedules'] == 0) {
             $reached_limit = false;
-        }   
+        } else {
+            if ($totalSchedules >= $activePlan['total_schedules']) {
+                $reached_limit = true;
+            } else {
+                $reached_limit = false;
+            }   
+        }
+
         $this->view->reached_limit = $reached_limit;
 
         $this->render('index', false);
