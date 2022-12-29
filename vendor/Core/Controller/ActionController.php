@@ -361,7 +361,7 @@ class ActionController
         } else {
             return [
                 'total_customers' => 10,
-                'total_services' => 3,
+                'total_services' => 5,
                 'total_schedules' => 20
             ];
         }
