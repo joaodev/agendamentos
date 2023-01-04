@@ -350,19 +350,19 @@ class ActionController
     public function getActivePlan(): array
     {
         if ($_SESSION['PLAN']) {
-            $plansModel = Container::getClass("Plans", "app");
-            $plans = $plansModel->getOne($_SESSION['PLAN']);
+            //$plansModel = Container::getClass("Plans", "app");
+            //$plans = $plansModel->getOne($_SESSION['PLAN']);
    
             return [
-                'total_customers' => $plans['total_customers'],
-                'total_services'  => $plans['total_services'],
-                'total_schedules' => $plans['total_schedules'],
+                'total_customers' => 0,
+                'total_services'  => 0,
+                'total_schedules' => 0,
             ];
         } else {
             return [
                 'total_customers' => 10,
-                'total_services' => 5,
-                'total_schedules' => 20
+                'total_services' => 10,
+                'total_schedules' => 10
             ];
         }
     }

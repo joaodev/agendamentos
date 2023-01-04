@@ -46,19 +46,24 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             <div class="row">
                 <div class="col-md-12">
                     <?php if ($this->view->reached_limit): ?>
-                        <div class="alert bg-primary" role="alert">
-                            Limite de cadastros atingido, <a onclick="openModule('planos-usuario');" 
-                            class="alert-link text-white" style="cursor: pointer;">altere seu plano</a> para aumentar o limite atual.
+                        <div class="alert bg-red" role="alert">
+                            <span class="fa fa-info-circle pr-1"></span>
+                            Limite de cadastros atingido! 
+                            <a onclick="openModule('planos-usuario');" 
+                                class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para aumentar o limite atual.
                         </div>
+                    <?php else: ?>
+                        <?php if (empty($_SESSION['PLAN'])): ?>
+                            <div class="alert alert-info" role="alert">
+                                <span class="fa fa-users pr-1"></span> 
+                                Você está utilizando o Plano Gratuito. 
+                                <a onclick="openModule('planos-usuario');" 
+                                    class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para alterar e liberar todos os recursos do sistema.
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                     <div class="card">
                         <div class="card-body">
-                            <?php if (empty($_SESSION['PLAN'])): ?>
-                                <div class="alert alert-info" role="alert">
-                                    <a onclick="openModule('planos-usuario');" 
-                                    class="alert-link text-white" style="cursor: pointer;">Altere seu plano</a> para realizar consultas e emissões de relatórios via Excel.
-                                </div>
-                            <?php endif; ?>
                             <div class="table-responsive">
                                 <table class="table table-bordered table-hover" id="table_sv" style="width: 100%;">
                                     <thead>
@@ -112,106 +117,62 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             </div>
         </div>
     </section>
-    <?php if (!empty($_SESSION['PLAN'])): ?>
-        <script type="text/javascript">
-            $(document).ready(function() {
-                let buttonCommon = {
-                    exportOptions: {
-                        format: {
-                            body: function ( data ) {
-                                return data;
-                            }
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let buttonCommon = {
+                exportOptions: {
+                    format: {
+                        body: function ( data ) {
+                            return data;
                         }
                     }
-                };
-            
-                $('#table_sv').DataTable({
-                    "sDom": 'flBtip',
-                    searching: true,
-                    buttons: [
-                        $.extend( true, {}, buttonCommon, {
-                            extend: 'excel',
-                            title: 'Serviços',
-                            exportOptions: {columns: [0,1,2,4,5,6]}
-                        })
-                    ],
-                    order: [ [0, "asc"] ],
-                    columnDefs: [{orderable: false, targets: [3]}],
-                    responsive: true,
-                    info: true,
-                    processing: true,
-                    scrollCollapse: true,
-                    paging: true,
-                    "pageLength": 10,
-                    "language": {
-                        "sEmptyService": "Nenhum registro encontrado",
-                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
-                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
-                        "sInfoPostFix": "",
-                        "sInfoThousands": ".",
-                        "sLengthMenu": "_MENU_ &nbsp;",
-                        "sLoadingRecords": "Carregando...",
-                        "sProcessing": "Processando...",
-                        "sZeroRecords": "Nenhum registro encontrado",
-                        "sSearch": "Filtrar",
-                        "oPaginate": {
-                            "sNext": "Próximo",
-                            "sPrevious": "Anterior",
-                            "sFirst": "Primeiro",
-                            "sLast": "Último"
-                        },
-                        "oAria": {
-                            "sSortAscending": ": Ordenar colunas de forma ascendente",
-                            "sSortDescending": ": Ordenar colunas de forma descendente"
-                        }
+                }
+            };
+        
+            $('#table_sv').DataTable({
+                "sDom": 'flBtip',
+                searching: true,
+                buttons: [
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'excel',
+                        title: 'Serviços',
+                        exportOptions: {columns: [0,1,2,4,5,6]}
+                    })
+                ],
+                order: [ [0, "asc"] ],
+                columnDefs: [{orderable: false, targets: [3]}],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 10,
+                "language": {
+                    "sEmptyService": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
                     }
-                });
+                }
             });
-        </script>
-    <?php else: ?>
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $('#table_sv').DataTable({
-                    "sDom": 'tip',
-                    searching: false,
-                    order: [ [0, "asc"] ],
-                    columnDefs: [{orderable: false, targets: [3]}],
-                    responsive: true,
-                    info: true,
-                    processing: true,
-                    scrollCollapse: true,
-                    paging: false,
-                    "pageLength": 10,
-                    "language": {
-                        "sEmptyService": "Nenhum registro encontrado",
-                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
-                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
-                        "sInfoPostFix": "",
-                        "sInfoThousands": ".",
-                        "sLengthMenu": "_MENU_ &nbsp;",
-                        "sLoadingRecords": "Carregando...",
-                        "sProcessing": "Processando...",
-                        "sZeroRecords": "Nenhum registro encontrado",
-                        "sSearch": "Filtrar",
-                        "oPaginate": {
-                            "sNext": "Próximo",
-                            "sPrevious": "Anterior",
-                            "sFirst": "Primeiro",
-                            "sLast": "Último"
-                        },
-                        "oAria": {
-                            "sSortAscending": ": Ordenar colunas de forma ascendente",
-                            "sSortDescending": ": Ordenar colunas de forma descendente"
-                        }
-                    }
-                });
-            });
-        </script>
-    <?php endif; ?>
-
-    
+        });
+    </script>
     <script>
         function openDetails(uuid) {
             $("#baseLoader").show();
