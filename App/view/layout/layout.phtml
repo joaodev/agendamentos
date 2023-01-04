@@ -328,22 +328,22 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] != '1'): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('planos-usuario');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-dollar-sign"></i>
-                                                <p>
-                                                    Planos
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
                                     <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewServices): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('servicos');" class="nav-link text-white" style="cursor: pointer;">
                                                 <i class="nav-icon fas fa-cubes"></i>
                                                 <p>
                                                     Serviços
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] != '1'): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('planos-usuario');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-dollar-sign"></i>
+                                                <p>
+                                                    Planos
                                                 </p>
                                             </a>
                                         </li>
