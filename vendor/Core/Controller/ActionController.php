@@ -349,7 +349,7 @@ class ActionController
 
     public function getActivePlan(): array
     {
-        if ($_SESSION['PLAN']) {
+        if (!empty($_SESSION['PLAN'])) {
             //$plansModel = Container::getClass("Plans", "app");
             //$plans = $plansModel->getOne($_SESSION['PLAN']);
    
