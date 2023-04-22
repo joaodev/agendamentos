@@ -153,12 +153,9 @@ class UserController extends ActionController implements CrudInterface
     public function updateProcessAction(): bool
     {
         if (!empty($_POST)) {
+            $entity = $this->model->getOne($_POST['uuid']);
             if (!empty($_POST['password'])) {
                 unset($_POST['password']);
-            }
-
-            if (!empty($_POST['role_uuid'])) {
-                unset($_POST['role_uuid']);
             }
             
             $_POST['updated_at'] = date('Y-m-d H:i:s');
@@ -166,7 +163,11 @@ class UserController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction){  
+                if ($entity['role_uuid'] != $_POST['role_uuid']) {
+                    $this->reorganizeAcl($_POST['role_uuid'], $_POST['uuid']);
+                }
+
                 $this->toLog("Atualizou o usuário: {$_POST['name']} #{$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -294,6 +295,31 @@ class UserController extends ActionController implements CrudInterface
             return true;
         } else {
             return false;
+        }
+    }
+
+    private function reorganizeAcl($role, $user): void
+    {
+        if (!empty($role) && !empty($user)) {
+            //limpa a acl de usuario
+            if ($this->aclModel->cleanUserAcl($user)) {
+                //limpa os privilegios de usuarios
+                if ($this->privilegeModel->cleanUserPrivileges($user)) {
+                    //configura os novos privilegios
+                    $crud = new Crud();
+                    $privileges = $this->privilegeModel->getAllByRoleUuid($role);
+                    foreach ($privileges as $privilege) {
+                        $aclData = [
+                            'uuid' => $this->privilegeModel->NewUUID(),
+                            'user_uuid' => $user,
+                            'privilege_uuid' => $privilege['uuid']
+                        ];
+                        
+                        $crud->setTable($this->aclModel->getTable());
+                        $crud->create($aclData);
+                    }
+                }
+            }
         }
     }
 }

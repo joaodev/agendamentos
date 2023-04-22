@@ -5,8 +5,8 @@ $role    = $_SESSION['ROLE'];
 $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('financial'));
 ?>
 <?php if ($canView): ?>
-    <section class="content-header">
-        <div class="container-fluid">
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
             <div class="row">
                 <div class="col-8" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
@@ -57,7 +57,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <?php if (empty($_SESSION['PLAN'])): ?>
+                    <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
                         <div class="alert alert-info" role="alert">
                             <span class="fa fa-users pr-1"></span> 
                             Você está utilizando o Plano Gratuito. 

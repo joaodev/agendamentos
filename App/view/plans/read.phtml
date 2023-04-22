@@ -1,7 +1,7 @@
 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('plans'))): ?>
     <?php $entity = $this->view->entity; ?>
-    <section class="content-header">
-        <div class="container-fluid">
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
             <div class="row">
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
@@ -40,14 +40,62 @@
                                         <label for="name">Status</label>
                                         <?php if ($entity['status'] == '1'): ?>
                                             <p>
-                                                <i class="fa fa-circle" style="color: green;"></i> Ativa
+                                                <i class="fa fa-circle" style="color: green;"></i> Plano Ativo
                                             </p>
                                         <?php endif; ?>
                                         <?php if ($entity['status'] == '0'): ?>
                                             <p>
-                                                <i class="fa fa-circle" style="color: red;"></i> Inativa
+                                                <i class="fa fa-circle" style="color: red;"></i> Plano Inativo
                                             </p>
                                         <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="name">Descrição do Plano</label>
+                                        <p><?php echo $entity['description']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="name">Link de Pagamento</label>
+                                        <p><?php echo base64_decode($entity['btn_link']); ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="total_customers">Qtd. Clientes*</label>
+                                        <p><?php echo $entity['total_customers']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="total_services">Qtd. Serviços*</label>
+                                        <p><?php echo $entity['total_services']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="total_schedules">Qtd. Agendamentos*</label>
+                                        <p><?php echo $entity['total_schedules']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="total_revenues">Qtd. Receitas*</label>
+                                        <p><?php echo $entity['total_revenues']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="total_expenses">Qtd. Despesas*</label>
+                                        <p><?php echo $entity['total_expenses']; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="total_tasks">Qtd. Tarefas*</label>
+                                        <p><?php echo $entity['total_tasks']; ?></p>
                                     </div>
                                 </div>
                                 <div class="col-md-12"><hr></div>
@@ -64,19 +112,26 @@
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                        <div class="col-md-3 mt-2 mb-2">
                                             <button type="button" class="btn btn-outline-primary" onclick="openModule('planos');" style="width: 100%;">
                                                 <i class="fas fa-arrow-left pr-1"></i> Voltar
                                             </button>
                                         </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                        <div class="col-md-3  mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('plans'))): ?>
                                                 <button type="button" class="btn btn-outline-primary" onclick="updatePlan('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-pen pr-1"></i> Editar
                                                 </button>
                                             <?php endif; ?>
                                         </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                        <div class="col-md-3  mt-2 mb-2">
+                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('user-plans'))): ?>
+                                                <button type="button" class="btn btn-outline-primary" onclick="usersPlans('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                    <i class="fa fa-users pr-1"></i> Ativos
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="col-md-3 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('plans'))): ?>
                                                 <button type="button" class="btn btn-outline-primary" onclick="deletePlan('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-trash"></i> Remover

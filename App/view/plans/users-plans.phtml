@@ -1,0 +1,158 @@
+<?php
+$isAdmin = $_SESSION['ROLE_ADM'] == '1';
+$role    = $_SESSION['ROLE'];
+
+$canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('user-plans'));
+$canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('user-plans'));
+$canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('user-plans'));
+
+$data = $this->view->data; 
+if ($canView):
+?>
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
+            <div class="row">
+                <div class="col-11" >
+                    <h1 style="position: relative; top: 5px; font-size: 25px;">
+                        <i class="fas fa-user-cog pr-1"></i>
+                        Planos de Usuários
+                    </h1>
+                </div>
+                <div class="col-1">
+                    <ol class="breadcrumb float-right">
+                            <li class="breadcrumb-item">
+                                <button type="button" class="btn btn-outline-primary"
+                                    onclick="openDetails('<?php echo $_POST['uuid']; ?>');" style="width: 100%;">
+                                    <i class="fas fa-arrow-left"></i> 
+                                </button>
+                            </li>
+                        </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table_users_plans" style="width: 100%;">
+                                    <thead>
+                                        <tr class="text-center" style="height: 30px;">
+                                            <th style="font-size: 14px;">Data</th>
+                                            <th style="font-size: 14px;">Usuário</th>
+                                            <th style="font-size: 14px;">Comprovante</th>
+                                            <th style="font-size: 14px;">Status</th>
+                                            <th style="font-size: 14px;">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($data as $entity): ?>
+                                            <tr class="text-center">
+                                                <td style="font-size: 15px; ">
+                                                    <?php echo $this->formatDateTime($entity['created_at'], false); ?>
+                                                </td>
+                                                <td style="font-size: 15px; ">
+                                                    <?php echo $entity['userName']; ?>
+                                                </td>
+                                                <td style="font-size: 15px;">
+                                                    <a href="">
+                                                        <?php echo $entity['file']; ?>
+                                                    </a>
+                                                </td>
+                                                <td style="font-size: 15px;">
+                                                    <?php if ($entity['status'] == '0'): ?>
+                                                        <span style="color: blue;">AGUARDANDO COMPROVANTE</span>
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '1'): ?>
+                                                        <span style="color: green;">ATIVO</span>
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '2'): ?>
+                                                        <span style="color: blue;">CANCELADO</span>
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '3'): ?>
+                                                        <span style="color: purple;">ATIVAÇÃO PENDENTE</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="font-size: 15px;">
+                                                    <button type="button" class="btn btn-success btn-sm">
+                                                        <span class="fa fa-sync"></span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm">
+                                                        <span class="fa fa-trash"></span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let buttonCommon = {
+                exportOptions: {
+                    format: {
+                        body: function ( data ) {
+                            return data;
+                        }
+                    }
+                }
+            };	
+
+            $('#table_users_plans').DataTable({
+                "sDom": 'flBtip',
+                searching: true,
+                buttons: [
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'excel',
+                        title: 'PLANOS DE USUÁRIOS',
+                        ///exportOptions: {columns: [0,1,2,3,4,6]}
+                    })
+                ],
+                order: [ [0, "desc"] ],
+                columnDefs: [{orderable: false, targets: [2]}],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+
+        function openUserPlanDetails(uuid) {
+            alert(uuid);
+        }
+    </script>
+<?php endif; ?>

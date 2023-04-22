@@ -25,7 +25,17 @@ class ActionController
         }
 
         if (!empty($_POST)) {
-            self::dataValidation($_POST);
+            foreach ($_POST as $key => $value) {
+                $_POST[$key] = str_replace("'", "`", $_POST[$key]);
+            }
+
+            $data = $_POST;
+            if (!empty($data['description'])) unset($data['description']);
+            if (!empty($data['mail_password'])) unset($data['mail_password']);
+            if (!empty($data['password'])) unset($data['password']);
+            if (!empty($data['confirmation'])) unset($data['confirmation']);
+
+            self::dataValidation($data);
         }
 
         $this->view = new stdClass();
@@ -323,6 +333,7 @@ class ActionController
             'services' => '62430c22-1a3d-42ff-8921-fca074a676dc',
             'financial' => 'c2262430-8921-1a3d-42ff-074a676fcadc',
             'plans' => '4b3ab6dc-16af-450b-a2e8-f4c006c8bf16',
+            'user-plans' => '192631d7-87f0-4677-b446-a018ef4026e2',
         ];
 
         return $codes[$key];
@@ -350,19 +361,25 @@ class ActionController
     public function getActivePlan(): array
     {
         if (!empty($_SESSION['PLAN'])) {
-            //$plansModel = Container::getClass("Plans", "app");
-            //$plans = $plansModel->getOne($_SESSION['PLAN']);
-   
+            $plansModel = Container::getClass("Plans", "app");
+            $plans = $plansModel->getOne($_SESSION['PLAN']);
+
             return [
-                'total_customers' => 0,
-                'total_services'  => 0,
-                'total_schedules' => 0,
+                'total_customers' => $plans['total_customers'],
+                'total_services'  => $plans['total_services'],
+                'total_schedules' => $plans['total_schedules'],
+                'total_tasks' => $plans['total_tasks'],
+                'total_revenues' => $plans['total_revenues'],
+                'total_expenses' =>$plans['total_expenses']
             ];
         } else {
             return [
                 'total_customers' => 10,
                 'total_services' => 10,
-                'total_schedules' => 10
+                'total_schedules' => 10,
+                'total_tasks' => 10,
+                'total_revenues' => 10,
+                'total_expenses' => 10
             ];
         }
     }

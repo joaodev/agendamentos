@@ -4,10 +4,10 @@ $canViewCustomers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
 $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'));
 $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('expenses'));
 ?>
-<section class="content mt-4" style="margin-left: 9px; margin-right: 9px;">
-    <div class="container-fluid">
+<section class="content mt-5 pt-4" style="margin-left: 9px; margin-right: 9px;">
+    <div class="container-fluid mt-2">
         <div class="row">
-            <?php if (empty($_SESSION['PLAN'])): ?>
+            <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
                 <div class="col-12">
                     <div class="alert alert-info" role="alert">
                         Você está no plano Gratuito, 
@@ -16,7 +16,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                     </div>
                 </div>
             <?php endif; ?>
-            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewCustomers): ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
                 <div class="col-12 col-md-6">
                     <div class="small-box bg-gradient-success" onclick="openModule('financeiro')" style="cursor: pointer;">
                         <div class="inner">
@@ -29,7 +29,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                     </div>
                 </div>
             <?php endif; ?>
-            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewExpenses): ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewExpenses): ?>
                 <div class="col-12 col-md-6">
                     <div class="small-box bg-gradient-danger" onclick="openModule('despesas')" style="cursor: pointer;">
                         <div class="inner">
@@ -42,7 +42,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                     </div>
                 </div>
             <?php endif; ?>
-            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewSchedules): ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
                 <div class="col-6 col-md-6 col-lg-3">
                     <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
                         <div class="inner">
@@ -55,7 +55,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                     </div>
                 </div>
             <?php endif; ?>
-            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewSchedules): ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
                 <div class="col-6 col-md-6 col-lg-3">
                     <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
                         <div class="inner">
@@ -69,7 +69,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                 </div>
             <?php endif; ?>
             
-            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewCustomers): ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
                 <div class="col-6 col-md-6 col-lg-3">
                     <div class="small-box bg-gradient-dark" onclick="openModule('clientes')" style="cursor: pointer;">
                         <div class="inner">
@@ -82,7 +82,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                     </div>
                 </div>
             <?php endif; ?>
-            <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewServices): ?>
+            <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewServices): ?>
                 <div class="col-6 col-md-6 col-lg-3">
                     <div class="small-box bg-gradient-dark" onclick="openModule('servicos')" style="cursor: pointer;">
                         <div class="inner">

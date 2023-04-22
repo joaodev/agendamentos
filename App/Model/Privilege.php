@@ -94,4 +94,23 @@ class Privilege extends Model
             return $e->getMessage();
         }
     }
+
+    public function cleanUserPrivileges($user): bool|string
+    {
+        try {
+            $query = "DELETE FROM privilege
+                        WHERE user_uuid = :user_uuid";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":user_uuid", $user);
+            $stmt->execute();
+
+            $stmt = null;
+            $this->closeDb();
+
+            return true;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
 }

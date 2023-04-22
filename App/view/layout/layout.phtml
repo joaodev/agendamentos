@@ -205,10 +205,16 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
             <img class="animation__shake" src="<?php echo baseUrl . 'public/uploads/logo/' . $config['logo_icon']; ?>"
             alt="<?php echo $config['site_title']; ?>" height="200">
         </div>
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a onclick="openModule('meu-perfil');" class="nav-link" style="cursor: pointer; text-center">
+                        <i class="fa fa-user"></i>
+                        <?php echo $_SESSION['NAME']; ?>
+                    </a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -247,7 +253,12 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                     <div class="info" style="margin-top: -10px;">
                         <a onclick="openModule('meu-perfil');" class="d-block text-white" style="cursor: pointer"><?php echo $_SESSION['NAME']; ?><br>
                         <small><a onclick="openModule('meu-perfil');" class="d-block text-white" style="cursor: pointer">
-                        (<?php echo $_SESSION['ROLE_NAME']; ?> - <?php echo (!empty($_SESSION['PLAN_NAME']) ? $_SESSION['PLAN_NAME'] : 'Plano Gratuito'); ?>)
+                        (
+                        <?php echo $_SESSION['ROLE_NAME']; ?> 
+                        <?php if (!$_SESSION['ROLE_ADM']):  ?>
+                            <?php echo (!empty($_SESSION['PLAN_NAME']) ? ' - ' . $_SESSION['PLAN_NAME'] : ' - Plano Gratuito'); ?>
+                        <?php endif; ?>
+                        )
                     </a></small></a>
                     </div>
                 </div>
@@ -263,11 +274,11 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                         </li>
                         <?php if (
                             $_SESSION['ROLE_ADM'] == '1'
-                            || $canViewCustomers
                             || $canViewUsers
                             || $canViewExpenses
                             || $canViewSchedules
-                            || $canViewServices
+                            || $canViewPlans
+                            || $canViewPayments
                         ): ?>
                             <li class="nav-item">
                                 <a href="#" class="nav-link text-white">
@@ -278,33 +289,12 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview" style="display: none;">
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewSchedules): ?>
-                                        <!--
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('agendamentos');" class="nav-link text-white" style="cursor: pointer;">
                                                 <i class="nav-icon fas fa-calendar"></i>
                                                 <p>
                                                     Agendamentos
-                                                </p>
-                                            </a>
-                                        </li>
-                                        -->
-                                    <?php endif; ?>
-                                    <li class="nav-item ml-2">
-                                            <a onclick="openModule('agendamentos');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-calendar"></i>
-                                                <p>
-                                                    Tarefas
-                                                </p>
-                                            </a>
-                                        </li>
-
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewCustomers): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('clientes');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-users"></i>
-                                                <p>
-                                                    Clientes
                                                 </p>
                                             </a>
                                         </li>
@@ -319,9 +309,9 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewExpenses): ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewExpenses): ?>
                                         <li class="nav-item ml-2">
-                                            <a onclick="openModule('despesas');" class="nav-link text-white" style="cursor: pointer;">
+                                            <a onclick="openModule('receitas');" class="nav-link text-white" style="cursor: pointer;">
                                                 <i class="nav-icon fas fa-file-invoice-dollar"></i>
                                                 <p>
                                                     Receitas
@@ -329,7 +319,7 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewExpenses): ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewExpenses): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('despesas');" class="nav-link text-white" style="cursor: pointer;">
                                                 <i class="nav-icon fas fa-file-invoice-dollar"></i>
@@ -339,7 +329,7 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewFinancial): ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewFinancial): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('financeiro');" class="nav-link text-white" style="cursor: pointer;">
                                                 <i class="nav-icon fas fa-cash-register"></i>
@@ -349,52 +339,12 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewServices): ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPlans): ?>
                                         <li class="nav-item ml-2">
-                                            <a onclick="openModule('servicos');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-cubes"></i>
-                                                <p>
-                                                    Serviços
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] != '1'): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('planos-usuario');" class="nav-link text-white" style="cursor: pointer;">
+                                            <a onclick="openModule('planos');" class="nav-link text-white" style="cursor: pointer;">
                                                 <i class="nav-icon fas fa-dollar-sign"></i>
                                                 <p>
                                                     Planos
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                </ul>
-                            </li>
-                        <?php endif; ?>
-                        <?php if (
-                            $_SESSION['ROLE_ADM'] == '1'
-                            || $canViewPayments
-                            || $canViewConfigs
-                            || $canViewSmtp
-                            || $canViewLogs
-                            || $canViewPlans
-                        ): ?>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link text-white">
-                                    <i class="nav-icon fas fa-cog"></i>
-                                    <p>
-                                        CONFIGURAÇÕES
-                                        <i class="fas fa-angle-left right"></i>
-                                    </p>
-                                </a>
-                                <ul class="nav nav-treeview" style="display: none;">
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('controle-acesso');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-lock"></i>
-                                                <p>
-                                                    Controle de Acesso
                                                 </p>
                                             </a>
                                         </li>
@@ -409,6 +359,71 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                             </a>
                                         </li>
                                     <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('controle-acesso');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-lock"></i>
+                                                <p>
+                                                    Controle de Acesso
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (
+                            $_SESSION['ROLE_ADM'] == '0'
+                            || $canViewCustomers
+                            || $canViewServices
+                        ): ?>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-white">
+                                    <i class="nav-icon fas fa-plus"></i>
+                                    <p>
+                                        CADASTROS
+                                        <i class="fas fa-angle-left right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview" style="display: none;">
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('clientes');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-users"></i>
+                                                <p>
+                                                    Clientes
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewServices): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('servicos');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-cubes"></i>
+                                                <p>
+                                                    Serviços
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (
+                            $_SESSION['ROLE_ADM'] == '1'
+                            || $canViewConfigs
+                            || $canViewSmtp
+                            || $canViewLogs
+                        ): ?>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-white">
+                                    <i class="nav-icon fas fa-cog"></i>
+                                    <p>
+                                        CONFIGURAÇÕES
+                                        <i class="fas fa-angle-left right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview" style="display: none;">
                                     <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewConfigs): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('configuracoes');" class="nav-link text-white" style="cursor: pointer;">
@@ -429,16 +444,6 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPlans): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('planos');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-dollar-sign"></i>
-                                                <p>
-                                                    Planos
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
                                     <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewSmtp): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('smtp');" class="nav-link text-white" style="cursor: pointer;">
@@ -452,7 +457,16 @@ $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                 </ul>
                             </li>
                         <?php endif; ?>
-
+                        <?php if ($_SESSION['ROLE_ADM'] == '0'): ?>
+                            <li class="nav-item">
+                                <a onclick="openModule('planos-usuario');" class="nav-link text-white" style="cursor: pointer;">
+                                    <i class="nav-icon fas fa-dollar-sign"></i>
+                                    <p>
+                                        Planos
+                                    </p>
+                                </a>
+                            </li>
+                        <?php endif; ?>
                         <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPolitics): ?>
                             <li class="nav-item">
                                 <a onclick="openModule('politica-privacidade');" class="nav-link text-white" style="cursor: pointer;">

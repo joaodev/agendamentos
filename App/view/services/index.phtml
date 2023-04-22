@@ -10,8 +10,8 @@ $canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $thi
 $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('services'));
 ?>
 <?php if ($canView): ?>
-    <section class="content-header">
-        <div class="container-fluid">
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
             <div class="row">
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
@@ -53,7 +53,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                 class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para aumentar o limite atual.
                         </div>
                     <?php else: ?>
-                        <?php if (empty($_SESSION['PLAN'])): ?>
+                        <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
                             <div class="alert alert-info" role="alert">
                                 <span class="fa fa-users pr-1"></span> 
                                 Você está utilizando o Plano Gratuito. 

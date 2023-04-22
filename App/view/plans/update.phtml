@@ -3,8 +3,8 @@ $entity = $this->view->entity;
 $role = $_SESSION['ROLE'];
 ?>
 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('plans'))): ?>
-    <section class="content-header">
-        <div class="container-fluid">
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
             <div class="row">
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
@@ -55,25 +55,53 @@ $role = $_SESSION['ROLE'];
                                                 placeholder="Descrição completa do Plano"><?php echo $entity['description']; ?></textarea>
                                         </div>
                                     </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="btn_link">Link de Pagamento*</label>
+                                            <input type="text" class="form-control" name="btn_link" id="btn_link" required
+                                                placeholder="Link" value="<?php echo base64_decode($entity['btn_link']); ?>">
+                                        </div>
+                                    </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="total_customers">Qtd. Clientes*</label>
-                                            <input type="number" class="form-control" name="total_customers" id="total_customers" min="0" placeholder="0 (Ilimitado)"
+                                            <input type="number" class="form-control" name="total_customers" id="total_customers" min="1" placeholder="0" required
                                                 value="<?php echo $entity['total_customers']; ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="total_services">Qtd. Serviços*</label>
-                                            <input type="number" class="form-control" name="total_services" id="total_services" min="0" placeholder="0 (Ilimitado)"
+                                            <input type="number" class="form-control" name="total_services" id="total_services" min="1" placeholder="0" required
                                                 value="<?php echo $entity['total_services']; ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="total_schedules">Qtd. Agendamentos</label>
-                                            <input type="number" class="form-control" name="total_schedules" id="total_schedules" min="0" placeholder="0 (Ilimitado)"
+                                            <label for="total_schedules">Qtd. Agendamentos*</label>
+                                            <input type="number" class="form-control" name="total_schedules" id="total_schedules" min="1" placeholder="0" required
                                                 value="<?php echo $entity['total_schedules']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="total_revenues">Qtd. Receitas*</label>
+                                            <input type="number" class="form-control" name="total_revenues" id="total_revenues" min="1" placeholder="0" required
+                                                value="<?php echo $entity['total_revenues']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="total_expenses">Qtd. Despesas*</label>
+                                            <input type="number" class="form-control" name="total_expenses" id="total_expenses" min="1" placeholder="0" required
+                                                value="<?php echo $entity['total_expenses']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="total_tasks">Qtd. Tarefas*</label>
+                                            <input type="number" class="form-control" name="total_tasks" id="total_tasks" min="1" placeholder="0" required
+                                                value="<?php echo $entity['total_tasks']; ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-4 mt-3 mb-2">

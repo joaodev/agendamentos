@@ -8,10 +8,11 @@ $canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
 $canCreate  = $isAdmin || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('plans'));
 $canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('plans'));
 $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('plans'));
+$canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('user-plans'));
 ?>
 <?php if ($canView): ?>
-    <section class="content-header">
-        <div class="container-fluid">
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
             <div class="row">
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
@@ -45,6 +46,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                     <thead>
                                         <tr class="text-center" style="height: 30px;">
                                             <th style="font-size: 14px;">Plano</th>
+                                            <th style="font-size: 14px;">Totais</th>
                                             <th style="font-size: 14px;">Status</th>
                                             <th style="display: none;">Status</th>
                                             <th style="display: none;">Cadastrado em</th>
@@ -56,13 +58,21 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                             <tr class="text-center" style="cursor: pointer;"
                                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
-                                                    <?php echo $entity['name']; ?>
+                                                    <h3 class="pt-3"><?php echo $entity['name']; ?></h3>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <b>Clientes:</b> <?php echo $entity['total_customers']; ?> <br />
+                                                    <b>Serviços:</b> <?php echo $entity['total_services']; ?> <br />
+                                                    <b>Agendamentos:</b> <?php echo $entity['total_schedules']; ?> <br />
+                                                    <b>Receitas:</b> <?php echo $entity['total_revenues']; ?> <br />
+                                                    <b>Despesas:</b> <?php echo $entity['total_expenses']; ?> <br />
+                                                    <b>Tarefas:</b> <?php echo $entity['total_tasks']; ?> <br />
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
-                                                        <i class="fa fa-circle" style="color: green;"></i>
+                                                        <i class="fa fa-circle pt-3" style="color: green;"></i>
                                                     <?php else: ?>
-                                                        <i class="fa fa-circle" style="color: red;"></i>
+                                                        <i class="fa fa-circle pt-3" style="color: red;"></i>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td style="display: none;">
@@ -104,11 +114,11 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     $.extend( true, {}, buttonCommon, {
                         extend: 'excel',
                         title: 'Planos',
-                        exportOptions: {columns: [0,2,3,4]}
+                        exportOptions: {columns: [0,1,3,4]}
                     })
                 ],
                 order: [ [0, "asc"] ],
-                columnDefs: [{orderable: false, targets: [1]}],
+                columnDefs: [{orderable: false, targets: [2]}],
                 responsive: true,
                 info: true,
                 processing: true,
@@ -157,6 +167,25 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             });
         }
     </script>
+    <?php if ($canViewUserPlans): ?>
+        <script>
+            function usersPlans(uuid) {
+                $("#baseLoader").show();
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>planos/planos-usuarios",
+                    data: {uuid:uuid},
+                    async: true
+                }).done(function(data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#baseLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
     <?php if ($canCreate): ?>
         <script>
             function createPlan() {

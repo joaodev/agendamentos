@@ -39,6 +39,7 @@ class PlansController extends ActionController implements CrudInterface
             $uuid = $this->model->NewUUID();
             $_POST['uuid'] = $uuid;
             $_POST['price'] = $this->moneyToDb($_POST['price']);
+            $_POST['btn_link'] = base64_encode($_POST['btn_link']);
             
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
@@ -82,7 +83,8 @@ class PlansController extends ActionController implements CrudInterface
         if (!empty($_POST)) {
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $_POST['price'] = $this->moneyToDb($_POST['price']);
-
+            $_POST['btn_link'] = base64_encode($_POST['btn_link']);
+            
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
@@ -319,6 +321,113 @@ class PlansController extends ActionController implements CrudInterface
 
             echo json_encode($data);
             return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function fileProcessAction(): bool
+    {
+        if (!empty($_POST) && !empty($_FILES)) {
+            if (!empty($_FILES) && !empty($_FILES["file"])) {
+                $image_name = $_FILES["file"]["name"];
+                if ($image_name != null) {
+
+                    $dir1 = "../public/uploads/userplans/" . $_POST['order'];
+                    if (!is_dir($dir1)) {
+                        mkdir($dir1);
+                    }
+
+                    $ext_img = explode(".", $image_name, 2);
+                    $new_name  = md5($ext_img[0]) . '.' . $ext_img[1];
+                    if ($ext_img[1] == 'jpg' || $ext_img[1] == 'jpeg'
+                        || $ext_img[1] == 'png' || $ext_img[1] == 'gif') {
+                        $tmp_name1  =  $_FILES["file"]["tmp_name"];
+                        $new_image_name = md5($new_name . time()).'.png';
+
+                        if (move_uploaded_file($tmp_name1, $dir1 . '/' . $new_image_name)) {
+                            $file = $new_image_name;
+                        } 
+                    }
+               
+                }
+            } else {
+                $file = "";
+            }
+
+            $crud = new Crud();
+            $crud->setTable($this->userPlansModel->getTable());
+            $transaction = $crud->update([
+                'file' => $file,
+                'status' => '3',
+                'uploaded_at' => date('Y-m-d H:i:s')
+            ],$_POST['order'], 'uuid');
+
+            if ($transaction){
+                $this->toLog("Usuário anexou o comprovante ao Plano {$_POST['order']}");
+                $data  = [
+                    'title' => 'Sucesso!', 
+                    'msg'   => 'Comprovante anexado.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right'
+                ];
+            } else {
+                $data  = [
+                    'title' => 'Erro!', 
+                    'msg' => 'O Comprovante não foi anexado.',
+                    'type' => 'error',
+                    'pos'   => 'top-center'
+                ];
+            }
+
+            echo json_encode($data);
+
+            return true;    
+        } else {
+            return false;
+        }
+    }
+
+    public function cancelPlanAction(): bool
+    {
+        if (!empty($_POST['uuid'])) {
+            $crud = new Crud();
+            $crud->setTable($this->userPlansModel->getTable());
+            $transaction = $crud->update([
+                'status' => '2',
+                'canceled_at' => date('Y-m-d H:i:s')
+            ],$_POST['uuid'], 'uuid');
+
+            if ($transaction){
+                $this->toLog("Usuário cancelou o Plano {$_POST['uuid']}");
+                $data  = [
+                    'title' => 'Sucesso!', 
+                    'msg'   => 'Plano cancelado.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right'
+                ];
+            } else {
+                $data  = [
+                    'title' => 'Erro!', 
+                    'msg' => 'O Plano não foi cancelado.',
+                    'type' => 'error',
+                    'pos'   => 'top-center'
+                ];
+            }
+
+            echo json_encode($data);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function usersPlansAction(): void
+    {
+        if (!empty($_POST['uuid'])) {   
+            $data = $this->userPlansModel->getAllUsersPlans($_POST['uuid']);
+            $this->view->data = $data;
+            $this->render('users-plans', false);
         }
     }
 }

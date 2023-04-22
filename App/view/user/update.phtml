@@ -5,8 +5,8 @@ $plans = $this->view->plans;
 $role = $_SESSION['ROLE'];
 ?>
 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('user'))): ?>
-    <section class="content-header">
-        <div class="container-fluid">
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
             <div class="row">
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
@@ -42,7 +42,7 @@ $role = $_SESSION['ROLE'];
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="plan_uuid">Plano</label>
-                                            <select class="form-control" name="plan_uuid" id="plan_uuid" required>
+                                            <select class="form-control" name="plan_uuid" id="plan_uuid">
                                                 <option value="">-</option>
                                                 <?php foreach($plans as $plan): ?>
                                                     <option value="<?php echo $plan['uuid']; ?>" <?php echo ($entity['plan_uuid'] == $plan['uuid']) ? 'selected' : ''; ?>>
@@ -76,17 +76,18 @@ $role = $_SESSION['ROLE'];
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="job_role">Cargo</label>
-                                            <input type="text" class="form-control" name="job_role" id="job_role" required
+                                            <input type="text" class="form-control" name="job_role" id="job_role"
                                                 value="<?php echo $entity['job_role']; ?>" maxlength="50">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="name">Nível de Acesso</label>
-                                            <select class="form-control" disabled>
+                                            <select class="form-control" name="role_uuid" required>
                                                 <option value="">-</option>
-                                                <?php foreach($roles as $role): ?>
-                                                    <option value="<?php echo $role['uuid']; ?>" <?php echo ($entity['role_uuid'] == $role['uuid']) ? 'selected' : ''; ?>>
+                                                <?php foreach ($roles as $role): ?>
+                                                    <option value="<?php echo $role['uuid']; ?>" 
+                                                        <?php echo ($entity['role_uuid'] == $role['uuid']) ? 'selected' : ''; ?>>
                                                         <?php echo $role['name']; ?>
                                                     </option>
                                                 <?php endforeach; ?>

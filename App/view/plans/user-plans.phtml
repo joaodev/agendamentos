@@ -1,5 +1,5 @@
-<section class="content-header">
-    <div class="container-fluid">
+<section class="content-header mt-5">
+    <div class="container-fluid mt-2">
         <div class="row">
             <div class="col-12" >
                 <h1 style="position: relative; top: 5px; font-size: 25px;">
@@ -21,7 +21,7 @@
                                 <h2>
                                     <small>Plano Selecionado: </small> <br><?php echo $entity['planName']; ?>  
                                     <?php if ($entity['status'] == '0'): ?>
-                                        <span style="color: blue;">( PENDENTE DE ATIVAÇÃO ) </span>
+                                        <span style="color: blue;">( AGUARDANDO COMPROVANTE ) </span>
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '1'): ?>
                                         <span style="color: green;">( ATIVO ) </span>
@@ -29,11 +29,115 @@
                                     <?php if ($entity['status'] == '2'): ?>
                                         <span style="color: blue;">( CANCELADO ) </span>
                                     <?php endif; ?>
+                                    <?php if ($entity['status'] == '3'): ?>
+                                        <span style="color: purple;">( ATIVAÇÃO PENDENTE ) </span>
+                                    <?php endif; ?>
                                 </h2>
+                                <?php if ($entity['status'] == '3'): ?>
+                                    <div class="text-center mt-3">
+                                        <hr>
+                                        <p><?php echo $entity['planDescription']; ?></p>
+                                        <h2>R$ <?php echo number_format($entity['planPrice'], 2, ",","."); ?> /mês</h2>
+                                        <?php if (!empty($entity['file'])): ?>
+                                            <hr>
+                                            <b>Comprovante enviado em <?php echo $this->formatDateTime($entity['uploaded_at']); ?></b>
+                                            <br>
+                                            <a href="<?php echo baseUrl . 'public/uploads/userplans/' . $entity['uuid'] . '/' . $entity['file']; ?>" target="_blank" class="btn btn-info btn-sm mt-3">
+                                                <span class="fa fa-eye"></span> Ver Comprovante
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if ($entity['status'] == '0'): ?>
+                                    <form name="formFile"  id="formFile" enctype="multipart/form-data" method="post">
+                                        <div class="text-center mt-3">
+                                            <hr>
+                                            <p><?php echo $entity['planDescription']; ?></p>
+                                            <h2>R$ <?php echo number_format($entity['planPrice'], 2, ",","."); ?> /mês</h2>
+                                            <div>
+                                                <!-- INICIO DO BOTAO PAGSEGURO -->
+                                                <a href="<?php echo base64_decode($entity['planBtnLink']); ?>" target="_blank" title="Pagar com PagSeguro"><img src="//assets.pagseguro.com.br/ps-integration-assets/botoes/pagamentos/205x30-pagar-azul.gif" alt="Pague com PagSeguro - é rápido, grátis e seguro!" /></a>
+                                                <!-- FIM DO BOTAO PAGSEGURO -->
+                                            </div>
+                                            <hr>
+                                            <b>Anexar o Comprovante de Pagamento</b>
+                                            <input type="file" class="form-control" name="file" id="file" required>
+                                        </div>
+                                        <input type="hidden" id="order" value="<?php echo $entity['uuid']; ?>">
+                                        <button type="submit" class="btn btn-outline-success btn-lg w-100 mt-3"
+                                            id="btnSubmit">
+                                            <span class="fa fa-upload pr-1"></span>
+                                            ENVIAR COMPROVANTE
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-3"
+                                        onclick="cancelOrder('<?php echo $entity['uuid']; ?>');">
+                                        CANCELAR PEDIDO
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
+                <script>
+                    $(document).ready(function(){
+                        $('#formFile').validate({
+                            submitHandler: function(  ){
+                                let file_data = $('#file').prop('files')[0];
+                                let form_data = new FormData();         
+
+                                form_data.append('file', file_data);    
+                                form_data.append('order', $("#order").val());    
+                                
+                                $("#baseLoader").show();
+                                $("#btnSubmit").show('disabled', true);
+
+                                $.ajax({
+                                    type: "POST",
+                                    url: "<?php echo baseUrl; ?>planos/processa-comprovante",
+                                    cache: false,
+                                    contentType: false,
+                                    processData: false,
+                                    data: form_data,
+                                    dataType: 'json',
+                                    async: true
+                                }).done(function(data) {
+                                    showAlert(data.type, data.title, data.msg, data.pos);
+                                    if(data.type === 'success') {
+                                        openModule('planos-usuario');
+                                    } else {
+                                        $("#btnSubmit").attr('disabled', false);
+                                        $("#baseLoader").hide();   
+                                    }
+                                }).fail(function() {
+                                    showInternalErrorAlert(); 
+                                    $("#baseLoader").hide();   
+                                    $("#btnSubmit").attr('disabled', false);
+                                }); 
+
+                                return false;
+                            }
+                        });
+                    });
+
+                    function cancelOrder(uuid) {
+                        $("#baseLoader").show();
+                        $.ajax({
+                            type: 'post',
+                            url: "<?php echo baseUrl; ?>planos/plano-cancelado",
+                            data: {uuid:uuid},
+                            dataType: 'json',
+                            async: true
+                        }).done(function(data) {
+                            showAlert(data.type, data.title, data.msg, data.pos);
+                            $("#baseLoader").hide();
+                            openModule('planos-usuario');
+                        }).fail(function() {
+                            showInternalErrorAlert();
+                            $("#baseLoader").hide();
+                        });
+                    }
+                </script>
             <?php else: ?>
                 <?php foreach ($this->view->data as $entity): ?>
                     <div class="col-md-6">
@@ -45,36 +149,43 @@
                                 <div class="text-center mt-3">
                                     <p><?php echo $entity['description']; ?></p>
                                     <h2>R$ <?php echo number_format($entity['price'], 2, ",","."); ?> /mês</h2>
+                                    <br>
+                                    <div>
+                                        <!-- INICIO DO BOTAO PAGSEGURO -->
+                                        <a href="<?php echo base64_decode($entity['btn_link']); ?>" target="_blank" title="Pagar com PagSeguro"><img src="//assets.pagseguro.com.br/ps-integration-assets/botoes/pagamentos/205x30-pagar-azul.gif" alt="Pague com PagSeguro - é rápido, grátis e seguro!" /></a>
+                                        <!-- FIM DO BOTAO PAGSEGURO -->
+                                    </div>
+                                    <br>
                                 </div>
                                 <button type="button" class="btn btn-outline-success btn-lg w-100 mt-3"
                                     onclick="selectPlan('<?php echo $entity['uuid']; ?>');" >
                                     <span class="fa fa-check pr-1"></span>
-                                    SOLICITAR
+                                    CONFIRMAR PAGAMENTO
                                 </button>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
+                <script>
+                    function selectPlan(uuid) {
+                        $("#baseLoader").show();
+                        $.ajax({
+                            type: 'post',
+                            url: "<?php echo baseUrl; ?>planos/plano-selecionado",
+                            data: {uuid:uuid},
+                            dataType: 'json',
+                            async: true
+                        }).done(function(data) {
+                            showAlert(data.type, data.title, data.msg, data.pos);
+                            $("#baseLoader").hide();
+                            openModule('planos-usuario');
+                        }).fail(function() {
+                            showInternalErrorAlert();
+                            $("#baseLoader").hide();
+                        });
+                    }
+                </script>
             <?php endif; ?>
         </div>
     </div>
 </section>
-<script>
-    function selectPlan(uuid) {
-        $("#baseLoader").show();
-        $.ajax({
-            type: 'post',
-            url: "<?php echo baseUrl; ?>planos/plano-selecionado",
-            data: {uuid:uuid},
-            dataType: 'json',
-            async: true
-        }).done(function(data) {
-            showAlert(data.type, data.title, data.msg, data.pos);
-            $("#baseLoader").hide();
-            openModule('planos-usuario');
-        }).fail(function() {
-            showInternalErrorAlert();
-            $("#baseLoader").hide();
-        });
-    }
-</script>
