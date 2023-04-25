@@ -16,7 +16,7 @@ $role = $_SESSION['ROLE'];
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
                             <button type="button" class="btn btn-outline-primary" title="Voltar para Formas de Pagamento"
-                                onclick="openModule('formas-pagamento');" style="width: 100%;">
+                                onclick="openDetails('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i>
                             </button>
                         </li>
@@ -64,7 +64,7 @@ $role = $_SESSION['ROLE'];
                                             </div>
                                             <div class="col-md-4 mt-2 mb-2">
                                                 <button type="button" class="btn btn-outline-primary w-100"
-                                                    onclick="openModule('formas-pagamento');"
+                                                    onclick="openDetails('<?php echo $entity['uuid']; ?>');"
                                                     title="Voltar para Formas de Pagamento">
                                                     <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>

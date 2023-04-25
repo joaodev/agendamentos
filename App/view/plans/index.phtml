@@ -24,7 +24,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                     <?php if ($canCreate): ?>
                         <ol class="breadcrumb float-right">
                             <li class="breadcrumb-item">
-                                <button type="button" class="btn btn-outline-primary"
+                                <button type="button" class="btn btn-outline-success" title="Adicionar Plano"
                                     onclick="createPlan();" style="width: 100%;">
                                     <i class="fas fa-plus"></i> 
                                 </button>

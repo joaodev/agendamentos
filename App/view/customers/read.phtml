@@ -30,12 +30,11 @@
                         <div class="card-body"> 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <b>Situação:</b>
                                     <?php if ($entity['status'] == '1'): ?>
-                                            <i class="fa fa-circle pl-1" style="color: green;"></i> Ativo no sistema
+                                            <i class="fa fa-circle pr-1" style="color: green;"></i> Ativo no Sistema
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '2'): ?>
-                                            <i class="fa fa-circle pl-1" style="color: red;"></i> Inativo no sistema
+                                            <i class="fa fa-circle pr-1" style="color: red;"></i> Inativo no Sistema
                                     <?php endif; ?>
                                     <hr>
                                 </div>
@@ -93,19 +92,21 @@
                                     <b>UF</b>
                                     <p><?php echo (!empty($entity['state']) ? $entity['state'] : 'Não informado'); ?></p>
                                 </div>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <b>Status</b>
-                                    <p><?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?></p>
-                                </div>
                                 <div class="col-md-12"><hr></div>
-                                <div class="col-12 col-md-6">
-                                    <b>Cadastrado em: </b> 
-                                    <span><?php echo $this->formatDateTime($entity['created_at']); ?></span>
+                                <div class="col-6 text-left">
+                                    <span class="fa fa-calendar pr-1"></span>
+                                    <span>Cadastrado em</span> <br>
+                                    <b>
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </b>
                                 </div>
-                                <div class="col-12 col-md-6 ">
+                                <div class="col-6 text-right">
                                     <?php if (!empty($entity['updated_at'])): ?>
-                                        <b>Atualizado em: </b>
-                                        <span><?php echo $this->formatDateTime($entity['updated_at']); ?></span>
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <span>Atualizado em</span> <br>
+                                        <b>
+                                            <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                        </b>
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12"><hr></div>
@@ -127,7 +128,7 @@
                                                 </button>
                                             <?php endif; ?>
                                         </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                        <div class="col-md-12 col-lg-4 mt-2 mb-2">
                                             <button type="button" class="btn btn-outline-primary" onclick="openModule('clientes');" 
                                                 style="width: 100%;" title="Voltar para Clientes">
                                                 <i class="fas fa-arrow-left pr-1"></i> Voltar

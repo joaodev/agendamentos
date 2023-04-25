@@ -1,6 +1,5 @@
 <?php 
 $roles = $this->view->roles;
-$plans = $this->view->plans;
 $role = $_SESSION['ROLE'];
 ?>
 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('user'))): ?>
@@ -38,20 +37,6 @@ $role = $_SESSION['ROLE'];
                                         <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
                                         <hr>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="plan_uuid">Plano</label>
-                                            <select name="plan_uuid" id="plan_uuid" class="form-control" required>
-                                                <option value="">-</option>
-                                                <?php foreach($plans as $plan): ?>
-                                                    <option value="<?php echo $plan['uuid']; ?>">
-                                                        <?php echo $plan['name']; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-12"><hr></div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="name">Nome</label>
@@ -171,13 +156,16 @@ $role = $_SESSION['ROLE'];
                                             <input type="text" class="form-control" name="state" id="state"  maxlength="2">
                                         </div>
                                     </div>
-                                    <div class="col-md-12 text-right mt-3 mb-2">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openModule('usuarios');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                    <div class="col-md-8 mt-3 mb-2">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit"
+                                            title="Salvar Colaborador">
                                             <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <button type="button" class="btn btn-outline-primary w-100"
+                                            onclick="openModule('usuarios');" title="Voltar para Colaboradores">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
                                 </div>

@@ -29,50 +29,55 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <b>Situação:</b>
+                                <div class="col-md-12">
                                     <?php if ($entity['status'] == '1'): ?>
-                                            <i class="fa fa-circle pl-1" style="color: blue;"></i> Tarefa Pendente
+                                            <i class="fa fa-circle pr-1" style="color: blue;"></i> Pendente
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '2'): ?>
-                                            <i class="fa fa-circle pl-1" style="color: green;"></i> Tarefa Concluída
+                                            <i class="fa fa-circle pr-1" style="color: green;"></i> Concluída
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '3'): ?>
-                                            <i class="fa fa-circle pl-1" style="color: red;"></i> Tarefa Cancelada
+                                            <i class="fa fa-circle pr-1" style="color: red;"></i> Cancelada
                                     <?php endif; ?>
-                                    <hr>
                                 </div>
-                                <div class="col-md-3">
-                                    <b>Data:</b>
-                                    <?php echo $this->formatDate($entity['task_date']); ?>
-                                    <hr>
+                                <div class="col-12"><hr></div>
+                                <div class="col-md-6">
+                                    <b>Data</b>
+                                    <p><?php echo $this->formatDate($entity['task_date']); ?></p>
                                 </div>
-                                <div class="col-md-3">
-                                    <b>Hora:</b>
-                                    <?php if ($entity['task_time'] != '00:00:00'): ?>
-                                        <?php echo $entity['task_time'] ? $entity['task_time'] : 'O dia todo'; ?>
-                                    <?php else: ?>
-                                        O dia todo
-                                    <?php endif; ?>
-                                    <hr>
+                                <div class="col-md-6">
+                                    <b>Hora</b>
+                                    <p>
+                                        <?php if ($entity['task_time'] != '00:00:00'): ?>
+                                            <?php echo $entity['task_time'] ? $entity['task_time'] : 'O dia todo'; ?>
+                                        <?php else: ?>
+                                            O dia todo
+                                        <?php endif; ?>
+                                    </p>
                                 </div>
                                 <div class="col-md-12">
-                                    <b>Título:</b>
+                                    <b>Título</b>
                                     <p><?php echo $entity['title']; ?></p>
                                 </div>
                                 <div class="col-md-12">
-                                    <b>Descrição:</b>
+                                    <b>Descrição</b>
                                     <p><?php echo $entity['description']; ?></p>
                                 </div>
                                 <div class="col-md-12"><hr></div>
-                                <div class="col-12 col-md-6">
-                                    <b>Cadastrada em: </b> 
-                                    <span><?php echo $this->formatDateTime($entity['created_at']); ?></span>
+                                <div class="col-6 text-left">
+                                    <span class="fa fa-calendar pr-1"></span>
+                                    <span>Cadastrada em</span> <br>
+                                    <b>
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </b>
                                 </div>
-                                <div class="col-12 col-md-6 ">
+                                <div class="col-6 text-right">
                                     <?php if (!empty($entity['updated_at'])): ?>
-                                        <b>Atualizada em: </b>
-                                        <span><?php echo $this->formatDateTime($entity['updated_at']); ?></span>
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <span>Atualizada em</span> <br>
+                                        <b>
+                                            <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                        </b>
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12"><hr></div>
@@ -94,7 +99,7 @@
                                                 </button>
                                             <?php endif; ?>
                                         </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                        <div class="col-md-12 col-lg-4 mt-2 mb-2">
                                             <button type="button" class="btn btn-outline-primary" title="Voltar para Tarefas"
                                                  onclick="openModule('tarefas');" style="width: 100%;">
                                                 <i class="fas fa-arrow-left pr-1"></i> Voltar
