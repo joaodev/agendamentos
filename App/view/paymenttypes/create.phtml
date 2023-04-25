@@ -36,14 +36,20 @@
                                             <input type="text" class="form-control" name="name" id="name" required maxlength="150">
                                         </div>
                                     </div>
-                                    <div class="col-md-12 text-right mt-3 mb-2">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openModule('formas-pagamento');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
-                                            <i class="fa fa-save pr-1"></i> Salvar
-                                        </button>
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-8 mt-2 mb-2">
+                                                <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Forma de Pagamento">
+                                                    <i class="fa fa-save pr-1"></i> Salvar
+                                                </button>
+                                            </div>
+                                            <div class="col-md-4 mt-2 mb-2">
+                                                <button type="button" class="btn btn-outline-primary w-100"
+                                                        onclick="openModule('formas-pagamento');" title="Voltar para Formas de Pagamento">
+                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </form>

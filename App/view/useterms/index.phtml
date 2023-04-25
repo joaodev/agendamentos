@@ -9,11 +9,20 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
-                <div class="col-12">
+                <div class="col-11">
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-check-circle pr-1"></i>
                         Termos de Uso
                     </h1>
+                </div>
+                <div class="col-1">
+                    <ol class="breadcrumb float-right">
+                        <li class="breadcrumb-item">
+                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inical">
+                                <i class="fas fa-home"></i> 
+                            </a>
+                        </li>
+                    </ol>
                 </div>
             </div>
         </div>
@@ -37,11 +46,20 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                                             required><?php echo $entity['description']; ?></textarea>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-12 text-right mt-3 mb-2">
+                                                <div class="col-md-12">
                                                     <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
-                                                    <button type="submit" class="btn btn-primary" id="btnSubmit">
-                                                        <i class="fa fa-save pr-1"></i> Salvar
-                                                    </button>
+                                                    <div class="row">
+                                                        <div class="col-md-8 mt-2 mb-2">
+                                                            <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar">
+                                                                <i class="fa fa-save pr-1"></i> Salvar
+                                                            </button>
+                                                        </div>
+                                                        <div class="col-md-4 mt-2 mb-2">
+                                                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inicial">
+                                                                <i class="fas fa-home pr-1"></i> Início
+                                                            </a>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             <?php else: ?>
                                                 <div class="col-md-12">
@@ -104,4 +122,3 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
         });
     </script>
 <?php endif; ?>
-                                    

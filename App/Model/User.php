@@ -22,8 +22,9 @@ class User extends Model
                         u.cellphone, u.job_role, r.name as role, u.phone,
                         r.is_admin, u.created_at, u.updated_at, u.file,
                         u.postal_code, u.address, u.number, u.complement, 
-                        u.neighborhood, u.city, u.state, u.document_1, u.document_2,
-                        u.plan_uuid 
+                        u.neighborhood, u.city, u.state, u.gender, u.birthdate,
+                        u.start_date, u.end_date, u.salary,                 
+                        u.document_1, u.document_2, u.auth2factor 
                 FROM user AS u
                 INNER JOIN role AS r
                     ON u.role_uuid = r.uuid
@@ -53,7 +54,9 @@ class User extends Model
                 SELECT u.uuid, u.name, u.email, u.status, u.file, u.phone, u.whatsapp,
                         u.cellphone, u.job_role, r.name as role, u.created_at, u.updated_at,
                         u.postal_code, u.address, u.number, u.complement, 
-                        u.neighborhood, u.city, u.state, u.document_1, u.document_2, u.plan_uuid
+                        u.neighborhood, u.city, u.state, u.gender, u.birthdate,
+                        u.start_date, u.end_date, u.salary,                         
+                        u.document_1, u.document_2, u.auth2factor 
                 FROM user AS u
                 INNER JOIN role AS r
                     ON u.role_uuid = r.uuid
@@ -99,8 +102,7 @@ class User extends Model
         try {
             $query = "
                 SELECT u.uuid, u.name, u.email, u.status, u.file,  u.phone,
-                        u.cellphone, u.job_role, r.name as role, u.created_at,
-                        u.plan_uuid
+                        u.cellphone, u.job_role, r.name as role, u.created_at
                 FROM user AS u
                 INNER JOIN role AS r
                     ON u.role_uuid = r.uuid
@@ -128,8 +130,7 @@ class User extends Model
             if (!empty($email) && !empty($password) && !empty($token)) {
                 $query = "
                     SELECT u.uuid, u.name, u.email, u.password, u.file,
-                            r.name as role, u.role_uuid, r.is_admin,
-                            u.plan_uuid
+                            r.name as role, u.role_uuid, r.is_admin, u.auth2factor 
                     FROM user AS u
                     INNER JOIN role AS r
                         ON u.role_uuid = r.uuid
@@ -174,12 +175,10 @@ class User extends Model
                 $query = "
                     SELECT u.uuid, u.name, u.email, u.password, u.file,
                             r.name as role, u.role_uuid, r.is_admin,
-                            u.code, u.plan_uuid, p.name as plan
+                            u.code, u.auth2factor 
                     FROM user AS u
                     INNER JOIN role AS r
                         ON u.role_uuid = r.uuid
-                    LEFT JOIN plans AS p
-                        ON u.plan_uuid = p.uuid
                     WHERE u.email=:email
                         AND u.status = :status
                         AND u.deleted = :deleted

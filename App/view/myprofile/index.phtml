@@ -3,12 +3,21 @@ $entity = $this->view->entity;
 ?>
 <section class="content-header mt-5">
     <div class="container-fluid mt-2">
-        <div class="row">
-            <div class="col-12">
-                <h1 style="position: relative; top: 5px; font-size: 25px;">
+        <div class="row mb-2">
+            <div class="col-11">
+                <h1 style="position: relative; top: 5px">
                     <i class="fas fa-user pr-1"></i>
                     Meu Perfil
                 </h1>
+            </div>
+            <div class="col-1">
+                <ol class="breadcrumb float-right">
+                    <li class="breadcrumb-item">
+                        <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inical">
+                            <i class="fas fa-home"></i> 
+                        </a>
+                    </li>
+                </ol>
             </div>
         </div>
     </div>
@@ -27,7 +36,9 @@ $entity = $this->view->entity;
                                         <?php if (!empty($entity['file'])): ?><br>
                                             <img src="<?php echo baseUrl . 'public/uploads/users/'
                                                 . $entity['file']; ?>" style="max-height: 200px; margin-bottom: 15px;" alt="<?php echo $entity['name']; ?>">
-                                                
+                                            <div class="mb-2">
+                                                <input type="checkbox" name="remove_image" id="remove_image" value="1" class="mr-1"> Remover imagem de perfil
+                                            </div>
                                         <?php endif; ?>
                                         <input type="file" class="form-control" name="file" id="file">
                                     </div>
@@ -90,12 +101,23 @@ $entity = $this->view->entity;
                                         <input type="password" class="form-control" name="confirmation" id="confirmation" minlength="8"  maxlength="100">
                                     </div>
                                 </div>
+                                <div class="col-12">
+                                    <hr>
+                                    <input type="checkbox" name="auth2factor" id="auth2factor" value="1" class="mr-1"
+                                        <?php echo ($entity['auth2factor'] == '1' ? 'checked' : ''); ?>> Habilitar Autenticação em 2 Fatores. <small>( Será enviado um token de acesso após o login. )</small>
+                                    <hr>
+                                </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12 text-right mt-3 mb-2">
-                                    <button type="submit" class="btn btn-primary" id="btnSubmit">
-                                        <i class="fa fa-save pr-1"></i> Salvar
+                                <div class="col-md-8 mt-2 mb-2">
+                                    <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Atualizar Perfil">
+                                        <i class="fa fa-save pr-1"></i> Atualizar Perfil
                                     </button>
+                                </div>
+                                <div class="col-md-4 mt-2 mb-2">
+                                    <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inicial">
+                                        <i class="fas fa-home pr-1"></i> Início
+                                    </a>
                                 </div>
                             </div>
                         </form>
@@ -137,6 +159,14 @@ $entity = $this->view->entity;
                 form_data.append('whatsapp', $("#whatsapp").val());    
                 form_data.append('password', $("#password").val());    
                 form_data.append('confirmation', $("#confirmation").val());    
+
+                if ($('#remove_image').is(':checked')) {
+                    form_data.append('remove_image', $("#remove_image").val());    
+                }
+
+                if ($('#auth2factor').is(':checked')) {
+                    form_data.append('auth2factor', $("#auth2factor").val());    
+                }
 
                 $("#baseLoader").show();
                 $("#btnSubmit").attr('disabled', true);

@@ -2,18 +2,18 @@
 $data = $this->view->data;
 
 $isAdmin = $_SESSION['ROLE_ADM'] == '1';
-$role    = $_SESSION['ROLE'];
+$role = $_SESSION['ROLE'];
 
-$canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('payment-types'));
-$canCreate  = $isAdmin || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('payment-types'));
-$canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('payment-types'));
-$canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('payment-types'));
+$canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('payment-types'));
+$canCreate = $isAdmin || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('payment-types'));
+$canUpdate = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('payment-types'));
+$canDelete = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('payment-types'));
 ?>
 <?php if ($canView): ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
-                <div class="col-11" >
+                <div class="col-11">
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-th-list pr-1"></i>
                         Formas de Pagamento
@@ -23,9 +23,9 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     <?php if ($canCreate): ?>
                         <ol class="breadcrumb float-right">
                             <li class="breadcrumb-item">
-                                <button type="button" class="btn btn-outline-primary"
-                                    onclick="createTable();" style="width: 100%;">
-                                    <i class="fas fa-plus"></i> 
+                                <button type="button" class="btn btn-outline-success" onclick="createTable();"
+                                    style="width: 100%;" title="Adicionar Forma de Pagamento">
+                                    <i class="fas fa-plus"></i>
                                 </button>
                             </li>
                         </ol>
@@ -45,8 +45,8 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                     <thead>
                                         <tr class="text-center" style="height: 30px;">
                                             <th style="font-size: 14px;">Forma de Pagamento</th>
-                                            <th style="font-size: 14px;">Status</th>
-                                            <th style="display: none;">Status</th>
+                                            <th style="font-size: 14px;">Situação</th>
+                                            <th style="display: none;">Situação</th>
                                             <th style="display: none;">Cadastrado em</th>
                                             <th style="display: none;">Atualizado em</th>
                                         </tr>
@@ -60,13 +60,13 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
-                                                        <i class="fa fa-circle" style="color: green;"></i>
+                                                        <i class="fa fa-circle pr-1" style="color: green;"></i>
                                                     <?php else: ?>
-                                                        <i class="fa fa-circle" style="color: red;"></i>
+                                                        <i class="fa fa-circle pr-1" style="color: red;"></i>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td style="display: none;">
-                                                    <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
+                                                    <?php echo ($entity['status'] == '1') ? 'Ativa' : 'Inativa'; ?>
                                                 </td>
                                                 <td style="display: none;">
                                                     <?php echo $this->formatDateTime($entity['created_at']); ?>
@@ -86,11 +86,11 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
         </div>
     </section>
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             let buttonCommon = {
                 exportOptions: {
                     format: {
-                        body: function ( data ) {
+                        body: function (data) {
                             return data;
                         }
                     }
@@ -101,14 +101,14 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 "sDom": 'flBtip',
                 searching: true,
                 buttons: [
-                    $.extend( true, {}, buttonCommon, {
+                    $.extend(true, {}, buttonCommon, {
                         extend: 'excel',
                         title: 'Formas de Pagamento',
-                        exportOptions: {columns: [0,2,3,4]}
+                        exportOptions: { columns: [0, 2, 3, 4] }
                     })
                 ],
-                order: [ [0, "asc"] ],
-                columnDefs: [{orderable: false, targets: [1]}],
+                order: [[0, "asc"]],
+                columnDefs: [{ orderable: false, targets: [1] }],
                 responsive: true,
                 info: true,
                 processing: true,
@@ -146,12 +146,12 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>formas-pagamento/detalhes",
-                data: {uuid:uuid},
+                data: { uuid: uuid },
                 async: true
-            }).done(function(data) {
+            }).done(function (data) {
                 $("#sis_content").html(data);
                 $("#baseLoader").hide();
-            }).fail(function() {
+            }).fail(function () {
                 showInternalErrorAlert();
                 $("#baseLoader").hide();
             });
@@ -165,10 +165,10 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     type: 'post',
                     url: "<?php echo baseUrl; ?>formas-pagamento/cadastrar",
                     async: true
-                }).done(function(data) {
+                }).done(function (data) {
                     $("#sis_content").html(data);
                     $("#baseLoader").hide();
-                }).fail(function() {
+                }).fail(function () {
                     showInternalErrorAlert();
                     $("#baseLoader").hide();
                 });
@@ -182,12 +182,12 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>formas-pagamento/editar",
-                    data: {uuid:uuid},
+                    data: { uuid: uuid },
                     async: true
-                }).done(function(data) {
+                }).done(function (data) {
                     $("#sis_content").html(data);
                     $("#baseLoader").hide();
-                }).fail(function() {
+                }).fail(function () {
                     showInternalErrorAlert();
                     $("#baseLoader").hide();
                 });
@@ -201,7 +201,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Forma de Pagamento');
                 $("#modalDeleteLoader").hide();
                 $("#modalDelete").modal('show');
-                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\'' + uuid + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
             }
 
             function runDelete(uuid) {
@@ -211,15 +211,15 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>formas-pagamento/excluir",
-                        data: {uuid: uuid},
+                        data: { uuid: uuid },
                         dataType: 'json',
                         async: true
-                    }).done(function(data) {
+                    }).done(function (data) {
                         showAlert(data.type, data.title, data.msg, data.pos);
                         $("#modalDelete").modal('hide');
                         $("#modalXL").modal('hide');
                         openModule('formas-pagamento');
-                    }).fail(function() {
+                    }).fail(function () {
                         showInternalErrorAlert();
                         $("#modalDeleteLoader").hide();
                     });

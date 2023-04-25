@@ -8,12 +8,21 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
 <?php if ($canView): ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-12">
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
+            <div class="row mb-2">
+                <div class="col-11">
+                    <h1 style="position: relative; top: 5px">
                         <i class="fas fa-cogs pr-1"></i>
                         Configurações
                     </h1>
+                </div>
+                <div class="col-1">
+                    <ol class="breadcrumb float-right">
+                        <li class="breadcrumb-item">
+                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inical">
+                                <i class="fas fa-home"></i> 
+                            </a>
+                        </li>
+                    </ol>
                 </div>
             </div>
         </div>
@@ -27,7 +36,7 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                             <form method="post" name="formUpdateConfig" id="formUpdateConfig" enctype="multipart/form-data">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="" class="form-control-label">Logo</label><br>
+                                        <label for="" class="form-control-label">Logomarca</label><br>
                                         <?php if (!empty($entity['logo'])): ?>
                                             <div class="mb-3">
                                                 <a href="<?php echo baseUrl . 'public/uploads/logo/'
@@ -35,6 +44,9 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                                     <img src="<?php echo baseUrl . 'public/uploads/logo/'
                                                         . $entity['logo']; ?>" alt="" style="max-height: 100px;">
                                                 </a>
+                                                <div class="my-2">
+                                                    <input type="checkbox" name="remove_image_logo" id="remove_image_logo" value="1"> Remover imagem
+                                                </div>
                                             </div>
                                         <?php endif; ?>
                                         <?php if ($canUpdate): ?>
@@ -42,7 +54,7 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                         <?php endif; ?>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="" class="form-control-label">Logo - Ícone</label><br>
+                                        <label for="" class="form-control-label">Ícone</label><br>
                                         <?php if (!empty($entity['logo_icon'])): ?>
                                             <div class="mb-3">
                                                 <a href="<?php echo baseUrl . 'public/uploads/logo/'
@@ -50,6 +62,9 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                                     <img src="<?php echo baseUrl . 'public/uploads/logo/'
                                                         . $entity['logo_icon']; ?>" alt="" style="max-height: 100px;">
                                                 </a>
+                                                <div class="my-2">
+                                                    <input type="checkbox" name="remove_image_icon" id="remove_image_icon" value="1"> Remover imagem
+                                                </div>
                                             </div>
                                         <?php endif; ?>
                                         <?php if ($canUpdate): ?>
@@ -84,29 +99,41 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                             value="<?php echo $entity['site_title']; ?>" <?php echo ($canUpdate) ? 'required' : 'readonly'; ?>>
                                     </div>
                                 </div>
-                                <hr>
-                                <div class="col-md-4 offset-md-4 text-center">
-                                    <label for="file_menu" class="form-control-label">Imagem de Fundo para o Menu</label><br>
-                                    <?php if (!empty($entity['file_menu'])): ?>
-                                        <div class="mb-3 text-center">
-                                            <a href="<?php echo baseUrl . 'public/uploads/menu/'
-                                                . $entity['file_menu']; ?>" target="_blank">
-                                                <img src="<?php echo baseUrl . 'public/uploads/menu/'
-                                                    . $entity['file_menu']; ?>" alt="" style="max-height: 200px;">
-                                            </a>
-                                        </div>
-                                    <?php endif; ?>
-                                    <?php if ($canUpdate): ?>
-                                        <input type="file" class="form-control" name="file_menu" id="file_menu">
-                                    <?php endif; ?>
+                                <div class="form-group"><hr></div>
+                                <div class="row">
+                                    <div class="col-md-6 offset-md-3 text-center">
+                                        <label for="file_menu" class="form-control-label">Imagem de Fundo para o Menu</label><br>
+                                        <?php if (!empty($entity['file_menu'])): ?>
+                                            <div class="mb-3 text-center">
+                                                <a href="<?php echo baseUrl . 'public/uploads/menu/'
+                                                    . $entity['file_menu']; ?>" target="_blank">
+                                                    <img src="<?php echo baseUrl . 'public/uploads/menu/'
+                                                        . $entity['file_menu']; ?>" alt="" style="max-height: 250px;">
+                                                </a>
+                                                <?php if ($canUpdate): ?>
+                                                    <div class="my-2">
+                                                        <input type="checkbox" name="remove_image_menu" id="remove_image_menu" value="1"> Remover imagem
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if ($canUpdate): ?>
+                                            <input type="file" class="form-control" name="file_menu" id="file_menu">
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                                 <?php if ($canUpdate): ?>
                                     <div class="row">
-                                        <div class="col-12 mt-2"><hr></div>
-                                        <div class="col-md-12 text-center mt-2 mb-2">
-                                            <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                        <div class="col-12"><hr></div>
+                                        <div class="col-md-8 mt-2 mb-2">
+                                            <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Atualizar Configurações">
                                                 <i class="fa fa-save pr-1"></i> Atualizar Configurações
                                             </button>
+                                        </div>
+                                        <div class="col-md-4 mt-2 mb-2">
+                                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inicial">
+                                                <i class="fas fa-home pr-1"></i> Início
+                                            </a>
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -122,15 +149,13 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
     <script type="text/javascript" src="<?php echo baseUrl; ?>public/app/farbtastic/farbtastic.js"></script>
     <script>
           $(document).ready(function(){
-
             $('#colorpicker_primary').farbtastic('#primary_color');
             $('#colorpicker_secondary').farbtastic('#secondary_color');
-
           });
     </script>
     <?php if ($canUpdate): ?>
         <script>
-            $(document).ready(function() {
+            $(document).ready(function(){
 
                 $('#formUpdateConfig').validate({
                     submitHandler: function() {
@@ -141,6 +166,7 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                         
                         form_data.append('uuid', '<?php echo $entity['uuid']; ?>');
                         form_data.append('site_title', $("#site_title").val());
+                        
 
                         form_data.append('primary_color', $("#primary_color").val());
                         form_data.append('secondary_color', $("#secondary_color").val());
@@ -148,6 +174,18 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                         form_data.append('logo', logo);    
                         form_data.append('logo_icon', logo_icon);
                         form_data.append('file_menu', file_menu);
+
+                        if ($('#remove_image_logo').is(':checked')) {
+                            form_data.append('remove_image_logo', $("#remove_image_logo").val());    
+                        }
+                        
+                        if ($('#remove_image_icon').is(':checked')) {
+                            form_data.append('remove_image_icon', $("#remove_image_icon").val());    
+                        }
+
+                        if ($('#remove_image_menu').is(':checked')) {
+                            form_data.append('remove_image_menu', $("#remove_image_menu").val());    
+                        }
 
                         $("#baseLoader").show();
                         $("#btnSubmit").attr('disabled', true);

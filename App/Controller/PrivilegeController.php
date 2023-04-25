@@ -40,7 +40,7 @@ class PrivilegeController extends ActionController
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($update, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Acão aplicada ao privilegio #{$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 

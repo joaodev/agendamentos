@@ -77,7 +77,17 @@ class MyProfileController extends ActionController
                     }
                 }
             } else {
-                unset($_POST['file']);
+                if (!empty($_POST['remove_image'])) {
+                    $_SESSION['PHOTO'] = null;
+                    $_POST['file'] = null;
+                    unset($_POST['remove_image']);
+                } else {
+                    unset($_POST['file']);
+                }
+            }
+
+            if (empty($_POST['auth2factor'])) {
+                $_POST['auth2factor'] = 0;
             }
 
             $_POST['updated_at'] = date('Y-m-d H:i:s');

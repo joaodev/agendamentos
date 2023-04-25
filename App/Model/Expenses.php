@@ -86,8 +86,9 @@ class Expenses extends Model
     public function getAllByMonth($status, $month): bool|array|string
     {
         try {
-            $d1 = $month . '-01';
-            $d2 = $month . '-31';
+            $m = explode("-", $month);
+            $d1 = $m[0];
+            $d2 = $m[1];
 
             $whereStatus = "";
             if ($status != '0') {
@@ -108,7 +109,7 @@ class Expenses extends Model
                             ON o.payment_type_uuid = p.uuid
                         WHERE $whereStatus o.deleted = :deleted
                             AND o.user_uuid = :user_uuid
-                            AND o.expense_date BETWEEN :d1 AND :d2";
+                            AND YEAR(o.expense_date) = :d1 AND MONTH(o.expense_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             if ($status != '0') {
@@ -134,15 +135,15 @@ class Expenses extends Model
     public function getTotalByStatus($status)
     {
         try {
-            $d1 = date('Y-m') . '-01';
-            $d2 = date('Y-m') . '-31';
+            $d1 = date('Y');
+            $d2 = date('m');
 
             $query = "SELECT SUM(amount) as total
                         FROM expenses 
                         WHERE status = :status
                         AND deleted = :deleted
                         AND user_uuid = :user_uuid
-                        AND expense_date BETWEEN :d1 AND :d2";
+                        AND YEAR(expense_date) = :d1 AND MONTH(expense_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
@@ -171,15 +172,15 @@ class Expenses extends Model
     {
         try {
             $month = explode("/", $month, 2);
-            $d1 = $month[1] . '-' . $month[0] . '-01';
-            $d2 = $month[1] . '-' . $month[0] . '-31';
+            $d1 = $month[1];
+            $d2 = $month[0];
 
             $query = "SELECT SUM(amount) as total
                         FROM expenses 
                         WHERE status = :status
                         AND deleted = :deleted
                         AND user_uuid = :user_uuid
-                        AND expense_date BETWEEN :d1 AND :d2";
+                        AND YEAR(expense_date) = :d1 AND MONTH(expense_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
@@ -207,15 +208,16 @@ class Expenses extends Model
     public function getTotalAmountByMonth($month)
     {
         try {
-            $d1 = $month . '-01';
-            $d2 = $month . '-31';
+            $m = explode("-", $month);
+            $d1 = $m[0];
+            $d2 = $m[1];
 
             $query = "SELECT SUM(amount) as total
                         FROM expenses 
                         WHERE status = :status
                         AND deleted = :deleted
                         AND user_uuid = :user_uuid
-                        AND expense_date BETWEEN :d1 AND :d2";
+                        AND YEAR(expense_date) = :d1 AND MONTH(expense_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", '2');

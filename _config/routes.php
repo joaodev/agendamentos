@@ -9,7 +9,7 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/', 'controller' => 'index', 'action' => 'index'],
 	['namespace' => 'app', 'route' => '/politica-de-privacidade', 'controller' => 'politics', 'action' => 'user-view'],
 
-    ['namespace' => 'app', 'route' => '/solicitar-demonstracao', 'controller' => 'demo', 'action' => 'index'],
+    ['namespace' => 'app', 'route' => '/criar-conta', 'controller' => 'create-account', 'action' => 'index'],
 
 	['namespace' => 'app', 'route' => '/inicio', 'controller' => 'index', 'action' => 'index'],
 	
@@ -134,7 +134,28 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/planos/plano-selecionado', 'controller' => 'plans', 'action' => 'selected-plan'],
 	['namespace' => 'app', 'route' => '/planos/plano-cancelado', 'controller' => 'plans', 'action' => 'cancel-plan'],
 	['namespace' => 'app', 'route' => '/planos/processa-comprovante', 'controller' => 'plans', 'action' => 'file-process'],
+	
 	['namespace' => 'app', 'route' => '/planos/planos-usuarios', 'controller' => 'plans', 'action' => 'users-plans'],
+	['namespace' => 'app', 'route' => '/planos/planos-usuarios/atualizar', 'controller' => 'plans', 'action' => 'update-userplan'],
+	['namespace' => 'app', 'route' => '/planos/planos-usuarios/processa-plano-usario', 'controller' => 'plans', 'action' => 'process-userplan'],
+	['namespace' => 'app', 'route' => '/planos/planos-usuarios/excluir', 'controller' => 'plans', 'action' => 'delete-userplan'],
+	['namespace' => 'app', 'route' => '/planos/planos-usuarios/excluir-comprovante', 'controller' => 'plans', 'action' => 'delete-paymentfile'],
+
+	['namespace' => 'app', 'route' => '/receitas', 'controller' => 'revenues', 'action' => 'index'],
+	['namespace' => 'app', 'route' => '/receitas/cadastrar', 'controller' => 'revenues', 'action' => 'create'],
+	['namespace' => 'app', 'route' => '/receitas/processa-cadastro', 'controller' => 'revenues', 'action' => 'create-process'],
+	['namespace' => 'app', 'route' => '/receitas/detalhes', 'controller' => 'revenues', 'action' => 'read'],
+	['namespace' => 'app', 'route' => '/receitas/editar', 'controller' => 'revenues', 'action' => 'update'],
+	['namespace' => 'app', 'route' => '/receitas/processa-edicao', 'controller' => 'revenues', 'action' => 'update-process'],
+	['namespace' => 'app', 'route' => '/receitas/excluir', 'controller' => 'revenues', 'action' => 'delete'],
+
+	['namespace' => 'app', 'route' => '/tarefas', 'controller' => 'tasks', 'action' => 'index'],
+	['namespace' => 'app', 'route' => '/tarefas/cadastrar', 'controller' => 'tasks', 'action' => 'create'],
+	['namespace' => 'app', 'route' => '/tarefas/processa-cadastro', 'controller' => 'tasks', 'action' => 'create-process'],
+	['namespace' => 'app', 'route' => '/tarefas/detalhes', 'controller' => 'tasks', 'action' => 'read'],
+	['namespace' => 'app', 'route' => '/tarefas/editar', 'controller' => 'tasks', 'action' => 'update'],
+	['namespace' => 'app', 'route' => '/tarefas/processa-edicao', 'controller' => 'tasks', 'action' => 'update-process'],
+	['namespace' => 'app', 'route' => '/tarefas/excluir', 'controller' => 'tasks', 'action' => 'delete'],
 ];
 
 $systemDir = match ($_SERVER['HTTP_HOST']) {

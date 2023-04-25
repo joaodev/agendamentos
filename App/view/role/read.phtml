@@ -2,19 +2,19 @@
 <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
+            <div class="row mb-2">
+                <div class="col-11">
+                    <h1 style="position: relative; top: 5px">
                         <i class="fas fa-info-circle pr-1"></i>
-                        Perfil de Acesso
+                        Perfil
                     </h1>
                 </div>
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary"
+                            <button type="button" class="btn btn-outline-primary" title="Voltar para Controle de Acesso"
                                 onclick="openModule('controle-acesso');" style="width: 100%;">
-                                <i class="fas fa-arrow-left"></i> 
+                                <i class="fas fa-arrow-left"></i>
                             </button>
                         </li>
                     </ol>
@@ -31,50 +31,77 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class="form-group">
-                                        <label for="name">Nível:</label>
-                                        <input type="text" class="form-control" readonly
-                                                value="<?php echo $entity['name']; ?>">
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <label for="name">Nível</label>
+                                        <p>
+                                            <?php echo $entity['name']; ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="name">Administrador:</label>
-                                        <input type="text" class="form-control" readonly
-                                                value="<?php echo ($entity['is_admin']) ? 'Sim' : 'Não'; ?>">
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <label for="name">Administrador</label>
+                                        <p>
+                                            <?php echo ($entity['is_admin']) ? 'Sim' : 'Não'; ?>
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="col-md-12"><hr></div>
-                                <div class="col-md-6 text-left">
-                                    <span>Cadastrado em:</span> <br>
-                                    <b><?php echo $this->formatDateTime($entity['created_at']); ?></b>
+                                <div class="col-md-12">
+                                    <hr>
                                 </div>
-                                <div class="col-md-6 text-right">
+                                <div class="col-6 text-left">
+                                    <span class="fa fa-calendar pr-1"></span>
+                                    <span>Cadastrado em</span> <br>
+                                    <b>
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </b>
+                                </div>
+                                <div class="col-6 text-right">
                                     <?php if (!empty($entity['updated_at'])): ?>
-                                        <span>Atualizado em:</span> <br>
-                                        <b><?php echo $this->formatDateTime($entity['updated_at']); ?></b>
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <span>Atualizado em</span> <br>
+                                        <b>
+                                            <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                        </b>
                                     <?php endif; ?>
                                 </div>
-                                <div class="col-md-12"><hr></div>
-                                <div class="col-6 col-md-6 mt-3">
-                                    <?php if ($entity['uuid'] != $_SESSION['COD'] && $entity['uuid'] != 1): ?>
-                                        <button type="button" class="btn btn-default mr-2 mb-2" onclick="deleteRole('<?php echo $entity['uuid']; ?>');">
-                                            <i class="fa fa-trash"></i> Remover
-                                        </button>
-                                    <?php endif; ?>
-                                    <?php if ($entity['is_admin'] == 0): ?>
-                                        <button type="button" class="btn btn-primary mb-2" onclick="rolePrivileges('<?php echo $entity['uuid']; ?>');">
-                                            <i class="fa fa-unlock pr-1"></i> Permissões
-                                        </button>
-                                    <?php endif; ?>
+                                <div class="col-md-12">
+                                    <hr>
                                 </div>
-                                <div class="col-6 col-md-6 text-right mt-3 mb-2">
-                                    <button type="button" class="btn btn-default mr-2"
-                                            onclick="openModule('controle-acesso');">
-                                        <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" onclick="updateRole('<?php echo $entity['uuid']; ?>');">
-                                        <i class="fa fa-pen pr-1"></i> Editar
-                                    </button>
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                            <button type="button" class="btn btn-outline-danger"
+                                                onclick="deleteRole('<?php echo $entity['uuid']; ?>');" style="width: 100%;"
+                                                title="Remover Perfil">
+                                                <i class="fa fa-trash"></i> Remover
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                            <?php if ($entity['is_admin'] == 0): ?>
+                                                <button type="button" class="btn btn-outline-primary mb-2"
+                                                    onclick="rolePrivileges('<?php echo $entity['uuid']; ?>');"
+                                                    style="width: 100%;" title="Permissões do Perfil">
+                                                    <i class="fa fa-unlock pr-1"></i> Permissões
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                            <button type="button" class="btn btn-outline-success"
+                                                onclick="updateRole('<?php echo $entity['uuid']; ?>');" style="width: 100%;"
+                                                title="Editar Perfil">
+                                                <i class="fa fa-pen pr-1"></i> Editar
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                            <button type="button" class="btn btn-outline-primary"
+                                                onclick="openModule('controle-acesso');" style="width: 100%;"
+                                                title="Voltar para Controle de Acesso">
+                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -18,7 +18,7 @@ class SmtpController extends ActionController
 
     public function indexAction(): void
     {
-        $entity = $this->model->getOne();
+        $entity = $this->model->getEntity();
         $this->view->entity = $entity;
         $this->render('index', false);
     }
@@ -34,7 +34,7 @@ class SmtpController extends ActionController
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Atualizou as configurações de smtp");
                 $data  = [
                     'title' => 'Sucesso!',

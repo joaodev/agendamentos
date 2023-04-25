@@ -33,6 +33,17 @@
                                         <span style="color: purple;">( ATIVAÇÃO PENDENTE ) </span>
                                     <?php endif; ?>
                                 </h2>
+                                <?php if ($entity['status'] == '1'): ?>
+                                    <div class="text-center mt-3">
+                                        <hr>
+                                        <p><?php echo $entity['planDescription']; ?></p>
+                                        <h2>R$ <?php echo number_format($entity['planPrice'], 2, ",","."); ?> /mês</h2>
+                                        <?php if (!empty($entity['file'])): ?>
+                                            <hr>
+                                            <b>Renovação em <?php echo $this->formatDate($entity['renovation_at']); ?></b>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
                                 <?php if ($entity['status'] == '3'): ?>
                                     <div class="text-center mt-3">
                                         <hr>
@@ -64,7 +75,7 @@
                                             <input type="file" class="form-control" name="file" id="file" required>
                                         </div>
                                         <input type="hidden" id="order" value="<?php echo $entity['uuid']; ?>">
-                                        <button type="submit" class="btn btn-outline-success btn-lg w-100 mt-3"
+                                        <button type="submit" class="btn btn-outline-success w-100 mt-3"
                                             id="btnSubmit">
                                             <span class="fa fa-upload pr-1"></span>
                                             ENVIAR COMPROVANTE
@@ -157,7 +168,7 @@
                                     </div>
                                     <br>
                                 </div>
-                                <button type="button" class="btn btn-outline-success btn-lg w-100 mt-3"
+                                <button type="button" class="btn btn-outline-success w-100 mt-3"
                                     onclick="selectPlan('<?php echo $entity['uuid']; ?>');" >
                                     <span class="fa fa-check pr-1"></span>
                                     CONFIRMAR PAGAMENTO

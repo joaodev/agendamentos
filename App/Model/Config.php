@@ -13,7 +13,7 @@ class Config extends Model
         $this->setTable('site_config');
     }
 
-    public function getOne()
+    public function getEntity()
     {
         try {
             $query = "

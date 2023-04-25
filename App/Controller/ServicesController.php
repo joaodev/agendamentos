@@ -25,6 +25,10 @@ class ServicesController extends ActionController implements CrudInterface
 
         $activePlan = self::getActivePlan();
         $totalServices = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+
+        $totalFree = ($activePlan['total_services'] - $totalServices);
+        $this->view->total_free = $totalFree;
+
         if ($totalServices >= $activePlan['total_services']) {
             $reached_limit = true;
         } else {
@@ -62,7 +66,7 @@ class ServicesController extends ActionController implements CrudInterface
                 $crud->setTable($this->model->getTable());
                 $transaction = $crud->create($_POST);
     
-                if ($transaction){ 
+                if ($transaction) { 
                     $this->toLog("Cadastrou o serviço $uuid");
                     $data  = [
                         'title' => 'Sucesso!',
@@ -112,7 +116,7 @@ class ServicesController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Atualizou o serviço {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!',
@@ -156,7 +160,7 @@ class ServicesController extends ActionController implements CrudInterface
                 'updated_at' => date('Y-m-d H:i:s')
             ],$_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Removeu o serviço {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!',

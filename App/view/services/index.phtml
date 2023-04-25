@@ -60,6 +60,11 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                 <a onclick="openModule('planos-usuario');" 
                                     class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para alterar e liberar todos os recursos do sistema.
                             </div>
+                        <?php else: ?>
+                            <div class="alert alert-info" role="alert">
+                                <span class="fa fa-info-circle pr-1"></span> 
+                                Cadastros disponíveis: <b><?php echo $this->view->total_free; ?></b> 
+                            </div>
                         <?php endif; ?>
                     <?php endif; ?>
                     <div class="card">

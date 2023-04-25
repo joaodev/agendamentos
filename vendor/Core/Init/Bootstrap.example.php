@@ -41,8 +41,10 @@ class Bootstrap
                                         if ($url != $this->project_url . "/alterar-senha") {
                                             if ($url != $this->project_url . "/validar-token") {
                                                 if ($url != $this->project_url . "/cancelar-token") {
-                                                    $login->indexAction();
-                                                    return;
+                                                    if ($url != $this->project_url . "/criar-conta") {
+                                                        $login->indexAction();
+                                                        return;
+                                                    }
                                                 }
                                             }
                                         }

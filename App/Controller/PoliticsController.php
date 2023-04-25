@@ -34,7 +34,7 @@ class PoliticsController extends ActionController
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($postData, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Atualizou o conteúdo da política de privacidade");
                 $data  = [
                     'title' => 'Sucesso!', 

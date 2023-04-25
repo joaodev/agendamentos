@@ -1,0 +1,127 @@
+<?php 
+$entity = $this->view->entity; 
+$role = $_SESSION['ROLE'];
+?>
+<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('tasks'))): ?>
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
+            <div class="row">
+                <div class="col-11" >
+                    <h1 style="position: relative; top: 5px; font-size: 25px;">
+                        <i class="fas fa-pen-square pr-1"></i>
+                        Tarefa
+                    </h1>
+                </div>
+                <div class="col-1">
+                    <ol class="breadcrumb float-right">
+                        <li class="breadcrumb-item">
+                            <button type="button" class="btn btn-outline-primary"
+                                onclick="openDetails('<?php echo $entity['uuid']; ?>');" style="width: 100%;"
+                                title="Voltar para Detalhamento">
+                                <i class="fas fa-arrow-left"></i> 
+                            </button>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" name="formUpdateTask" id="formUpdateTask">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="name">Situação*</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Tarefa Pendente</option>
+                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Tarefa Conclúida</option>
+                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Tarefa Cancelada</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="name">Nome*</label>
+                                            <input type="text" class="form-control" name="title" id="title" required
+                                                value="<?php echo $entity['title']; ?>"
+                                                   placeholder="Nome do Tarefa">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="task_date">Data*</label>
+                                            <input type="date" class="form-control" name="task_date" id="task_date" required
+                                                value="<?php echo $entity['task_date']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="task_time">Hora</label>
+                                            <input type="time" class="form-control" name="task_time" id="task_time"
+                                                value="<?php echo $entity['task_time']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="title">Descrição*</label>
+                                            <textarea name="description" id="description" class="form-control" rows="10" required
+                                                      placeholder="Descrição completa do Tarefa"><?php echo $entity['description']; ?></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 mt-3 mb-2">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Tarefa">
+                                            <i class="fa fa-save pr-1"></i> Salvar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mt-3 mb-2">
+                                        <input type="hidden" name="uuid" id="id_mesa" value="<?php echo $entity['uuid']; ?>">
+                                        <button type="button" class="btn btn-outline-primary w-100"
+                                            onclick="openDetails('<?php echo $entity['uuid']; ?>');" title="Voltar para Detalhamento">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function(){
+            $('#formUpdateTask').validate({
+                submitHandler: function( form ){
+                    let dados = $( form ).serialize();
+
+                    $("#baseLoader").show();
+                    $("#btnSubmit").show('disabled', true);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>tarefas/processa-edicao",
+                        data: dados,
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#baseLoader").hide();
+                        $("#btnSubmit").attr('disabled', false);
+                    }).fail(function() {
+                        showInternalErrorAlert();
+                        $("#baseLoader").hide();
+                        $("#btnSubmit").attr('disabled', false);
+                    });
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

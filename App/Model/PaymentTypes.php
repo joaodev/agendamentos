@@ -17,7 +17,7 @@ class PaymentTypes extends Model
     {
         try {
             $query = "
-                SELECT uuid, name, status, created_at, updated_at
+                SELECT id, uuid, name, status, created_at, updated_at
                 FROM payment_types
                 WHERE uuid = :uuid
             ";
@@ -41,7 +41,7 @@ class PaymentTypes extends Model
     {
         try {
             $query = "
-                SELECT uuid, name, status, created_at, updated_at
+                SELECT id, uuid, name, status, created_at, updated_at
                 FROM payment_types
                 WHERE uuid = :uuid
                     AND deleted = :deleted
@@ -69,7 +69,7 @@ class PaymentTypes extends Model
     {
         try {
             $query = "
-                 SELECT uuid, name, status, created_at, updated_at
+                 SELECT id, uuid, name, status, created_at, updated_at
                 FROM payment_types
                 WHERE deleted = :deleted
                 ORDER BY name";
@@ -93,7 +93,7 @@ class PaymentTypes extends Model
     {
         try {
             $query = "
-                 SELECT uuid, name, status, created_at, updated_at
+                 SELECT id, uuid, name, status, created_at, updated_at
                 FROM payment_types
                 WHERE deleted = :deleted AND status = :status
                 ORDER BY name";

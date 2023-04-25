@@ -8,7 +8,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
 
 $data = $this->view->data; 
 if ($canView):
-?>
+    ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
@@ -42,10 +42,14 @@ if ($canView):
                                     <thead>
                                         <tr class="text-center" style="height: 30px;">
                                             <th style="font-size: 14px;">Data</th>
+                                            <th style="font-size: 14px;">Renovação</th>
                                             <th style="font-size: 14px;">Usuário</th>
                                             <th style="font-size: 14px;">Comprovante</th>
                                             <th style="font-size: 14px;">Status</th>
                                             <th style="font-size: 14px;">Ações</th>
+                                            <th style="display: none;">Status</th>
+                                            <th style="display: none;">Comprovante</th>
+                                            <th style="display: none;">Data Comprovante</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -55,12 +59,26 @@ if ($canView):
                                                     <?php echo $this->formatDateTime($entity['created_at'], false); ?>
                                                 </td>
                                                 <td style="font-size: 15px; ">
-                                                    <?php echo $entity['userName']; ?>
+                                                    <?php echo $this->formatDate($entity['renovation_at']); ?>
+                                                </td>
+                                                <td style="font-size: 15px; ">
+                                                    <?php echo $entity['userName'] . ' (' . $entity['userEmail'] . ')'; ?>
                                                 </td>
                                                 <td style="font-size: 15px;">
-                                                    <a href="">
-                                                        <?php echo $entity['file']; ?>
-                                                    </a>
+                                                    <?php if (!empty($entity['file'])): ?>
+                                                        <a href="<?php echo baseUrl . 'public/uploads/userplans/' . $entity['uuid'] . '/' . $entity['file']; ?>"
+                                                            target="_blank">
+                                                            <?php echo $entity['file']; ?>
+                                                        </a>
+                                                        <?php if ($canDelete): ?>
+                                                            <button type="button" class="btn btn-danger btn-xs" title="Excluir Comprovante"
+                                                                onclick="deleteUserPlanFile('<?php echo $entity['uuid']; ?>', '<?php echo $entity['file']; ?>');">
+                                                                <span class="fa fa-trash"></span>
+                                                            </button>
+                                                        <?php endif; ?>
+                                                    <?php else: ?>
+                                                        <b>Aguradando</b>
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td style="font-size: 15px;">
                                                     <?php if ($entity['status'] == '0'): ?>
@@ -70,19 +88,49 @@ if ($canView):
                                                         <span style="color: green;">ATIVO</span>
                                                     <?php endif; ?>
                                                     <?php if ($entity['status'] == '2'): ?>
-                                                        <span style="color: blue;">CANCELADO</span>
+                                                        <span style="color: red;">CANCELADO</span>
                                                     <?php endif; ?>
                                                     <?php if ($entity['status'] == '3'): ?>
                                                         <span style="color: purple;">ATIVAÇÃO PENDENTE</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td style="font-size: 15px;">
-                                                    <button type="button" class="btn btn-success btn-sm">
-                                                        <span class="fa fa-sync"></span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm">
-                                                        <span class="fa fa-trash"></span>
-                                                    </button>
+                                                    <?php if ($canUpdate): ?>
+                                                        <button type="button" class="btn btn-success btn-xs"
+                                                            onclick="updateUserPlan('<?php echo $entity['uuid']; ?>');">
+                                                            <span class="fa fa-sync"></span>
+                                                        </button>
+                                                    <?php endif; ?>
+                                                    <?php if ($canDelete): ?>
+                                                        <button type="button" class="btn btn-danger btn-xs"
+                                                            onclick="deleteUserPlan('<?php echo $entity['uuid']; ?>');">
+                                                            <span class="fa fa-trash"></span>
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="display: none;">
+                                                    <?php if ($entity['status'] == '0'): ?>
+                                                        AGUARDANDO COMPROVANTE
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '1'): ?>
+                                                        ATIVO
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '2'): ?>
+                                                        CANCELADO
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '3'): ?>
+                                                        ATIVAÇÃO PENDENTE
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="display: none;">
+                                                    <?php if (!empty($entity['file'])): ?>
+                                                        <?php echo baseUrl . 'public/uploads/userplans/' . $entity['uuid'] . '/' . $entity['file']; ?>
+                                                    <?php else: ?>
+                                                        <b>Aguradando</b>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="display: none;">
+                                                    <?php echo $this->formatDateTime($entity['uploaded_at']); ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -114,11 +162,11 @@ if ($canView):
                     $.extend( true, {}, buttonCommon, {
                         extend: 'excel',
                         title: 'PLANOS DE USUÁRIOS',
-                        ///exportOptions: {columns: [0,1,2,3,4,6]}
+                        exportOptions: {columns: [0,1,2,6,7,8]}
                     })
                 ],
                 order: [ [0, "desc"] ],
-                columnDefs: [{orderable: false, targets: [2]}],
+                columnDefs: [{orderable: false, targets: [3,5]}],
                 responsive: true,
                 info: true,
                 processing: true,
@@ -150,9 +198,90 @@ if ($canView):
                 }
             });
         });
-
-        function openUserPlanDetails(uuid) {
-            alert(uuid);
-        }
     </script>
+    <?php if ($canUpdate): ?>
+        <script>
+            function updateUserPlan(uuid) {
+                $("#modalLargeResult").empty();
+                $("#modalLargeTitle").html('<i class="fa fa-info-circle pr-2"></i> Atualizar Plano de Usuário');
+                $("#modalLargeLoader").show();
+                $("#modalLarge").modal('show');
+                
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>planos/planos-usuarios/atualizar",
+                    data: {uuid:uuid},
+                    async: true
+                }).done(function(data) {
+                    $("#modalLargeResult").html(data);
+                    $("#modalLargeLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalLargeLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canDelete): ?>
+        <script>
+            function deleteUserPlan(uuid) {
+                $("#modalXL").modal('hide');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Plano');
+                $("#modalDeleteLoader").hide();
+                $("#modalDelete").modal('show');
+                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runUserPlanDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }
+
+            function runUserPlanDelete(uuid) {
+                if (uuid !== null) {
+                    $("#modalDeleteLoader").show();
+                    
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>planos/planos-usuarios/excluir",
+                        data: {uuid: uuid},
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#modalDelete").modal('hide');
+                        $("#modalXL").modal('hide');
+                        usersPlans('<?php echo $this->view->plan_uuid; ?>');
+                    }).fail(function() {
+                        showInternalErrorAlert();
+                        $("#modalDeleteLoader").hide();
+                    });
+                }
+            }
+
+            function deleteUserPlanFile(uuid, file) {
+                $("#modalXL").modal('hide');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Comprovante de Pagamento');
+                $("#modalDeleteLoader").hide();
+                $("#modalDelete").modal('show');
+                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runUserPlanDeleteFile(\''+uuid+'\',\''+file+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }
+
+            function runUserPlanDeleteFile(uuid, file) {
+                $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>planos/planos-usuarios/excluir-comprovante",
+                    data: {
+                        uuid: uuid,
+                        file: file
+                    },
+                    dataType: 'json',
+                    async: true
+                }).done(function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    $("#modalDelete").modal('hide');
+                    $("#modalXL").modal('hide');
+                    usersPlans('<?php echo $this->view->plan_uuid; ?>');
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalDeleteLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
 <?php endif; ?>

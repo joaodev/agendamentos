@@ -54,23 +54,35 @@ class LoginController extends ActionController
 	            $_SESSION['ROLE']        = $credentials['role_uuid'];
 	            $_SESSION['ROLE_ADM']    = $credentials['is_admin'];
 	            $_SESSION['PHOTO']       = $credentials['file'];
-	            $_SESSION['PLAN_NAME']   = $credentials['plan'];
-	            $_SESSION['PLAN']        = $credentials['plan_uuid'];
 
-                $currentDevice = $_SERVER["HTTP_USER_AGENT"];
-                $checkedDevices = $this->devicesModel->findAllBy('user_device', 'user_uuid', $credentials['uuid']);
-
-                $devices = [];
-                foreach ($checkedDevices as $checkedDevice) {
-                    $devices[] = $checkedDevice['user_device'];
+                $userPlan = $this->getActiveUserPlan($credentials['uuid']);
+                if (!empty($userPlan)) {
+                    $_SESSION['PLAN_NAME'] = $userPlan['planName'];
+                    $_SESSION['PLAN'] = $userPlan['plan_uuid'];
+                } else {
+                    $_SESSION['PLAN_NAME'] = null;
+                    $_SESSION['PLAN'] = null;
                 }
 
-                if (in_array($currentDevice, $devices)) {
-                    $_SESSION['TOKEN'] = $credentials['code'];
-                    $this->toLog("Fez login no sistema usando um dispositivo registrado.");
+                if ($credentials['auth2factor'] == 1) {
+                    $currentDevice = $_SERVER["HTTP_USER_AGENT"];
+                    $checkedDevices = $this->devicesModel->findAllBy('user_device', 'user_uuid', $credentials['uuid']);
+
+                    $devices = [];
+                    foreach ($checkedDevices as $checkedDevice) {
+                        $devices[] = $checkedDevice['user_device'];
+                    }
+
+                    if (in_array($currentDevice, $devices)) {
+                        $_SESSION['TOKEN'] = $credentials['code'];
+                        $this->toLog("Fez login no sistema usando um dispositivo registrado.");
+                    } else {
+                        $this->toLog("Fez login no sistema, aguardando validação do token");
+                        self::registerToken($credentials['uuid']);
+                    }
                 } else {
-                    $this->toLog("Fez login no sistema, aguardando validação do token");
-                    self::registerToken($credentials['uuid']);
+                    $_SESSION['TOKEN'] = $credentials['code'];
+                    $this->toLog("Fez login no sistema no modo padrão.");
                 }
 
 	            self::redirect('');

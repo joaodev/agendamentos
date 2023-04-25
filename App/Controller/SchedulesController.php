@@ -39,6 +39,9 @@ class SchedulesController extends ActionController implements CrudInterface
         $activePlan = self::getActivePlan();
         $totalSchedules = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
         
+        $totalFree = ($activePlan['total_schedules'] - $totalSchedules);
+        $this->view->total_free = $totalFree;
+
         if ($activePlan['total_schedules'] == 0) {
             $reached_limit = false;
         } else {
@@ -107,7 +110,7 @@ class SchedulesController extends ActionController implements CrudInterface
                 $crud->setTable($this->model->getTable());
                 $transaction = $crud->create($_POST);
     
-                if ($transaction){
+                if ($transaction) {
                     $this->toLog("Cadastrou o agendamento $uuid");
                     $data  = [
                         'title' => 'Sucesso!', 
@@ -176,7 +179,7 @@ class SchedulesController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Atualizou o agendamento {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -219,7 +222,7 @@ class SchedulesController extends ActionController implements CrudInterface
                 'updated_at' => date('Y-m-d H:i:s')
             ],$_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Removeu o agendamento {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 

@@ -57,7 +57,7 @@ class RoleController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->create($_POST);
 
-            if ($transaction){
+            if ($transaction) {
                 $modules = $this->modulesModel->getAll();
                 foreach ($modules as $module) {
                     if ($module['view_uuid'] != 0) {
@@ -127,7 +127,7 @@ class RoleController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Atualizou o perfil de acesso: {$_POST['name']} #{$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -165,7 +165,7 @@ class RoleController extends ActionController implements CrudInterface
                 $crud->setTable($this->model->getTable());
                 $transaction = $crud->update($updateData, $_POST['uuid'], 'uuid');
 
-                if ($transaction){
+                if ($transaction) {
                     $this->toLog("Removeu o perfil de acesso: #{$_POST['uuid']}");
                     $data  = [
                         'title' => 'Sucesso!', 

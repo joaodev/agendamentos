@@ -46,7 +46,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                 <div class="col-6 col-md-6 col-lg-3">
                     <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
                         <div class="inner">
-                            <p>Tarefas <br>Pendentes</p>
+                            <p>Agendamentos <br>Pendentes</p>
                             <h3><?php echo $this->view->total_pending_schedules; ?></h3>
                         </div>
                         <div class="icon">
@@ -59,7 +59,7 @@ $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
                 <div class="col-6 col-md-6 col-lg-3">
                     <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
                         <div class="inner">
-                            <p>Tarefas <br>Concluídas</p>
+                            <p>Agendamentos <br>Concluídos</p>
                             <h3><?php echo $this->view->total_finished_schedules; ?></h3>
                         </div>
                         <div class="icon">

@@ -43,7 +43,7 @@ class DemoController extends ActionController
                     $crud = new Crud();
                     $crud->setTable($this->model->getTable());
                     $transaction = $crud->create($_POST);
-
+                    
                     if ($transaction) {
                         $privileges = $this->privilegeModel->getAllByRoleUuid($_POST['role_uuid']);
                         foreach ($privileges as $privilege) {

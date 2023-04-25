@@ -9,11 +9,20 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
-                <div class="col-12">
+                <div class="col-11">
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-envelope pr-1"></i>
                         SMTP
                     </h1>
+                </div>
+                <div class="col-1">
+                    <ol class="breadcrumb float-right">
+                        <li class="breadcrumb-item">
+                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inical">
+                                <i class="fas fa-home"></i> 
+                            </a>
+                        </li>
+                    </ol>
                 </div>
             </div>
         </div>
@@ -27,54 +36,59 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                             <form method="post" name="formUpdateConfig" id="formUpdateConfig">
 
                                 <div class="form-group row">
-                                    <label for="mail_host" class="col-sm-2 form-control-label">Servidor SMTP</label>
-                                    <div class="col-sm-10">
+                                    <label for="mail_host" class="col-md-2 form-control-label">Servidor SMTP</label>
+                                    <div class="col-md-10">
                                         <input type="text" class="form-control" name="mail_host" id="mail_host" maxlength="30"
                                                value="<?php echo $entity['mail_host']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="mail_port" class="col-sm-2 form-control-label">Porta</label>
-                                    <div class="col-sm-10">
+                                    <label for="mail_port" class="col-md-2 form-control-label">Porta</label>
+                                    <div class="col-md-10">
                                         <input type="text" class="form-control" name="mail_port" id="mail_port" maxlength="10"
                                                value="<?php echo $entity['mail_port']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="mail_username" class="col-sm-2 form-control-label">Usuário</label>
-                                    <div class="col-sm-10">
+                                    <label for="mail_username" class="col-md-2 form-control-label">Usuário</label>
+                                    <div class="col-md-10">
                                         <input type="text" class="form-control" name="mail_username" id="mail_username" maxlength="50"
                                                value="<?php echo $entity['mail_username']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
                                     </div>
                                 </div>
                                 <?php if ($canUpdate): ?>
                                     <div class="form-group row">
-                                        <label for="mail_password" class="col-sm-2 form-control-label">Senha</label>
-                                        <div class="col-sm-10">
+                                        <label for="mail_password" class="col-md-2 form-control-label">Senha</label>
+                                        <div class="col-md-10">
                                             <input type="text" class="form-control" name="mail_password" id="mail_password" maxlength="50">
                                         </div>
                                     </div>
                                 <?php endif; ?>
                                 <div class="form-group row">
-                                    <label for="mail_from_address" class="col-sm-2 form-control-label">Email para envio</label>
-                                    <div class="col-sm-10">
+                                    <label for="mail_from_address" class="col-md-2 form-control-label">Email para envio</label>
+                                    <div class="col-md-10">
                                         <input type="text" class="form-control" name="mail_from_address" id="mail_from_address" maxlength="100"
                                                value="<?php echo $entity['mail_from_address']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="mail_to_address" class="col-sm-2 form-control-label">Email para Recebimento</label>
-                                    <div class="col-sm-10">
+                                    <label for="mail_to_address" class="col-md-2 form-control-label">Email para Recebimento</label>
+                                    <div class="col-md-10">
                                         <input type="text" class="form-control" name="mail_to_address" id="mail_to_address" maxlength="100"
                                                value="<?php echo $entity['mail_to_address']; ?>" <?php echo ($canUpdate) ? '' : 'readonly'; ?>>
                                     </div>
                                 </div>
                                 <?php if ($canUpdate): ?>
                                     <div class="row">
-                                        <div class="col-md-12 text-right mt-3 mb-2">
-                                            <button type="submit" class="btn btn-primary">
+                                        <div class="col-md-8 mt-2 mb-2">
+                                            <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar">
                                                 <i class="fa fa-save pr-1"></i> Salvar
                                             </button>
+                                        </div>
+                                        <div class="col-md-4 mt-2 mb-2">
+                                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inicial">
+                                                <i class="fas fa-home pr-1"></i> Início
+                                            </a>
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -102,7 +116,7 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                         form_data.append('mail_to_address', $("#mail_to_address").val());
 
                         $("#baseLoader").show();
-                        $("#btnSubmit").show('disabled', true);
+                        $("#btnSubmit").attr('disabled', true);
 
                         $.ajax({
                             type: "POST",
@@ -116,10 +130,11 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                         }).done(function(data) {
                             showAlert(data.type, data.title, data.msg, data.pos);
                             $("#baseLoader").hide();
+                            $("#btnSubmit").attr('disabled', false);
                         }).fail(function() {
                             showInternalErrorAlert();
                             $("#baseLoader").hide();
-                            $("#btnSubmit").show('disabled', false);
+                            $("#btnSubmit").attr('disabled', false);
                         });
 
                         return false;

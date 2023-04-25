@@ -39,7 +39,7 @@ class PaymentTypesController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->create($_POST);
            
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Cadastrou a Forma de Pagamento $uuid");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -81,7 +81,7 @@ class PaymentTypesController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Atualizou a Forma de Pagamento {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -124,7 +124,7 @@ class PaymentTypesController extends ActionController implements CrudInterface
                 'updated_at' => date('Y-m-d H:i:s')
             ],$_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Removeu a Forma de Pagamento {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 

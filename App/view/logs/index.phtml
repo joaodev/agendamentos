@@ -8,11 +8,20 @@ $canView = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCode
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
-                <div class="col-12">
+                <div class="col-11">
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-th-list pr-1"></i>
                         Logs do Sistema
                     </h1>
+                </div>
+                <div class="col-1">
+                    <ol class="breadcrumb float-right">
+                        <li class="breadcrumb-item">
+                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inical">
+                                <i class="fas fa-home"></i> 
+                            </a>
+                        </li>
+                    </ol>
                 </div>
             </div>
         </div>
@@ -31,7 +40,7 @@ $canView = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCode
                                             <th style="font-size: 14px;">Horário</th>
                                             <th style="font-size: 14px;">Colaborador</th>
                                             <th style="font-size: 14px;">Ação</th>
-                                            <th style="font-size: 14px;">Status</th>
+                                            <th style="font-size: 14px;">Situação</th>
                                             <th style="display: none;">IP</th>
                                             <th style="display: none;">Dispositivo</th>
                                         </tr>

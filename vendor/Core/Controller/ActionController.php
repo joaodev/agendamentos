@@ -211,7 +211,7 @@ class ActionController
     public function getSiteConfig()
     {
         $configModel = Container::getClass("Config", "app");
-        $configData  = $configModel->getOne();
+        $configData  = $configModel->getEntity();
 
         return $configData;
     }
@@ -334,6 +334,8 @@ class ActionController
             'financial' => 'c2262430-8921-1a3d-42ff-074a676fcadc',
             'plans' => '4b3ab6dc-16af-450b-a2e8-f4c006c8bf16',
             'user-plans' => '192631d7-87f0-4677-b446-a018ef4026e2',
+            'revenues' => '2ee634af-df6f-49ce-b31b-50cff4826987',
+            'tasks' => '1e184c91-a53c-4bae-a6b2-e43fb4364b8f',
         ];
 
         return $codes[$key];
@@ -345,6 +347,12 @@ class ActionController
         return $expensesModel->getTotalByStatusByMonth($status, $month);
     }
 
+    public function getTotalRevenuesByMonth($status, $month)
+    {
+        $revenuesModel = Container::getClass("Revenues", "app");
+        return $revenuesModel->getTotalByStatusByMonth($status, $month);
+    }
+
     public function getTotalSchedulesByMonth($status, $month)
     {
         $expensesModel = Container::getClass("Schedules", "app");
@@ -354,8 +362,13 @@ class ActionController
     public function formatMonth($month): string
     {
         $exp = explode('-', $month, 2);
-
         return $exp[1] . '/' . $exp[0];
+    }
+
+    public function getActiveUserPlan($uuid): array|bool
+    {
+        $model = Container::getClass("UserPlans", "app");
+        return $model->getActiveUserPlanByUuid($uuid);
     }
 
     public function getActivePlan(): array

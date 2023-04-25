@@ -34,6 +34,19 @@ class ExpensesController extends ActionController implements CrudInterface
         $data = $this->model->getAllByMonth('0', $month);
         $this->view->data = $data;
 
+        $activePlan = self::getActivePlan();
+        $totalData = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+
+        $totalFree = ($activePlan['total_expenses'] - $totalData);
+        $this->view->total_free = $totalFree;
+
+        if ($totalData >= $activePlan['total_expenses']) {
+            $reached_limit = true;
+        } else {
+            $reached_limit = false;
+        }   
+        $this->view->reached_limit = $reached_limit;
+
         $this->render('index', false);
     }
 
@@ -75,8 +88,8 @@ class ExpensesController extends ActionController implements CrudInterface
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->create($_POST);
- 
-            if ($transaction){
+            var_dump($transaction); die;
+            if ($transaction) {
                 $this->toLog("Cadastrou a despesa $uuid");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -141,7 +154,7 @@ class ExpensesController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Atualizou a despesa {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -184,7 +197,7 @@ class ExpensesController extends ActionController implements CrudInterface
                 'updated_at' => date('Y-m-d H:i:s')
             ],$_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Removeu a despesa {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 

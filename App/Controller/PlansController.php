@@ -45,7 +45,7 @@ class PlansController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->create($_POST);
            
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Cadastrou o Plano $uuid");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -89,7 +89,7 @@ class PlansController extends ActionController implements CrudInterface
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Atualizou o Plano {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -132,7 +132,7 @@ class PlansController extends ActionController implements CrudInterface
                 'updated_at' => date('Y-m-d H:i:s')
             ],$_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Removeu o Plano {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -363,7 +363,7 @@ class PlansController extends ActionController implements CrudInterface
                 'uploaded_at' => date('Y-m-d H:i:s')
             ],$_POST['order'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Usuário anexou o comprovante ao Plano {$_POST['order']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -398,7 +398,7 @@ class PlansController extends ActionController implements CrudInterface
                 'canceled_at' => date('Y-m-d H:i:s')
             ],$_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Usuário cancelou o Plano {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -427,7 +427,132 @@ class PlansController extends ActionController implements CrudInterface
         if (!empty($_POST['uuid'])) {   
             $data = $this->userPlansModel->getAllUsersPlans($_POST['uuid']);
             $this->view->data = $data;
+
+            $this->view->plan_uuid = $_POST['uuid'];
+
             $this->render('users-plans', false);
+        }
+    }
+
+    public function deleteUserplanAction(): bool
+    {
+        if (!empty($_POST)) {
+            $crud = new Crud();
+            $crud->setTable($this->userPlansModel->getTable());
+            $transaction = $crud->delete($_POST['uuid'], 'uuid');
+
+            if ($transaction) {
+                $this->toLog("Removeu o Plano de Usuário {$_POST['uuid']}");
+                $data  = [
+                    'title' => 'Sucesso!', 
+                    'msg'   => 'Plano de Usuário removido.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right'
+                ];
+            } else {
+                $data  = [
+                    'title' => 'Erro!', 
+                    'msg' => 'O Plano de Usuário não foi removido.',
+                    'type' => 'error',
+                    'pos'   => 'top-center'
+                ];
+            }
+
+            echo json_encode($data);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function deletePaymentfileAction(): bool
+    {
+        if (!empty($_POST['uuid'])) {
+            $crud = new Crud();
+            $crud->setTable($this->userPlansModel->getTable());
+            $transaction = $crud->update([
+                'file' => null,
+                'status' => '0',
+                'uploaded_at' => null
+            ],$_POST['uuid'], 'uuid');
+           
+            if ($transaction) {
+                $this->toLog("Removeu o Comprovante de Pagamento {$_POST['file']}");
+                $data  = [
+                    'title' => 'Sucesso!', 
+                    'msg'   => 'Comprovante de Pagamento removido.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right'
+                ];
+            } else {
+                $data  = [
+                    'title' => 'Erro!', 
+                    'msg' => 'O Comprovante de Pagamento não foi removido.',
+                    'type' => 'error',
+                    'pos'   => 'top-center'
+                ];
+            }
+
+            echo json_encode($data);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function updateUserplanAction(): void
+    {
+        if (!empty($_POST['uuid'])) {
+            $plans = $this->model->getAll();
+            $this->view->plans = $plans;
+            
+            $entity = $this->userPlansModel->getOne($_POST['uuid']);
+            $this->view->entity = $entity;
+            $this->render('update-userplan', false);
+        }
+    }
+
+    public function processUserplanAction(): bool
+    {
+        if (!empty($_POST)) {
+            if (!empty($_POST['message'])) {
+                $entity = $this->userPlansModel->getOne($_POST['uuid']);
+                //novo mecanismo de envio de emails aqui
+            }
+
+            $logMessage = $_POST['message'] ? ' com a mensagem: ' . $_POST['message'] : '';
+
+            $updateData = [
+                'plan_uuid' => $_POST['plan_uuid'],
+                'status' => $_POST['status'],
+                'renovation_at' => $_POST['renovation_at']
+            ];
+
+            $crud = new Crud();
+            $crud->setTable($this->userPlansModel->getTable());
+            $transaction = $crud->update($updateData, $_POST['uuid'], 'uuid');
+
+            if ($transaction) {
+                $this->toLog("Atualizou o Plano de Usuário {$_POST['uuid']}{$logMessage}");
+                $data  = [
+                    'title' => 'Sucesso!', 
+                    'msg'   => 'Plano de Usuário atualizado.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right'
+                ];
+            } else {
+                $data  = [
+                    'title' => 'Erro!', 
+                    'msg' => 'O Plano de Usuário não foi atualizado.',
+                    'type' => 'error',
+                    'pos'   => 'top-center'
+                ];
+            }
+
+            echo json_encode($data);
+            return true;
+        } else {
+            return false;
         }
     }
 }

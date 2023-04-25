@@ -37,9 +37,6 @@ class UserController extends ActionController implements CrudInterface
     {
         $roles = $this->roleModel->getAll(null);
         $this->view->roles = $roles;
-  
-        $plans = $this->plansModel->getAll(null);
-        $this->view->plans = $plans;
       
         $this->render('create', false);
     }
@@ -82,13 +79,25 @@ class UserController extends ActionController implements CrudInterface
             } else {
                 unset($_POST['confirmation']);
                 $_POST['password'] = Bcrypt::hash($_POST['password']);
+
+                $_POST['salary'] = $this->moneyToDb($_POST['salary']);
+
+                if (empty($_POST['birthdate'])) {
+                    unset($_POST['birthdate']);
+                }
+                if (empty($_POST['end_date'])) {
+                    unset($_POST['end_date']);
+                }
+
+                $_POST['code'] = md5($this->randomString());
+                $_POST['code_validated'] = 1;
     
                 $_POST['uuid'] = $this->model->NewUUID();
                 $crud = new Crud();
                 $crud->setTable($this->model->getTable());
                 $transaction = $crud->create($_POST);
     
-                if ($transaction){
+                if ($transaction) {
                     $privileges = $this->privilegeModel->getAllByRoleUuid($_POST['role_uuid']);
                     foreach ($privileges as $privilege) {
                         $aclData = [
@@ -143,9 +152,6 @@ class UserController extends ActionController implements CrudInterface
             $entity = $this->model->getOne($_POST['uuid']);
             $this->view->entity = $entity;
 
-            $plans = $this->plansModel->getAll(null);
-            $this->view->plans = $plans;
-
             $this->render('update', false);
         }
     }
@@ -158,12 +164,26 @@ class UserController extends ActionController implements CrudInterface
                 unset($_POST['password']);
             }
             
+            if (!empty($_POST['salary']) && $_POST['salary'] != '0,00') {
+                $_POST['salary'] = $this->moneyToDb($_POST['salary']);
+            } else {
+                $_POST['salary'] = null;
+            }
+
+            if (empty($_POST['birthdate'])) {
+                $_POST['birthdate'] = null;
+            }
+
+            if (empty($_POST['end_date'])) {
+                $_POST['end_date'] = null;
+            }
+            
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){  
+            if ($transaction) {  
                 if ($entity['role_uuid'] != $_POST['role_uuid']) {
                     $this->reorganizeAcl($_POST['role_uuid'], $_POST['uuid']);
                 }
@@ -204,7 +224,7 @@ class UserController extends ActionController implements CrudInterface
                 $crud->setTable($this->model->getTable());
                 $transaction = $crud->update($updateData, $_POST['uuid'], 'uuid');
 
-                if ($transaction){
+                if ($transaction) {
                     $this->toLog("Removeu o usuário: #{$_POST['uuid']}");
                     $data  = [
                         'title' => 'Sucesso!', 
@@ -274,7 +294,7 @@ class UserController extends ActionController implements CrudInterface
             $crud->setTable($this->aclModel->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
-            if ($transaction){
+            if ($transaction) {
                 $this->toLog("Permissões de usuário atualizadas: #{$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
