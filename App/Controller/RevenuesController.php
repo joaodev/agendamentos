@@ -37,7 +37,9 @@ class RevenuesController extends ActionController implements CrudInterface
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
-        $totalData = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+        $totalData = $this->model->totalMonthlyData(
+            $month, $this->model->getTable(), 'revenue_date', $_SESSION['COD']
+        );
 
         $totalFree = ($activePlan['total_revenues'] - $totalData);
         $this->view->total_free = $totalFree;
@@ -66,34 +68,49 @@ class RevenuesController extends ActionController implements CrudInterface
     public function createProcessAction(): bool
     {
         if (!empty($_POST)) {
-            $uuid = $this->model->NewUUID();
-            $_POST['uuid'] = $uuid;
-            $_POST['user_uuid'] = $_SESSION['COD'];
-            $_POST['amount'] = $this->moneyToDb($_POST['amount']);
- 
-            $crud = new Crud();
-            $crud->setTable($this->model->getTable());
-            $transaction = $crud->create($_POST);
-            
-            if ($transaction) {
-                if (!empty($_FILES)) {
-                    $this->filesModel->uploadFiles($_FILES, "revenues", $uuid);
-                }
-                
-                $this->toLog("Cadastrou a receita $uuid");
+            $activePlan = self::getActivePlan();
+            $month = substr($_POST['revenue_date'], 0, 7);
+            $totalRevenues = $this->model->totalMonthlyData(
+                $month, $this->model->getTable(), 'revenue_date', $_SESSION['COD']
+            );
+
+            if ($totalRevenues >= $activePlan['total_revenues']) {
                 $data  = [
-                    'title' => 'Sucesso!', 
-                    'msg'   => 'Receita cadastrada.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right'
-                ];
-            } else {
-                $data  = [
-                    'title' => 'Erro!', 
-                    'msg' => 'A receita não foi cadastrada.',
+                    'title' => 'Erro!',
+                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plano.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
+            } else {
+                $uuid = $this->model->NewUUID();
+                $_POST['uuid'] = $uuid;
+                $_POST['user_uuid'] = $_SESSION['COD'];
+                $_POST['amount'] = $this->moneyToDb($_POST['amount']);
+    
+                $crud = new Crud();
+                $crud->setTable($this->model->getTable());
+                $transaction = $crud->create($_POST);
+                
+                if ($transaction) {
+                    if (!empty($_FILES)) {
+                        $this->filesModel->uploadFiles($_FILES, "revenues", $uuid);
+                    }
+                    
+                    $this->toLog("Cadastrou a receita $uuid");
+                    $data  = [
+                        'title' => 'Sucesso!', 
+                        'msg'   => 'Receita cadastrada.',
+                        'type'  => 'success',
+                        'pos'   => 'top-right'
+                    ];
+                } else {
+                    $data  = [
+                        'title' => 'Erro!', 
+                        'msg' => 'A receita não foi cadastrada.',
+                        'type' => 'error',
+                        'pos'   => 'top-center'
+                    ];
+                }
             }
 
             echo json_encode($data);

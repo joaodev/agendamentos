@@ -173,6 +173,13 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             </div>
         </div>
     </section>
+    <?php if (empty($_GET['m'])): ?>
+        <script>
+            $(document).ready(function() {
+                $("#f_month").val('<?php echo date('Y-m'); ?>');
+            });
+        </script>
+    <?php endif; ?>
     <script type="text/javascript">
         $(document).ready(function() {
             let buttonCommon = {
@@ -251,7 +258,10 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>tarefas/detalhes",
-                data: {uuid:uuid},
+                data: {
+                    uuid:uuid,
+                    month: $("#f_month").val()
+                },
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
@@ -269,6 +279,9 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>tarefas/cadastrar",
+                    data: {
+                        month: $("#f_month").val()
+                    },  
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
@@ -312,6 +325,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             function runDelete(uuid) {
                 if (uuid !== null) {
                     $("#modalDeleteLoader").show();
+                    let month = $("#f_month").val();
 
                     $.ajax({
                         type: "POST",
@@ -323,7 +337,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                         showAlert(data.type, data.title, data.msg, data.pos);
                         $("#modalDelete").modal('hide');
                         $("#modalXL").modal('hide');
-                        openModule('tarefas');
+                        openModule('tarefas?m=' + month);
                     }).fail(function() {
                         showInternalErrorAlert();
                         $("#modalDeleteLoader").hide();

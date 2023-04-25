@@ -119,6 +119,13 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
             </div>
         </div>
     </section>
+    <?php if (empty($_GET['m'])): ?>
+        <script>
+            $(document).ready(function() {
+                $("#f_month").val('<?php echo date('Y-m'); ?>');
+            });
+        </script>
+    <?php endif; ?>
     <script type="text/javascript">
         $(document).ready(function() {
             let buttonCommon = {

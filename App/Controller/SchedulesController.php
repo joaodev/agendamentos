@@ -39,7 +39,9 @@ class SchedulesController extends ActionController implements CrudInterface
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
-        $totalSchedules = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+        $totalSchedules = $this->model->totalMonthlyData(
+            $month, $this->model->getTable(), 'schedule_date', $_SESSION['COD']
+        );
         
         $totalFree = ($activePlan['total_schedules'] - $totalSchedules);
         $this->view->total_free = $totalFree;
@@ -78,7 +80,11 @@ class SchedulesController extends ActionController implements CrudInterface
     {
         if (!empty($_POST)) {
             $activePlan = self::getActivePlan();
-            $totalSchedules = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+            $month = substr($_POST['schedule_date'], 0, 7);
+            $totalSchedules = $this->model->totalMonthlyData(
+                $month, $this->model->getTable(), 'schedule_date', $_SESSION['COD']
+            );
+            
             if ($totalSchedules >= $activePlan['total_schedules']) {
                 $data  = [
                     'title' => 'Erro!',

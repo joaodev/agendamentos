@@ -295,4 +295,37 @@ class Model extends InitDb
             return $e->getMessage();
         }
     }
+
+    public function totalMonthlyData($month, $table, $column, $user): int|string
+    {
+        try {
+            $m = explode("-", $month);
+            $d1 = $m[0];
+            $d2 = $m[1];
+            
+            $query = "
+                SELECT uuid
+                FROM $table 
+                WHERE deleted = :deleted
+                AND user_uuid = :user_uuid
+                AND YEAR($column) = :d1 AND MONTH($column) = :d2
+            ";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":d1", $d1);
+            $stmt->bindValue(":d2", $d2);
+            $stmt->execute();
+            
+            $result = $stmt->rowCount();
+
+            $stmt = null;
+            $this->closeDb();
+
+            return $result;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
 }

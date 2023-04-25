@@ -32,7 +32,9 @@ class TasksController extends ActionController implements CrudInterface
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
-        $totalTasks = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+        $totalTasks = $this->model->totalMonthlyData(
+            $month, $this->model->getTable(), 'task_date', $_SESSION['COD']
+        );
 
         $totalFree = ($activePlan['total_tasks'] - $totalTasks);
         $this->view->total_free = $totalFree;
@@ -56,11 +58,15 @@ class TasksController extends ActionController implements CrudInterface
     {
         if (!empty($_POST)) {
             $activePlan = self::getActivePlan();
-            $totalTasks = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+            $month = substr($_POST['task_date'], 0, 7);
+            $totalTasks = $this->model->totalMonthlyData(
+                $month, $this->model->getTable(), 'task_date', $_SESSION['COD']
+            );
+
             if ($totalTasks >= $activePlan['total_tasks']) {
                 $data  = [
                     'title' => 'Erro!',
-                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plana.',
+                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plano.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];

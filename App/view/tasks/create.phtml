@@ -12,7 +12,7 @@
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
                             <button type="button" class="btn btn-outline-primary" title="Voltar para Tarefas"
-                                onclick="openModule('tarefas');" style="width: 100%;">
+                                onclick="openModule('tarefas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
                         </li>
@@ -70,7 +70,7 @@
                                     </div>
                                     <div class="col-md-4 mt-3 mb-2">
                                         <button type="button" class="btn btn-outline-primary w-100"
-                                                onclick="openModule('tarefas');" title="Voltar para Tarefas">
+                                                onclick="openModule('tarefas?m=<?php echo $_POST['month']; ?>');" title="Voltar para Tarefas">
                                             <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
