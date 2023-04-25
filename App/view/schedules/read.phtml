@@ -42,7 +42,7 @@
                                     <hr>
                                 </div>
                                 <div class="col-md-6">
-                                    <b>Serviço:</b>
+                                    <b>Serviço</b>
                                     <p>
                                         <?php echo $entity['serviceName']; ?> 
                                         <br> 
@@ -51,7 +51,7 @@
                                 </div>
                                 <?php if (!empty($entity['customerName'])): ?>
                                     <div class="col-md-6">
-                                        <b>Dados do Cliente:</b>
+                                        <b>Dados do Cliente</b>
                                         <p>
                                             <?php echo $entity['customerName']; ?><br>
                                             <?php echo $entity['customerEmail'] ?? 'Não informado'; ?><br>
@@ -61,7 +61,7 @@
                                 <?php endif; ?>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-md-4">
-                                    <b>Data do Agendamento:</b>
+                                    <b>Data do Agendamento</b>
                                     <p><?php echo $this->formatDate($entity['schedule_date']); ?> - <?php echo substr($entity['schedule_time'], 0, 5); ?></p>
                                 </div>
                                 <div class="col-md-4">
@@ -69,7 +69,7 @@
                                     <p>R$ <?php echo number_format($entity['amount'], 2, ",", "."); ?></p>
                                 </div>
                                 <div class="col-md-4">
-                                    <b>Forma de Pagamento:</b>
+                                    <b>Forma de Pagamento</b>
                                     <p>
                                         <?php echo $entity['paymentTypeName'] ?? 'Não informada'; ?>    
                                     </p>
@@ -77,19 +77,37 @@
                                 <?php if (!empty($entity['description'])): ?>
                                     <div class="col-md-12">
                                         <hr>
-                                        <b>Informações Adicionais: </b>
-                                        <?php echo $entity['description']; ?>
+                                        <b>Informações Adicionais</b>
+                                        <p>
+                                            <?php echo $entity['description']; ?>
+                                        </p>
                                     </div>
                                 <?php endif; ?>
                                 <?php if (!empty($entity['file'])): ?>
                                     <div class="col-12">
                                         <hr>
-                                        <b>Anexo: </b>
+                                        <b>Anexo</b>
                                         <a href="<?php echo baseUrl . 'public/uploads/schedules/' . $entity['file']; ?>" target="_blank">
                                             <?php echo $entity['file']; ?>
                                         </a>
                                     </div>
                                 <?php endif; ?>
+                                <div class="col-md-12"><hr></div>
+                                <div class="col-md-12 text-center">
+                                    <b>Arquivos Enviados</b>
+                                    <?php if (!empty($this->view->files)) : ?>
+                                        <?php foreach ($this->view->files as $file) : ?>
+                                            <div>
+                                                <a href="<?php echo baseUrl . 'public/uploads/schedules/' . $entity['uuid'] . '/' . $file['file']; ?>" 
+                                                    target="_blank">
+                                                    <?php echo $file['file']; ?>
+                                                </a>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <p class="text-center mt-2">Nenhum arquivo enviado</p>
+                                    <?php endif; ?>
+                                </div>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-6 text-left">
                                     <span class="fa fa-calendar pr-1"></span>

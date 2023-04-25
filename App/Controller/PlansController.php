@@ -517,7 +517,19 @@ class PlansController extends ActionController implements CrudInterface
         if (!empty($_POST)) {
             if (!empty($_POST['message'])) {
                 $entity = $this->userPlansModel->getOne($_POST['uuid']);
-                //novo mecanismo de envio de emails aqui
+                $url = baseUrl;
+                $message = "<p>Você possui novas informações sobre o {$entity['planName']}.
+                    <br><br>
+                    {$_POST['message']} 
+                    <br><br> 
+                    <a href='$url'>acesse a plataforma</a> para conferir os detalhes.</p>"; 
+                    
+                $this->sendMail([
+                    'title' => 'Informações - ' . $entity['planName'],
+                    'message' => $message,
+                    'name' => $entity['userName'],
+                    'toAddress' => $entity['userEmail']
+                ]);
             }
 
             $logMessage = $_POST['message'] ? ' com a mensagem: ' . $_POST['message'] : '';

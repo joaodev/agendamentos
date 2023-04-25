@@ -13,6 +13,7 @@ class SchedulesController extends ActionController implements CrudInterface
     private mixed $customersModel;
     private mixed $paymentTypesModel;
     private mixed $servicesModel;
+    private mixed $filesModel;
 
     public function __construct()
     {
@@ -21,6 +22,7 @@ class SchedulesController extends ActionController implements CrudInterface
         $this->customersModel = Container::getClass("Customers", "app");
         $this->paymentTypesModel = Container::getClass("PaymentTypes", "app");
         $this->servicesModel = Container::getClass("Services", "app");
+        $this->filesModel = Container::getClass("Files", "app");
     }
 
     public function indexAction(): void
@@ -88,22 +90,6 @@ class SchedulesController extends ActionController implements CrudInterface
                 $uuid = $this->model->NewUUID();
                 $_POST['uuid'] = $uuid;
                 $_POST['user_uuid'] = $_SESSION['COD'];
-
-                if (!empty($_FILES)) {
-                    $image_name  = $_FILES["file"]["name"];
-                    if ($image_name != null) {
-                        $ext_img = explode(".", $image_name, 2);
-                        $new_name  = 'Arquivo_Agendamento_'.date('dmY') . '.' . $ext_img[1];
-                        $dir1 = "../public/uploads/schedules/" . $new_name;
-                        $tmp_name1  =  $_FILES["file"]["tmp_name"];
-                        if (move_uploaded_file($tmp_name1, $dir1)) {
-                            $_POST['file'] = $new_name;
-                        }
-                    }
-                } else {
-                    unset($_POST['file']);
-                }
-
                 $_POST['amount'] = $this->moneyToDb($_POST['amount']);
     
                 $crud = new Crud();
@@ -111,6 +97,10 @@ class SchedulesController extends ActionController implements CrudInterface
                 $transaction = $crud->create($_POST);
     
                 if ($transaction) {
+                    if (!empty($_FILES)) {
+                        $this->filesModel->uploadFiles($_FILES, "schedules", $uuid);
+                    }
+
                     $this->toLog("Cadastrou o agendamento $uuid");
                     $data  = [
                         'title' => 'Sucesso!', 
@@ -149,7 +139,10 @@ class SchedulesController extends ActionController implements CrudInterface
 
             $services = $this->servicesModel->findAllActives('uuid, title, description, price');
             $this->view->services = $services;
-    
+            
+            $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);
+            $this->view->files = $files;
+
             $this->render('update', false);
         }
     }
@@ -160,26 +153,15 @@ class SchedulesController extends ActionController implements CrudInterface
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $_POST['amount']  = $this->moneyToDb($_POST['amount']);
 
-            if (!empty($_FILES)) {
-                $image_name  = $_FILES["file"]["name"];
-                if ($image_name != null) {
-                    $ext_img = explode(".", $image_name, 2);
-                    $new_name  = 'Arquivo_Agendamento_'.date('dmY') . '.' . $ext_img[1];
-                    $dir1 = "../public/uploads/schedules/" . $new_name;
-                    $tmp_name1  =  $_FILES["file"]["tmp_name"];
-                    if (move_uploaded_file($tmp_name1, $dir1)) {
-                        $_POST['file'] = $new_name;
-                    }
-                }
-            } else {
-                unset($_POST['file']);
-            }
-
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
             if ($transaction) {
+                if (!empty($_FILES)) {
+                    $this->filesModel->uploadFiles($_FILES, "schedules", $_POST['uuid']);
+                }
+
                 $this->toLog("Atualizou o agendamento {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
@@ -208,6 +190,10 @@ class SchedulesController extends ActionController implements CrudInterface
         if (!empty($_POST['uuid'])) {
             $entity = $this->model->getOne($_POST['uuid']);
             $this->view->entity = $entity;
+
+            $files = $this->filesModel->findAllBy('file', 'parent_uuid', $_POST['uuid']);
+            $this->view->files = $files;
+
             $this->render('read', false);
         }
     }
@@ -276,5 +262,16 @@ class SchedulesController extends ActionController implements CrudInterface
     public function createCustomerAction(): void
     {
         $this->render('create-customer', false);
+    }
+
+    public function deleteFileAction(): bool
+    {
+        if (!empty($_POST)) {
+            $crud = new Crud();
+            $crud->setTable($this->filesModel->getTable());
+            return $crud->update(['deleted' => '1'], $_POST['uuid'], 'uuid');
+        } else {
+            return false;
+        }
     }
 }

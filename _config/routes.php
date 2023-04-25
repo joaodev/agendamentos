@@ -92,6 +92,7 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/despesas/editar', 'controller' => 'expenses', 'action' => 'update'],
 	['namespace' => 'app', 'route' => '/despesas/processa-edicao', 'controller' => 'expenses', 'action' => 'update-process'],
 	['namespace' => 'app', 'route' => '/despesas/excluir', 'controller' => 'expenses', 'action' => 'delete'],
+	['namespace' => 'app', 'route' => '/despesas/remove-arquivo', 'controller' => 'expenses', 'action' => 'delete-file'],
 
 	['namespace' => 'app', 'route' => '/formas-pagamento', 'controller' => 'payment-types', 'action' => 'index'],
 	['namespace' => 'app', 'route' => '/formas-pagamento/cadastrar', 'controller' => 'payment-types', 'action' => 'create'],
@@ -110,6 +111,7 @@ $router['app'] = [
     ['namespace' => 'app', 'route' => '/agendamentos/processa-edicao', 'controller' => 'schedules', 'action' => 'update-process'],
     ['namespace' => 'app', 'route' => '/agendamentos/excluir', 'controller' => 'schedules', 'action' => 'delete'],
     ['namespace' => 'app', 'route' => '/agendamentos/detalhes-servico', 'controller' => 'schedules', 'action' => 'service-details'],
+    ['namespace' => 'app', 'route' => '/agendamentos/remove-arquivo', 'controller' => 'schedules', 'action' => 'delete-file'],
 
 	['namespace' => 'app', 'route' => '/agendamentos/cadastrar-servico', 'controller' => 'schedules', 'action' => 'create-service'],
 	['namespace' => 'app', 'route' => '/agendamentos/cadastrar-cliente', 'controller' => 'schedules', 'action' => 'create-customer'],
@@ -148,6 +150,7 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/receitas/editar', 'controller' => 'revenues', 'action' => 'update'],
 	['namespace' => 'app', 'route' => '/receitas/processa-edicao', 'controller' => 'revenues', 'action' => 'update-process'],
 	['namespace' => 'app', 'route' => '/receitas/excluir', 'controller' => 'revenues', 'action' => 'delete'],
+	['namespace' => 'app', 'route' => '/receitas/remove-arquivo', 'controller' => 'revenues', 'action' => 'delete-file'],
 
 	['namespace' => 'app', 'route' => '/tarefas', 'controller' => 'tasks', 'action' => 'index'],
 	['namespace' => 'app', 'route' => '/tarefas/cadastrar', 'controller' => 'tasks', 'action' => 'create'],
@@ -156,6 +159,8 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/tarefas/editar', 'controller' => 'tasks', 'action' => 'update'],
 	['namespace' => 'app', 'route' => '/tarefas/processa-edicao', 'controller' => 'tasks', 'action' => 'update-process'],
 	['namespace' => 'app', 'route' => '/tarefas/excluir', 'controller' => 'tasks', 'action' => 'delete'],
+	['namespace' => 'app', 'route' => '/tarefas/remove-arquivo', 'controller' => 'tasks', 'action' => 'delete-file'],
+
 ];
 
 $systemDir = match ($_SERVER['HTTP_HOST']) {

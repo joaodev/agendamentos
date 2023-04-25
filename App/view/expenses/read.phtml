@@ -72,17 +72,22 @@
                                         <?php echo $entity['paymentTypeName']; ?>    
                                     </p>
                                 </div>
-                                <?php if (!empty($entity['file'])): ?>
-                                    <div class="col-md-12"><hr></div>
-                                    <div class="col-12 text-center">
-                                        <b>Anexo</b>
-                                        <p>
-                                            <a href="<?php echo baseUrl . 'public/uploads/expenses/' . $entity['file']; ?>" target="_blank">
-                                                <?php echo $entity['file']; ?>
-                                            </a>
-                                        </p>
-                                    </div>
-                                <?php endif; ?>
+                                <div class="col-md-12"><hr></div>
+                                <div class="col-md-12 text-center">
+                                    <b>Arquivos Enviados</b>
+                                    <?php if (!empty($this->view->files)) : ?>
+                                        <?php foreach ($this->view->files as $file) : ?>
+                                            <div>
+                                                <a href="<?php echo baseUrl . 'public/uploads/expenses/' . $entity['uuid'] . '/' . $file['file']; ?>" 
+                                                    target="_blank">
+                                                    <?php echo $file['file']; ?>
+                                                </a>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <p class="text-center mt-2">Nenhum arquivo enviado</p>
+                                    <?php endif; ?>
+                                </div>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-6 text-left">
                                     <span class="fa fa-calendar pr-1"></span>

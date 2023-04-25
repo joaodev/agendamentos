@@ -44,7 +44,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
     <section class="content" style="margin-left: 9px; margin-right: 9px;">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-12">
                     <?php if ($this->view->reached_limit): ?>
                         <div class="alert bg-red" role="alert">
                             <span class="fa fa-info-circle pr-1"></span>
@@ -67,12 +67,49 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                             </div>
                         <?php endif; ?>
                     <?php endif; ?>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-info">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-calendar pr-1"></i> Pendentes</span> 
+                                    <h3><?php echo $this->getTotalTasksByMonth('1', $this->view->month); ?></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-success">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-calendar-check pr-1"></i> Concluídas</span> 
+                                    <h3><?php echo $this->getTotalTasksByMonth('2', $this->view->month); ?></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-danger">
+                                <div class="card-body">
+                                    <span style="font-size: 1em"><i class="fa fa-calendar-minus pr-1"></i> Canceladas</span> 
+                                    <h3><?php echo $this->getTotalTasksByMonth('3', $this->view->month); ?></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 offset-md-4 mb-3 text-center">
+                            <a onclick="changeMonth();" style="width: 100%; cursor: pointer;" title="Alterar Mês">
+                                <i class="fas fa-sync  pr-1"></i> Mês Atual: <?php echo $this->view->month; ?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered table-hover" id="table_sv" style="width: 100%;">
                                     <thead>
                                         <tr class="text-center" style="height: 30px;">
+                                            <th style="font-size: 14px;">Data</th>
+                                            <th style="font-size: 14px;">Horário</th>
                                             <th style="font-size: 14px;">Tarefa</th>
                                             <th style="font-size: 14px;">Descrição</th>
                                             <th style="font-size: 14px;">Status</th>
@@ -86,6 +123,12 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                             <tr class="text-center" style="cursor: pointer;"
                                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
+                                                    <?php echo $this->formatDate($entity['task_date']); ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php echo substr($entity['task_time'], 0, 5); ?>
+                                                </td>
+                                                <td style="font-size: 15px">
                                                     <?php echo $entity['title']; ?>
                                                 </td>
                                                 <td style="font-size: 15px">
@@ -93,13 +136,25 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
-                                                        <i class="fa fa-circle" style="color: green;"></i>
-                                                    <?php else: ?>
-                                                        <i class="fa fa-circle" style="color: red;"></i>
+                                                            <i class="fa fa-circle pr-1" style="color: blue;"></i> 
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '2'): ?>
+                                                            <i class="fa fa-circle pr-1" style="color: green;"></i> 
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '3'): ?>
+                                                            <i class="fa fa-circle pr-1" style="color: red;"></i> 
                                                     <?php endif; ?>
                                                 </td>
                                                 <td style="display: none;">
-                                                    <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
+                                                    <?php if ($entity['status'] == '1'): ?>
+                                                            Pendente
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '2'): ?>
+                                                            Concluída
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '3'): ?>
+                                                            Cancelada
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td style="display: none;">
                                                     <?php echo $this->formatDateTime($entity['created_at']); ?>
@@ -137,11 +192,14 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     $.extend( true, {}, buttonCommon, {
                         extend: 'excel',
                         title: 'Tarefas',
-                        //exportOptions: {columns: [0,1,2,4,5,6]}
+                        exportOptions: {columns: [0,1,2,3,5,6,7]}
                     })
                 ],
-                order: [ [0, "asc"] ],
-                columnDefs: [{orderable: false, targets: [3]}],
+                order: [ [0, "desc"] ],
+                columnDefs: [
+                    {type: 'date-eu', targets: [0]},
+                    {orderable: false, targets: [4]}
+                ],
                 responsive: true,
                 info: true,
                 processing: true,
@@ -173,8 +231,21 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 }
             });
         });
-    </script>
-    <script>
+
+        function changeMonth() {
+            $("#modalMonthTitle").html('<i class="fa fa-info-circle pr-2"></i> Alterar Mês');
+            $("#modalMonthLoader").hide();
+            $("#modalMonth").modal('show');           
+        }
+
+        function selectMonth() {
+            let month = $("#f_month").val();
+            $("#modalMonthLoader").show();
+            openModule('tarefas?m=' + month);
+            $("#modalMonthLoader").hide();
+            $("#modalMonth").modal('hide');    
+        }
+
         function openDetails(uuid) {
             $("#baseLoader").show();
             $.ajax({

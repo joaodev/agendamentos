@@ -74,6 +74,8 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
     <script src="<?php echo baseUrl; ?>public/app/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
     <link rel="stylesheet" type="text/css" href="<?php echo baseUrl; ?>public/app/plugins/select2/css/select2.min.css">
     <script src="<?php echo baseUrl; ?>public/app/plugins/select2/js/select2.min.js"></script>
+    <link href="<?php echo baseUrl; ?>public/lightbox2/src/css/lightbox.css" rel="stylesheet" />
+    <script src="<?php echo baseUrl; ?>public/lightbox2/src/js/lightbox.js"></script>
     <script>
         $.widget.bridge('uibutton', $.ui.button)
     </script>
@@ -279,10 +281,12 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                         </li>
                         <?php if (
                             $_SESSION['ROLE_ADM'] == '0'
+                            || $canViewSchedules
                             || $canViewCustomers
                             || $canViewServices
                             || $canViewExpenses
                             || $canViewRevenues
+                            || $canViewTasks
                         ): ?>
                             <li class="nav-item">
                                 <a href="#" class="nav-link text-white">
@@ -293,6 +297,16 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview" style="display: none;">
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('agendamentos');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-calendar"></i>
+                                                <p>
+                                                    Agendamentos
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
                                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('clientes');" class="nav-link text-white" style="cursor: pointer;">
@@ -333,6 +347,16 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                             </a>
                                         </li>
                                     <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('tarefas');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-tasks"></i>
+                                                <p>
+                                                    Tarefas
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
                                 </ul>
                             </li>
                         <?php endif; ?>
@@ -342,7 +366,7 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                             || $canViewSchedules
                             || $canViewPlans
                             || $canViewPayments
-                            || $canViewTasks
+                            || $canViewFinancial
                         ): ?>
                             <li class="nav-item">
                                 <a href="#" class="nav-link text-white">
@@ -353,16 +377,6 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview" style="display: none;">
-                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('agendamentos');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-calendar"></i>
-                                                <p>
-                                                    Agendamentos
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
                                     <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewUsers): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('usuarios');" class="nav-link text-white" style="cursor: pointer;">
@@ -409,16 +423,6 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                                 <i class="nav-icon fas fa-lock"></i>
                                                 <p>
                                                     Controle de Acesso
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('tarefas');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-tasks"></i>
-                                                <p>
-                                                    Tarefas
                                                 </p>
                                             </a>
                                         </li>

@@ -64,6 +64,22 @@
                                     <p><?php echo $entity['description']; ?></p>
                                 </div>
                                 <div class="col-md-12"><hr></div>
+                                <div class="col-md-12 text-center">
+                                    <b>Arquivos Enviados</b>
+                                    <?php if (!empty($this->view->files)) : ?>
+                                        <?php foreach ($this->view->files as $file) : ?>
+                                            <div>
+                                                <a href="<?php echo baseUrl . 'public/uploads/tasks/' . $entity['uuid'] . '/' . $file['file']; ?>" 
+                                                    target="_blank">
+                                                    <?php echo $file['file']; ?>
+                                                </a>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <p class="text-center mt-2">Nenhum arquivo enviado</p>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-12"><hr></div>
                                 <div class="col-6 text-left">
                                     <span class="fa fa-calendar pr-1"></span>
                                     <span>Cadastrada em</span> <br>

@@ -10,17 +10,25 @@ use App\Interfaces\CrudInterface;
 class TasksController extends ActionController implements CrudInterface
 {
     private mixed $model;
+    private mixed $filesModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->model = Container::getClass("Tasks", "app");
+        $this->filesModel = Container::getClass("Files", "app");
     }
 
     public function indexAction(): void
     {
-        $stringFields = 'uuid, title, description, status, created_at, updated_at';
-        $data = $this->model->findAllBy($stringFields, 'user_uuid', $_SESSION['COD']);
+        if (!empty($_GET['m'])) {
+            $month = $_GET['m'];
+        } else {
+            $month = date('Y-m');
+        }
+
+        $this->view->month = self::formatMonth($month);
+        $data = $this->model->getAllByMonth('0', $month);
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
@@ -66,6 +74,10 @@ class TasksController extends ActionController implements CrudInterface
                 $transaction = $crud->create($_POST);
     
                 if ($transaction) { 
+                    if (!empty($_FILES)) {
+                        $this->filesModel->uploadFiles($_FILES, "tasks", $uuid);
+                    }
+
                     $this->toLog("Cadastrou a tarefa $uuid");
                     $data  = [
                         'title' => 'Sucesso!',
@@ -98,6 +110,9 @@ class TasksController extends ActionController implements CrudInterface
             $entity = $this->model->find($_POST['uuid'], $fields, 'uuid');
             $this->view->entity = $entity;
 
+            $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);
+            $this->view->files = $files;
+
             $this->render('update', false);
         }
     }
@@ -112,6 +127,10 @@ class TasksController extends ActionController implements CrudInterface
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
 
             if ($transaction) {
+                if (!empty($_FILES)) {
+                    $this->filesModel->uploadFiles($_FILES, "tasks", $_POST['uuid']);
+                }
+
                 $this->toLog("Atualizou a tarefa {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!',
@@ -141,6 +160,10 @@ class TasksController extends ActionController implements CrudInterface
             $fields = "uuid, title, description, task_date, task_time, status, created_at, updated_at";
             $entity = $this->model->find($_POST['uuid'], $fields, 'uuid');
             $this->view->entity = $entity;
+
+            $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);
+            $this->view->files = $files;
+
             $this->render('read', false);
         }
     }
@@ -174,6 +197,17 @@ class TasksController extends ActionController implements CrudInterface
 
             echo json_encode($data);
             return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function deleteFileAction(): bool
+    {
+        if (!empty($_POST)) {
+            $crud = new Crud();
+            $crud->setTable($this->filesModel->getTable());
+            return $crud->update(['deleted' => '1'], $_POST['uuid'], 'uuid');
         } else {
             return false;
         }

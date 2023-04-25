@@ -40,7 +40,8 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                         <?php if (!empty($entity['logo'])): ?>
                                             <div class="mb-3">
                                                 <a href="<?php echo baseUrl . 'public/uploads/logo/'
-                                                    . $entity['logo']; ?>" target="_blank">
+                                                    . $entity['logo']; ?>"  data-lightbox="image-1"
+                                                    data-title="<?php echo $entity['logo']; ?>">
                                                     <img src="<?php echo baseUrl . 'public/uploads/logo/'
                                                         . $entity['logo']; ?>" alt="" style="max-height: 100px;">
                                                 </a>
@@ -58,7 +59,8 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                         <?php if (!empty($entity['logo_icon'])): ?>
                                             <div class="mb-3">
                                                 <a href="<?php echo baseUrl . 'public/uploads/logo/'
-                                                    . $entity['logo_icon']; ?>" target="_blank">
+                                                    . $entity['logo_icon']; ?>"  data-lightbox="image-1"
+                                                    data-title="<?php echo $entity['logo_icon']; ?>">
                                                     <img src="<?php echo baseUrl . 'public/uploads/logo/'
                                                         . $entity['logo_icon']; ?>" alt="" style="max-height: 100px;">
                                                 </a>
@@ -106,7 +108,8 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                         <?php if (!empty($entity['file_menu'])): ?>
                                             <div class="mb-3 text-center">
                                                 <a href="<?php echo baseUrl . 'public/uploads/menu/'
-                                                    . $entity['file_menu']; ?>" target="_blank">
+                                                    . $entity['file_menu']; ?>"  data-lightbox="image-1"
+                                                    data-title="<?php echo $entity['file_menu']; ?>">
                                                     <img src="<?php echo baseUrl . 'public/uploads/menu/'
                                                         . $entity['file_menu']; ?>" alt="" style="max-height: 250px;">
                                                 </a>

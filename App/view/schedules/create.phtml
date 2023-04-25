@@ -120,8 +120,9 @@
                                     </div>   
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
-                                            <label for="user_uuid">Anexar Arquivo:</label>
-                                            <input type="file" class="form-control" name="file" id="file">
+                                            <label for="description">Anexar Arquivos</label>
+                                            <input type="file" class="form-control" name="file[]" multiple id="file"
+                                                accept="jpg,jpeg,png,pdf">
                                         </div>
                                     </div>
                                     <div class="col-md-8 mt-3 mb-2">
@@ -148,10 +149,12 @@
             $("input[id=amount]").maskMoney({allowNegative: false, thousands:'.', decimal:',', affixesStay: true});
             $('#formCreateSchedule').validate({
                 submitHandler: function() {
-                    let file_data = $('#file').prop('files')[0];
                     let form_data = new FormData();         
 
-                    form_data.append('file', file_data);    
+                    $.each($("input[type='file']")[0].files, function (i, file) {
+                        form_data.append('file_' + i, file);
+                    });
+
                     form_data.append('description', $("#description").val());    
                     form_data.append('amount', $("#amount").val());    
                     form_data.append('payment_type_uuid', $("#payment_type_uuid").val());    

@@ -27,7 +27,8 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form method="post" name="formCreateTask" id="formCreateTask">
+                            <form method="post" name="formCreateTask" id="formCreateTask"
+                                enctype="multipart/form-data">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -55,6 +56,13 @@
                                                 placeholder="Descrição completa da Tarefa"></textarea>
                                         </div>
                                     </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="description">Anexar Arquivos</label>
+                                            <input type="file" class="form-control" name="file[]" multiple id="file"
+                                                accept="jpg,jpeg,png,pdf">
+                                        </div>
+                                    </div>
                                     <div class="col-md-8 mt-3 mb-2">
                                         <button type="submit" class="btn btn-success w-100 " id="btnSubmit" title="Salvar Tarefa">
                                             <i class="fa fa-save pr-1"></i> Salvar
@@ -77,8 +85,17 @@
     <script>
         $(document).ready(function(){
             $('#formCreateTask').validate({
-                submitHandler: function( form ){
-                    let dados = $( form ).serialize();
+                submitHandler: function(){
+                    let form_data = new FormData();         
+
+                    $.each($("input[type='file']")[0].files, function (i, file) {
+                        form_data.append('file_' + i, file);
+                    });
+
+                    form_data.append('title', $("#title").val());    
+                    form_data.append('description', $("#description").val());    
+                    form_data.append('task_date', $("#task_date").val());    
+                    form_data.append('task_time', $("#task_time").val());    
 
                     $("#baseLoader").show();
                     $("#btnSubmit").show('disabled', true);
@@ -86,7 +103,10 @@
                     $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>tarefas/processa-cadastro",
-                        data: dados,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: form_data,
                         dataType: 'json',
                         async: true
                     }).done(function(data) {

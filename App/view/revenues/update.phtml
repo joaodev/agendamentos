@@ -107,8 +107,27 @@ $role = $_SESSION['ROLE'];
                                     <div class="col-12"><hr></div>
                                     <div class="col-12">
                                         <div class="form-group">
-                                            <label for="user_uuid">Anexar Arquivo:</label>
-                                            <input type="file" class="form-control" name="file" id="file">
+                                            <label for="user_uuid">Anexar Arquivos</label>
+                                            <input type="file" class="form-control" name="file[]" multiple id="file"
+                                                accept="jpg,jpeg,png,pdf">
+                                        </div>
+                                        <div class="text-center mt-3">
+                                            <b>Arquivos enviados:</b>
+                                            <?php foreach ($this->view->files as $file) :  ?>
+                                                <div class="my-3" id="box_<?php echo $file['uuid']; ?>">
+                                                    <a href="<?php echo baseUrl . 'public/uploads/revenues/'
+                                                                    . $entity['uuid'] . '/' . $file['file']; ?>" target="_blank" title="Abrir o arquivo" class="">
+                                                        <span class="fa fa-file pr-1"></span>
+                                                        <?php echo $file['file']; ?>
+                                                    </a>
+                                                    <a onclick="deleteFile('<?php echo $file['uuid']; ?>');" style="cursor: pointer;" class="btn btn-danger btn-xs ml-1">
+                                                        <span class="fa fa-trash"></span>
+                                                    </a>
+                                                </div>
+                                            <?php endforeach; ?>
+                                            <?php if (empty($this->view->files)): ?>
+                                                <p>Nenhum arquivo enviado</p>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <div class="col-md-8 mt-3 mb-2">
@@ -137,10 +156,12 @@ $role = $_SESSION['ROLE'];
 
             $('#formUpdateRevenue').validate({
                 submitHandler: function() {
-                    let file_data = $('#file').prop('files')[0];
                     let form_data = new FormData();         
-                    
-                    form_data.append('file', file_data);    
+                                        
+                    $.each($("input[type='file']")[0].files, function (i, file) {
+                        form_data.append('file_' + i, file);
+                    });
+
                     form_data.append('title', $("#title").val());    
                     form_data.append('description', $("#description").val());    
                     form_data.append('amount', $("#amount").val());    
@@ -180,5 +201,18 @@ $role = $_SESSION['ROLE'];
                 }
             });
         });
+
+        function deleteFile(uuid) {
+            $("#box_" + uuid).fadeOut(999);
+
+            $.ajax({
+                type: "POST",
+                url: "<?php echo baseUrl; ?>receitas/remove-arquivo",
+                data: {
+                    uuid: uuid
+                },
+                async: true
+            });
+        }
     </script>
 <?php endif; ?>
