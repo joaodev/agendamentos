@@ -52,6 +52,42 @@ class Tasks extends Model
             return $e->getMessage();
         }
     }
+    
+    public function getTotalByStatus($status)
+    {
+        try {
+            $d1 = date('Y');
+            $d2 = date('m');
+
+            $query = "SELECT COUNT(uuid) as total
+                        FROM tasks 
+                        WHERE status = :status
+                        AND deleted = :deleted
+                        AND user_uuid = :user_uuid
+                        AND YEAR(task_date) = :d1 AND MONTH(task_date) = :d2";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":status", $status);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":d1", $d1);
+            $stmt->bindValue(":d2", $d2);
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+            
+            if ($result) {
+                return $result['total'];
+            } else {
+                return 0;
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
 
     public function getTotalByStatusByMonth($status, $month)
     {

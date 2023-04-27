@@ -118,7 +118,12 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                     </thead>
                                     <tbody>
                                         <?php foreach ($data as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;" 
+                                            <?php 
+                                            $today = strtotime(date('Y-m-d'));
+                                            $entityDate = strtotime($entity['expense_date']);
+                                            $isLateClass = ($entityDate < $today && $entity['status'] == 1) ? 'alert alert-danger' : '';
+                                            ?>
+                                            <tr class="text-center <?php echo $isLateClass; ?>" style="cursor: pointer;" 
                                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
                                                     <?php echo $this->formatDate($entity['expense_date']); ?>

@@ -136,6 +136,7 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/planos/plano-selecionado', 'controller' => 'plans', 'action' => 'selected-plan'],
 	['namespace' => 'app', 'route' => '/planos/plano-cancelado', 'controller' => 'plans', 'action' => 'cancel-plan'],
 	['namespace' => 'app', 'route' => '/planos/processa-comprovante', 'controller' => 'plans', 'action' => 'file-process'],
+	['namespace' => 'app', 'route' => '/planos/processa-renovacao', 'controller' => 'plans', 'action' => 'renew-process'],
 	
 	['namespace' => 'app', 'route' => '/planos/planos-usuarios', 'controller' => 'plans', 'action' => 'users-plans'],
 	['namespace' => 'app', 'route' => '/planos/planos-usuarios/atualizar', 'controller' => 'plans', 'action' => 'update-userplan'],

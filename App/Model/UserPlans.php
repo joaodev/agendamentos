@@ -27,13 +27,14 @@ class UserPlans extends Model
                         FROM user_plans AS up
                         INNER JOIN plans AS p
                             ON up.plan_uuid = p.uuid
-                        WHERE up.user_uuid = :user_uuid";
+                        WHERE up.user_uuid = :user_uuid
+                            ORDER BY up.created_at DESC LIMIT 1";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":user_uuid", $user);
             $stmt->execute();
 
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             $stmt = null;
             $this->closeDb();

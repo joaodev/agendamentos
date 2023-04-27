@@ -6,8 +6,6 @@ use Core\Controller\ActionController;
 use Core\Di\Container;
 use Core\Db\Crud;
 use App\Interfaces\CrudInterface;
-use PHPMailer;
-use phpmailerException;
 
 class PlansController extends ActionController implements CrudInterface
 {
@@ -201,107 +199,16 @@ class PlansController extends ActionController implements CrudInterface
                 $entity = $this->model->getOne($_POST['uuid']);
                 $config = $this->getSiteConfig();
 
-                $message = '<!DOCTYPE html>
-                            <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-                            <head>
-                                <meta charset="UTF-8">
-                                <meta name="viewport" content="width=device-width,initial-scale=1">
-                                <meta name="x-apple-disable-message-reformatting">
-                                <title></title>
-                                <!--[if mso]>
-                                <noscript>
-                                    <xml>
-                                        <o:OfficeDocumentSettings>
-                                            <o:PixelsPerInch>96</o:PixelsPerInch>
-                                        </o:OfficeDocumentSettings>
-                                    </xml>
-                                </noscript>
-                                <![endif]-->
-                                <style>
-                                    table, td, div, h1, p {font-family: Arial, sans-serif;}
-                                </style>
-                            </head>
-                            <body style="margin:0;padding:0;">
-                                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
-                                    <tr>
-                                        <td style="padding:0; text-align: center;">
-                                            <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
-                                                <tr>
-                                                    <td style="text-align: center; padding:10px 0 10px 0;background:'.$config['primary_color'].';">
-                                                        <h1 style="color: white; text-shadow: black 0.1em 0.1em 0.2em;">'.$config['site_title'].'</h1>
-                                                        <h2 style="color: white; text-shadow: black 0.1em 0.1em 0.2em;">Código de Verificação</h2>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding:36px 30px 42px 30px;">
-                                                        <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
-                                                            <tr>
-                                                                <td style="padding:0 0 10px 0;color:#153643;">
-                                                                    <p>Pedido para alteração de plano:</p>
-                                                                    <p>Usuário: '.$_SESSION['NAME'].' - '.$_SESSION['EMAIL'].'</p>
-                                                                    <p>Plano Selecionado: '.$entity['name'].'</p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td style="padding:0;">
-                                                                    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
-                                                                        <tr>
-                                                                            <td style="width:260px;padding:0;vertical-align:top;color:#153643;">
-                                                                                <p style="margin:0 0 12px 0;font-size:11px;line-height:15px;font-family:Arial,sans-serif;">*Esta é uma mensagem automática, não responda este email.</p>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding:30px;background:'.$config['primary_color'].';">
-                                                        <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
-                                                            <tr>
-                                                                <td style="padding:0;width:100%; text-align: center;">
-                                                                    <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
-                                                                        &copy; ' . $config['site_title'] . '  | ' . date('Y') . '<br/>
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </body>
-                            </html>';   
+                $message = "<p>Pedido para alteração de plano:</p>
+                                <p>Usuário: {$_SESSION['NAME']} - {$_SESSION['EMAIL']}</p>
+                                <p>Plano Selecionado: {$entity['name']}</p>";
 
-                $mail = new PHPMailer();
-                $mail->isSMTP();                                            
-                $mail->Host       = $config['mail_host'];
-                $mail->SMTPAuth   = true;                                 
-                $mail->Username   = $config['mail_username'];
-                $mail->Password   = $config['mail_password'];
-                $mail->Port       = $config['mail_port'];
-
-                try {
-                    $mail->setFrom($config['mail_from_address'], $config['site_title']);
-                } catch (phpmailerException $e) {
-                    $this->toLog("Erro ao definir destinatário: $e");
-                }
-
-                $mail->addAddress($config['mail_to_address']);
-    
-                $message = wordwrap($message, 70);
-                $mail->isHTML();
-                $mail->Subject = utf8_decode('Solicitação de Plano - ' . $config['site_title']);
-                $mail->Body    = utf8_decode($message);
-
-                try {
-                    $mail->send();
-                } catch (phpmailerException $e) {
-                    $this->toLog("Erro ao enviar: $e");
-                }
+                $this->sendMail([
+                    'title' => 'Solicitação de Plano',
+                    'message' => $message,
+                    'name' => "Administrador",
+                    'toAddress' => $config['mail_to_address']
+                ]);
 
                 $this->toLog("Solicitação a alteração para o Plano {$_POST['uuid']}");
                 $data  = [
@@ -375,6 +282,68 @@ class PlansController extends ActionController implements CrudInterface
                 $data  = [
                     'title' => 'Erro!', 
                     'msg' => 'O Comprovante não foi anexado.',
+                    'type' => 'error',
+                    'pos'   => 'top-center'
+                ];
+            }
+
+            echo json_encode($data);
+
+            return true;    
+        } else {
+            return false;
+        }
+    }
+
+    public function renewProcessAction(): bool
+    {
+        if (!empty($_POST) && !empty($_FILES)) {
+            if (!empty($_FILES) && !empty($_FILES["file_renew"])) {
+                $image_name = $_FILES["file_renew"]["name"];
+                if ($image_name != null) {
+
+                    $dir1 = "../public/uploads/userplans/" . $_POST['order'];
+                    if (!is_dir($dir1)) {
+                        mkdir($dir1);
+                    }
+
+                    $ext_img = explode(".", $image_name, 2);
+                    $new_name  = md5($ext_img[0]) . '.' . $ext_img[1];
+                    if ($ext_img[1] == 'jpg' || $ext_img[1] == 'jpeg'
+                        || $ext_img[1] == 'png' || $ext_img[1] == 'gif') {
+                        $tmp_name1  =  $_FILES["file_renew"]["tmp_name"];
+                        $new_image_name = md5($new_name . time()).'.png';
+
+                        if (move_uploaded_file($tmp_name1, $dir1 . '/' . $new_image_name)) {
+                            $file = $new_image_name;
+                        } 
+                    }
+               
+                }
+            } else {
+                $file = "";
+            }
+
+            $crud = new Crud();
+            $crud->setTable($this->userPlansModel->getTable());
+            $transaction = $crud->update([
+                'file' => $file,
+                'status' => '1',
+                'uploaded_at' => date('Y-m-d H:i:s')
+            ],$_POST['order'], 'uuid');
+
+            if ($transaction) {
+                $this->toLog("Usuário anexou o comprovante ao Plano {$_POST['order']}");
+                $data  = [
+                    'title' => 'Sucesso!', 
+                    'msg'   => 'Operação confirmada.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right'
+                ];
+            } else {
+                $data  = [
+                    'title' => 'Erro!', 
+                    'msg' => 'O Comprovante não foi anexado, tente novamente.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];

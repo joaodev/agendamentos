@@ -11,6 +11,8 @@ class IndexController extends ActionController
     private mixed $servicesModel;
     private mixed $schedulesModel;
     private mixed $expensesModel;
+    private mixed $revenuesModel;
+    private mixed $tasksModel;
 
     public function __construct()
     {
@@ -19,6 +21,8 @@ class IndexController extends ActionController
         $this->servicesModel = Container::getClass("Services", "app");
         $this->schedulesModel = Container::getClass("Schedules", "app");
         $this->expensesModel = Container::getClass("Expenses", "app");
+        $this->revenuesModel = Container::getClass("Revenues", "app");
+        $this->tasksModel = Container::getClass("Tasks", "app");
     }
     
     public function indexAction(): void
@@ -35,11 +39,20 @@ class IndexController extends ActionController
         $total_finished_schedules = $this->schedulesModel->getTotalByStatus('2');
         $this->view->total_finished_schedules = $total_finished_schedules;
 
+        $total_revenues = $this->revenuesModel->getTotalByStatus('2');
+        $this->view->total_revenues = $total_revenues;
+
         $total_expenses = $this->expensesModel->getTotalByStatus('1') + $this->expensesModel->getTotalByStatus('2');
         $this->view->total_expenses = $total_expenses;
 
         $total_schedules = $this->schedulesModel->getTotalAmountByStatus('2');
         $this->view->total_schedules = $total_schedules;
+
+        $total_pending_tasks = $this->tasksModel->getTotalByStatus('1');
+        $this->view->total_pending_tasks = $total_pending_tasks;
+
+        $total_finished_tasks = $this->tasksModel->getTotalByStatus('2');
+        $this->view->total_finished_tasks = $total_finished_tasks;
 
         $this->render('index');
     }

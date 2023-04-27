@@ -9,12 +9,14 @@ class FinancialController extends ActionController
 {
     private mixed $schedulesModel;
     private mixed $expensesModel;
+    private mixed $revenuesModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->schedulesModel = Container::getClass("Schedules", "app");
         $this->expensesModel = Container::getClass("Expenses", "app");
+        $this->revenuesModel = Container::getClass("Revenues", "app");
     }
     
     public function indexAction(): void
@@ -30,6 +32,9 @@ class FinancialController extends ActionController
         $total_expenses = $this->expensesModel->getTotalAmountByMonth($month);
         $this->view->total_expenses = $total_expenses;
 
+        $total_revenues = $this->revenuesModel->getTotalAmountByMonth($month);
+        $this->view->total_revenues = $total_revenues;
+
         $total_schedules = $this->schedulesModel->getTotalAmountByMonth($month);
         $this->view->total_schedules = $total_schedules;
 
@@ -38,6 +43,9 @@ class FinancialController extends ActionController
 
         $expenses = $this->expensesModel->getAllByMonth('2', $month);
         $this->view->expenses = $expenses;
+
+        $revenues = $this->revenuesModel->getAllByMonth('2', $month);
+        $this->view->revenues = $revenues;
 
         $this->render('index', false);
     }

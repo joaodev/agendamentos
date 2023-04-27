@@ -6,7 +6,6 @@ use Core\Controller\ActionController;
 use Core\Di\Container;
 use Core\Db\Crud;
 use App\Interfaces\CrudInterface;
-use Core\Db\Bcrypt;
 
 class CustomersController extends ActionController implements CrudInterface
 {

@@ -120,7 +120,12 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                     </thead>
                                     <tbody>
                                         <?php foreach ($data as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;"
+                                            <?php 
+                                            $today = strtotime(date('Y-m-d'));
+                                            $entityDate = strtotime($entity['task_date']);
+                                            $isLateClass = ($entityDate < $today && $entity['status'] == 1) ? 'alert alert-danger' : '';
+                                            ?>
+                                            <tr class="text-center <?php echo $isLateClass; ?>" style="cursor: pointer;" 
                                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
                                                     <?php echo $this->formatDate($entity['task_date']); ?>
@@ -136,7 +141,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
-                                                            <i class="fa fa-circle pr-1" style="color: blue;"></i> 
+                                                            <i class="fa fa-circle pr-1" style="color: orange;"></i> 
                                                     <?php endif; ?>
                                                     <?php if ($entity['status'] == '2'): ?>
                                                             <i class="fa fa-circle pr-1" style="color: green;"></i> 
