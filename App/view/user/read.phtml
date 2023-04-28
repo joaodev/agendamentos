@@ -13,17 +13,21 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
-                <div class="col-11" >
+                <div class="col-9" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-info-circle pr-1"></i>
                         Colaborador
                     </h1>
                 </div>
-                <div class="col-1">
+                <div class="col-3">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
+                            <button type="button" class="btn btn-outline-info mr-1" title="Imprimir"
+                                onclick="window.print();">
+                                <i class="fas fa-print"></i> 
+                            </button>
                             <button type="button" class="btn btn-outline-primary"
-                                onclick="openModule('usuarios');" style="width: 100%;">
+                                onclick="openModule('usuarios');">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
                         </li>
@@ -38,13 +42,13 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="row">
+                            <div class="row" id="printable">
                                 <div class="col-md-12">
                                     <?php if ($entity['status'] == '1'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Ativo no Sistema
+                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Usuário ativo no sistema
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '0'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Inativo no Sistema
+                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Usuário inativo no sistema
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12">
@@ -172,35 +176,33 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12"><hr></div>
-                                <div class="col-12">
-                                    <div class="row">
-                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                            <?php if ($entity['uuid'] != $_SESSION['COD'] && $canDelete): ?>
-                                                <button type="button" class="btn btn-outline-danger" onclick="deleteUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-trash"></i> Remover
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                            <?php if ($canUpdate): ?>
-                                                <button type="button" class="btn btn-outline-success" onclick="updateUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-pen pr-1"></i> Editar
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                            <?php if ($canViewAcl): ?>
-                                                <button type="button" class="btn btn-outline-info" onclick="aclUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-users pr-1"></i> Permissões
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                            <button type="button" class="btn btn-outline-primary" onclick="openModule('usuarios');" style="width: 100%;">
-                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                            </button>
-                                        </div>
-                                    </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                    <?php if ($entity['uuid'] != $_SESSION['COD'] && $canDelete): ?>
+                                        <button type="button" class="btn btn-outline-danger" onclick="deleteUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                            <i class="fa fa-trash"></i> Remover
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                    <?php if ($canUpdate): ?>
+                                        <button type="button" class="btn btn-outline-success" onclick="updateUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                            <i class="fa fa-pen pr-1"></i> Editar
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                    <?php if ($canViewAcl): ?>
+                                        <button type="button" class="btn btn-outline-info" onclick="aclUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                            <i class="fa fa-users pr-1"></i> Permissões
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                    <button type="button" class="btn btn-outline-primary" onclick="openModule('usuarios');" style="width: 100%;">
+                                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                    </button>
                                 </div>
                             </div>
                         </div>

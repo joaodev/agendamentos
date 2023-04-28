@@ -39,9 +39,9 @@ $role = $_SESSION['ROLE'];
                                         <div class="form-group">
                                             <label for="service_uuid">Situação*</label>
                                             <select name="status" id="status_1" class="form-control" required>
-                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Agendado</option>
-                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Concluído</option>
-                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Cancelado</option>
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Agendamento pendente</option>
+                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Agendamento concluído</option>
+                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Agendamento cancelado</option>
                                             </select>
                                         </div>
                                     </div>

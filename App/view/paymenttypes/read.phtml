@@ -3,17 +3,21 @@
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
-                <div class="col-11">
+                <div class="col-9">
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-info-circle pr-1"></i>
                         Forma de Pagamento
                     </h1>
                 </div>
-                <div class="col-1">
+                <div class="col-3">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
+                            <button type="button" class="btn btn-outline-info mr-1" title="Imprimir"
+                                onclick="window.print();">
+                                <i class="fas fa-print"></i> 
+                            </button>
                             <button type="button" class="btn btn-outline-primary" title="Voltar para Formas de Pagamento"
-                                onclick="openModule('formas-pagamento');" style="width: 100%;">
+                                onclick="openModule('formas-pagamento');">
                                 <i class="fas fa-arrow-left"></i>
                             </button>
                         </li>
@@ -28,13 +32,13 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="row">
+                            <div class="row" id="printable">
                                 <div class="col-md-12">
                                     <?php if ($entity['status'] == '1'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Ativa no Sistema
+                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Forma ativa no sistema
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '0'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Inativa no Sistema
+                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Forma inativa no Sistema
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12">
@@ -71,36 +75,34 @@
                                 <div class="col-md-12">
                                     <hr>
                                 </div>
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('payment-types'))): ?>
-                                                <button type="button" class="btn btn-outline-danger"
-                                                    title="Remover Forma de Pagamento"
-                                                    onclick="deleteTable('<?php echo $entity['uuid']; ?>');"
-                                                    style="width: 100%;">
-                                                    <i class="fa fa-trash"></i> Remover
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('payment-types'))): ?>
-                                                <button type="button" class="btn btn-outline-success"
-                                                    title="Editar Forma de Pagamento"
-                                                    onclick="updateTable('<?php echo $entity['uuid']; ?>');"
-                                                    style="width: 100%;">
-                                                    <i class="fa fa-pen pr-1"></i> Editar
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-12 col-lg-4 mt-2 mb-2">
-                                            <button type="button" class="btn btn-outline-primary"
-                                                onclick="openModule('formas-pagamento');" style="width: 100%;"
-                                                title="Voltar para Formas de Pagamento">
-                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                            </button>
-                                        </div>
-                                    </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('payment-types'))): ?>
+                                        <button type="button" class="btn btn-outline-danger"
+                                            title="Remover Forma de Pagamento"
+                                            onclick="deleteTable('<?php echo $entity['uuid']; ?>');"
+                                            style="width: 100%;">
+                                            <i class="fa fa-trash"></i> Remover
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('payment-types'))): ?>
+                                        <button type="button" class="btn btn-outline-success"
+                                            title="Editar Forma de Pagamento"
+                                            onclick="updateTable('<?php echo $entity['uuid']; ?>');"
+                                            style="width: 100%;">
+                                            <i class="fa fa-pen pr-1"></i> Editar
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-12 col-lg-4 mt-2 mb-2">
+                                    <button type="button" class="btn btn-outline-primary"
+                                        onclick="openModule('formas-pagamento');" style="width: 100%;"
+                                        title="Voltar para Formas de Pagamento">
+                                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                    </button>
                                 </div>
                             </div>
                         </div>

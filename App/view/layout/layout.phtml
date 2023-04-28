@@ -204,6 +204,20 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
             border-color: <?php echo $config['secondary_color']; ?>;
             color: #fff;
         }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable, #printable * {
+                visibility: visible;
+            }
+            #printable {
+                position: fixed;
+                left: 0;
+                top: 0;
+            }
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed "><!-- sidebar-collapse -->

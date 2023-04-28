@@ -33,6 +33,16 @@ $role = $_SESSION['ROLE'];
                         <div class="card-body">
                             <form method="post" name="formUpdatePlan" id="formUpdatePlan">
                                 <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="name">Situação*</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Plano ativo no sistema</option>
+                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>Plano inativo no sistema</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-md-8">
                                         <div class="form-group">
                                             <label for="name">Nome do Plano*</label>
@@ -104,23 +114,21 @@ $role = $_SESSION['ROLE'];
                                                 value="<?php echo $entity['total_tasks']; ?>">
                                         </div>
                                     </div>
-                                    <div class="col-md-4 mt-3 mb-2">
-                                        <div class="form-group">
-                                            <select name="status" id="status_1" class="form-control">
-                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Plano ativa</option>
-                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>Plano inativa</option>
-                                            </select>
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-8 mt-2 mb-2">
+                                                <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
+                                                <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Plano">
+                                                    <i class="fa fa-save pr-1"></i> Salvar
+                                                </button>
+                                            </div>
+                                            <div class="col-md-4 mt-2 mb-2">
+                                                <button type="button" class="btn btn-outline-primary w-100"
+                                                        onclick="openDetails('<?php echo $entity['uuid']; ?>');" title="Voltar para Planos">
+                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-8 text-right mt-3 mb-2">
-                                        <input type="hidden" name="uuid" id="id_mesa" value="<?php echo $entity['uuid']; ?>">
-                                        <button type="button" class="btn btn-default mr-3"
-                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="btnSubmit">
-                                            <i class="fa fa-save pr-1"></i> Salvar
-                                        </button>
                                     </div>
                                 </div>
                             </form>

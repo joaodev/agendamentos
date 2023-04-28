@@ -328,4 +328,78 @@ class Model extends InitDb
             return $e->getMessage();
         }
     }
+
+    public function getTotalForToday($status, $user, $field, $table)
+    {
+        try {
+            $d1 = date('Y');
+            $d2 = date('m');
+            $d3 = date('d');
+
+            $query = "SELECT uuid
+                        FROM $table 
+                        WHERE status = :status
+                        AND deleted = :deleted
+                        AND user_uuid = :user_uuid
+                        AND YEAR($field) = :d1 
+                        AND MONTH($field) = :d2
+                        AND DAY($field) = :d3
+                        ";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":status", $status);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":d1", $d1);
+            $stmt->bindValue(":d2", $d2);
+            $stmt->bindValue(":d3", $d3);
+            $stmt->execute();
+
+            $result = $stmt->rowCount();
+
+            $stmt = null;
+            $this->closeDb();
+            
+            if ($result) {
+                return $result;
+            } else {
+                return 0;
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function getTotalDelayed($status, $user, $field, $table)
+    {
+        try {
+            $query = "SELECT uuid
+                        FROM $table 
+                        WHERE status = :status
+                        AND deleted = :deleted
+                        AND user_uuid = :user_uuid
+                        AND $field < :dt
+                        ";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":status", $status);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":dt", date('Y-m-d'));
+            $stmt->execute();
+
+            $result = $stmt->rowCount();
+
+            $stmt = null;
+            $this->closeDb();
+            
+            if ($result) {
+                return $result;
+            } else {
+                return 0;
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
 }

@@ -54,6 +54,46 @@ class IndexController extends ActionController
         $total_finished_tasks = $this->tasksModel->getTotalByStatus('2');
         $this->view->total_finished_tasks = $total_finished_tasks;
 
+        $schedulesForToday = $this->schedulesModel->getTotalForToday(
+            1, $_SESSION['COD'], 'schedule_date', $this->schedulesModel->getTable()
+        );
+        $this->view->schedulesForToday = $schedulesForToday;
+
+        $tasksForToday = $this->tasksModel->getTotalForToday(
+            1, $_SESSION['COD'], 'task_date', $this->tasksModel->getTable()
+        );
+        $this->view->tasksForToday = $tasksForToday;
+
+        $expensesForToday = $this->expensesModel->getTotalForToday(
+            1, $_SESSION['COD'], 'expense_date', $this->expensesModel->getTable()
+        );
+        $this->view->expensesForToday = $expensesForToday;
+
+        $revenuesForToday = $this->revenuesModel->getTotalForToday(
+            1, $_SESSION['COD'], 'revenue_date', $this->revenuesModel->getTable()
+        );
+        $this->view->revenuesForToday = $revenuesForToday;
+
+        $schedulesDelayed = $this->schedulesModel->getTotalDelayed(
+            1, $_SESSION['COD'], 'schedule_date', $this->schedulesModel->getTable()
+        );
+        $this->view->schedulesDelayed = $schedulesDelayed;
+
+        $tasksDelayed = $this->tasksModel->getTotalDelayed(
+            1, $_SESSION['COD'], 'task_date', $this->tasksModel->getTable()
+        );
+        $this->view->tasksDelayed = $tasksDelayed;
+
+        $expensesDelayed = $this->expensesModel->getTotalDelayed(
+            1, $_SESSION['COD'], 'expense_date', $this->expensesModel->getTable()
+        );
+        $this->view->expensesDelayed = $expensesDelayed;
+
+        $revenuesDelayed = $this->revenuesModel->getTotalDelayed(
+            1, $_SESSION['COD'], 'revenue_date', $this->revenuesModel->getTable()
+        );
+        $this->view->revenuesDelayed = $revenuesDelayed;
+
         $this->render('index');
     }
 }

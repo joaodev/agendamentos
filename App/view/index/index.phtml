@@ -3,18 +3,9 @@ $canViewSchedules = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
 $canViewCustomers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('customers'));
 $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'));
 $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('expenses'));
+$canViewRevenues = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('revenues'));
 $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('tasks'));
 ?>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.6/index.global.min.js'></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        let calendarEl = document.getElementById('calendar');
-        let calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth'
-        });
-        calendar.render();
-    });
-</script>
 <section class="content mt-5 pt-4" style="margin-left: 9px; margin-right: 9px;">
     <div class="container-fluid mt-2">
         <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
@@ -29,14 +20,75 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
             </div>
         <?php endif; ?>
         <div class="row">
-
-            <div class="col-lg-6">
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <h1>Operações</h1>
-                        <hr>    
+            <div class="col-lg-12">
+                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules) && $this->view->schedulesForToday > 0): ?>
+                    <div class="alert alert-info text-center" role="alert">
+                        Agendamentos para hoje: <?php echo $this->view->schedulesForToday; ?>  
+                        <a onclick="openModule('agendamentos');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                        </a>
                     </div>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
+                <?php endif; ?>
+                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewTasks) && $this->view->tasksForToday > 0): ?>
+                    <div class="alert alert-info text-center" role="alert">
+                        Tarefas para hoje: <?php echo $this->view->tasksForToday; ?>   
+                        <a onclick="openModule('tarefas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                        </a>
+                    </div>
+                <?php endif; ?>
+                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewExpenses) && $this->view->expensesForToday > 0): ?>
+                    <div class="alert alert-info text-center" role="alert">
+                        Despesas para hoje: <?php echo $this->view->expensesForToday; ?>  
+                        <a onclick="openModule('despesas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                        </a>
+                    </div>
+                <?php endif; ?>
+                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewRevenues) && $this->view->revenuesForToday > 0): ?>
+                    <div class="alert alert-info text-center" role="alert">
+                        Receitas para hoje: <?php echo $this->view->revenuesForToday; ?>    
+                        <a onclick="openModule('receitas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                        </a>
+                    </div>
+                <?php endif; ?>
+                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules) && $this->view->schedulesDelayed > 0): ?>
+                    <div class="alert alert-danger text-center" role="alert">
+                        Agendamentos atrasados: <?php echo $this->view->schedulesDelayed; ?>    
+                        <a onclick="openModule('agendamentos');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                        </a>
+                    </div>
+                <?php endif; ?>
+                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewTasks) && $this->view->tasksDelayed > 0): ?>
+                    <div class="alert alert-danger text-center" role="alert">
+                        Tarefas atrasadas: <?php echo $this->view->tasksDelayed; ?>    
+                        <a onclick="openModule('tarefas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                        </a>
+                    </div>
+                <?php endif; ?>
+                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewExpenses) && $this->view->expensesDelayed > 0): ?>
+                    <div class="alert alert-danger text-center" role="alert">
+                        Despesas atrasadas: <?php echo $this->view->expensesDelayed; ?>    
+                        <a onclick="openModule('despesas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                        </a>
+                    </div>
+                <?php endif; ?>
+                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewRevenues) && $this->view->revenuesDelayed > 0): ?>
+                    <div class="alert alert-danger text-center" role="alert">
+                        Receitas atrasadas: <?php echo $this->view->revenuesDelayed; ?>    
+                        <a onclick="openModule('receitas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <div class="col-lg-12">
+                <div class="row">
+                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewRevenues): ?>
                         <div class="col-12 col-xl-6">
                             <div class="small-box bg-gradient-success py-4" onclick="openModule('financeiro')" style="cursor: pointer;">
                                 <div class="inner">
@@ -64,7 +116,7 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                         </div>
                     <?php endif; ?>
                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
-                        <div class="col-6">
+                        <div class="col-6 col-lg-4">
                             <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
                                 <div class="inner">
                                     <p>Agendamentos <br>Pendentes</p>
@@ -77,7 +129,7 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                         </div>
                     <?php endif; ?>
                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
-                        <div class="col-6">
+                        <div class="col-6 col-lg-4">
                             <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
                                 <div class="inner">
                                     <p>Agendamentos <br>Concluídos</p>
@@ -90,7 +142,7 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                         </div>
                     <?php endif; ?>
                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
-                        <div class="col-6">
+                        <div class="col-6 col-lg-4">
                             <div class="small-box bg-gradient-dark" onclick="openModule('clientes')" style="cursor: pointer;">
                                 <div class="inner">
                                     <p>Clientes <br>Cadastrados</p>
@@ -103,7 +155,7 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                         </div>
                     <?php endif; ?>
                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewServices): ?>
-                        <div class="col-6">
+                        <div class="col-6 col-lg-4">
                             <div class="small-box bg-gradient-dark" onclick="openModule('servicos')" style="cursor: pointer;">
                                 <div class="inner">
                                     <p>Serviços <br>Cadastrados</p>
@@ -116,7 +168,7 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                         </div>
                     <?php endif; ?>
                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
-                        <div class="col-6">
+                        <div class="col-6 col-lg-4">
                             <div class="small-box bg-gradient-dark" onclick="openModule('tarefas')" style="cursor: pointer;">
                                 <div class="inner">
                                     <p>Tarefas <br>Pendentes</p>
@@ -127,9 +179,7 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                 </div>
                             </div>
                         </div>
-                    <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
-                        <div class="col-6">
+                        <div class="col-6 col-lg-4">
                             <div class="small-box bg-gradient-dark" onclick="openModule('tarefas')" style="cursor: pointer;">
                                 <div class="inner">
                                     <p>Tarefas <br>Concluídas</p>
@@ -143,10 +193,6 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                     <?php endif; ?>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div id='calendar'></div>
-            </div>
         </div>
-
     </div>
 </section>
