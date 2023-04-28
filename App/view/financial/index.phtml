@@ -79,7 +79,8 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                     </thead>
                                     <tbody>
                                         <?php foreach ($this->view->schedules as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;">
+                                            <tr class="text-center" style="cursor: pointer;"
+                                                onclick="viewModal('schedules', '<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
                                                     <?php echo $this->formatDate($entity['schedule_date']); ?>
                                                 </td>
@@ -95,7 +96,8 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                             </tr>
                                         <?php endforeach; ?>
                                         <?php foreach ($this->view->expenses as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;">
+                                            <tr class="text-center" style="cursor: pointer;"
+                                                onclick="viewModal('expenses', '<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
                                                     <?php echo $this->formatDate($entity['expense_date']); ?>
                                                 </td>
@@ -111,7 +113,8 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                             </tr>
                                         <?php endforeach; ?>
                                         <?php foreach ($this->view->revenues as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;">
+                                            <tr class="text-center" style="cursor: pointer;"
+                                                onclick="viewModal('revenues', '<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
                                                     <?php echo $this->formatDate($entity['revenue_date']); ?>
                                                 </td>
@@ -203,21 +206,44 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
             });
         });
     </script>
-
     <script>
-        function openDetails(uuid) {
-            $("#baseLoader").show();
+        function viewModal(mod, uuid) {
+            let modalTitle = '';
+            let modalUrl = '';
+
+            if (mod == 'schedules') {
+                modalTitle = 'Receita - Agendamento';
+                modalUrl = 'agendamentos/detalhes';
+            }
+
+            if (mod == 'revenues') {
+                modalTitle = 'Receita';
+                modalUrl = 'receitas/detalhes';
+            }
+
+            if (mod == 'expenses') {
+                modalUrl = 'despesas/detalhes';
+            }
+
+            $("#modalFinancialDetailsTitle").html('<i class="fa fa-info-circle pr-2"></i> Detalhes da ' + modalTitle);
+            $("#modalFinancialDetailsLoader").show();
+            $("#modalFinancialDetails").modal('show');     
+
             $.ajax({
                 type: 'post',
-                url: "<?php echo baseUrl; ?>despesas/detalhes",
-                data: {uuid:uuid},
+                url: "<?php echo baseUrl; ?>"+modalUrl,
+                data: {
+                    uuid:uuid,
+                    month: $("#f_month").val(),
+                    modal: true
+                },
                 async: true
             }).done(function(data) {
-                $("#sis_content").html(data);
-                $("#baseLoader").hide();
+                $("#modalFinancialDetailsResult").html(data);
+                $("#modalFinancialDetailsLoader").hide();
             }).fail(function() {
                 showInternalErrorAlert();
-                $("#baseLoader").hide();
+                $("#modalFinancialDetailsLoader").hide();
             });
         }
 
@@ -233,6 +259,28 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
             openModule('financeiro?m=' + month);
             $("#modalMonthLoader").hide();
             $("#modalMonth").modal('hide');    
+        }
+        
+        function openModDetails(uuid, mod) {
+            $("#modalFinancialDetailsLoader").show();
+            
+            $("#baseLoader").show();
+            $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>"+mod+"/detalhes",
+                data: {
+                    uuid:uuid,
+                    month: $("#f_month").val()
+                },
+                async: true
+            }).done(function(data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").hide();
+                $("#modalFinancialDetails").modal('hide');  
+            }).fail(function() {
+                showInternalErrorAlert();
+                $("#baseLoader").hide();
+            });
         }
     </script>
 <?php endif; ?>

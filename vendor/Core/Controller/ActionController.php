@@ -518,4 +518,20 @@ class ActionController
             return false;
         }
     }
+
+    public function isImage(string $image): bool
+    {
+        if (!empty($image)) {
+            $imageExt = pathinfo($image);
+            $imageExt = $imageExt['extension'];
+
+            if (in_array($imageExt, ['jpg', 'jpeg', 'png', 'gif'])) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

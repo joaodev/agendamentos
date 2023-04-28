@@ -115,14 +115,26 @@ $role = $_SESSION['ROLE'];
                                             <b>Arquivos enviados:</b>
                                             <?php foreach ($this->view->files as $file) :  ?>
                                                 <div class="my-3" id="box_<?php echo $file['uuid']; ?>">
-                                                    <a href="<?php echo baseUrl . 'public/uploads/revenues/'
-                                                                    . $entity['uuid'] . '/' . $file['file']; ?>" target="_blank" title="Abrir o arquivo" class="">
-                                                        <span class="fa fa-file pr-1"></span>
-                                                        <?php echo $file['file']; ?>
-                                                    </a>
-                                                    <a onclick="deleteFile('<?php echo $file['uuid']; ?>');" style="cursor: pointer;" class="btn btn-danger btn-xs ml-1">
-                                                        <span class="fa fa-trash"></span>
-                                                    </a>
+                                                    <?php if ($this->isImage($file['file'])): ?>
+                                                        <a href="<?php echo baseUrl . 'public/uploads/revenues/'
+                                                            . $entity['uuid'] . '/' . $file['file']; ?>" target="_blank" title="Abrir o arquivo"
+                                                            data-lightbox="image-1"
+                                                            data-title="<?php echo $file['file']; ?>">
+                                                            <span class="fa fa-image pr-1"></span>
+                                                            <?php echo $file['file']; ?>
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <a href="<?php echo baseUrl . 'public/uploads/revenues/'
+                                                            . $entity['uuid'] . '/' . $file['file']; ?>" target="_blank" title="Abrir o arquivo" class="">
+                                                            <span class="fa fa-file pr-1"></span>
+                                                            <?php echo $file['file']; ?>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                    <?php if ($entity['status'] == '1'): ?>
+                                                        <a onclick="deleteFile('<?php echo $file['uuid']; ?>');" style="cursor: pointer;" class="btn btn-danger btn-xs ml-1">
+                                                            <span class="fa fa-trash"></span>
+                                                        </a>
+                                                    <?php endif; ?>
                                                 </div>
                                             <?php endforeach; ?>
                                             <?php if (empty($this->view->files)): ?>
@@ -131,12 +143,14 @@ $role = $_SESSION['ROLE'];
                                         </div>
                                     </div>
                                     <div class="col-md-8 mt-3 mb-2">
-                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Receita">
-                                            <i class="fa fa-save pr-1"></i> Salvar
-                                        </button>
+                                        <?php if ($entity['status'] == '1'): ?>
+                                            <input type="hidden" name="uuid" id="id_receita" value="<?php echo $entity['uuid']; ?>">
+                                            <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Receita">
+                                                <i class="fa fa-save pr-1"></i> Salvar
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="col-md-4 mt-3 mb-2">
-                                        <input type="hidden" name="uuid" id="id_receita" value="<?php echo $entity['uuid']; ?>">
                                         <button type="button" class="btn btn-outline-primary w-100"
                                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');" title="Voltar para Detalhamento">
                                             <i class="fas fa-arrow-left pr-1"></i> Voltar

@@ -107,6 +107,31 @@
                                             </script>
                                         <?php else: ?>
                                             <b>A Renovação estará disponível a partir de <?php echo $this->formatDate($entity['renovation_at']); ?></b>
+                                            <br>
+                                            <button type="submit" class="btn btn-outline-success mt-3"
+                                                onclick="requestAlter();">
+                                                <span class="fa fa-sync pr-1"></span>
+                                                SOLICITAR ALTERAÇÃO NO PLANO ATUAL
+                                            </button>
+                                            <script>
+                                                function requestAlter() {
+                                                    $("#modalRequestAlterTitle").html('<i class="fa fa-sync pr-1"></i> Solicitar Alteração');
+                                                    $("#modalRequestAlterLoader").show();
+                                                    $("#modalRequestAlter").modal('show');
+
+                                                    $.ajax({
+                                                        type: 'post',
+                                                        url: "<?php echo baseUrl; ?>planos/solicitar-alteracao",
+                                                        async: true
+                                                    }).done(function(data) {
+                                                        $("#modalRequestAlterResult").html(data);
+                                                        $("#modalRequestAlterLoader").hide();
+                                                    }).fail(function() {
+                                                        showInternalErrorAlert();
+                                                        $("#modalRequestAlterLoader").hide();
+                                                    });
+                                                }
+                                            </script>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </div>

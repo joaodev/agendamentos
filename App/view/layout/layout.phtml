@@ -646,6 +646,38 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="modalFinancialDetails" data-keyboard="false">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="overlay" id="modalFinancialDetailsLoader">
+                            <i class="fas fa-2x fa-sync fa-spin"></i>
+                        </div>
+                        <div class="modal-header text-white bg-primary">
+                            <h4 class="modal-title" id="modalFinancialDetailsTitle"></h4>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="modalFinancialDetailsResult"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalRequestAlter" data-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="overlay" id="modalRequestAlterLoader">
+                            <i class="fas fa-2x fa-sync fa-spin"></i>
+                        </div>
+                        <div class="modal-header text-white bg-primary">
+                            <h4 class="modal-title" id="modalRequestAlterTitle"></h4>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="modalRequestAlterResult"></div>
+                    </div>
+                </div>
+            </div>
             <div class="modal fade" id="modalApproval" data-keyboard="false">
                 <div class="modal-dialog">
                     <div class="modal-content">

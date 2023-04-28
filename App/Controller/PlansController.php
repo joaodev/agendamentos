@@ -536,4 +536,51 @@ class PlansController extends ActionController implements CrudInterface
             return false;
         }
     }
+
+    public function requestAlterAction(): void
+    {
+        $plans = $this->model->getAllActives();
+        $this->view->plans = $plans;
+        $this->render('request-alter', false);
+    }
+
+    public function sendRequestAction(): bool
+    {   
+        if (!empty($_POST)) {
+            $config = $this->getSiteConfig();
+
+            $message = "<p>Pedido para alteração de plano:</p>
+                            <p>Usuário: {$_SESSION['NAME']} - {$_SESSION['EMAIL']}</p>
+                            <p>Plano Selecionado: {$_POST['plan_uuid']}</p>
+                            <p>Mensagem: {$_POST['description']}</p>";
+
+            $sended = $this->sendMail([
+                'title' => 'Solicitação para Alteração de Plano',
+                'message' => $message,
+                'name' => "Administrador",
+                'toAddress' => $config['mail_to_address']
+            ]);
+
+            if ($sended) {
+                $data  = [
+                    'title' => 'Sucesso!', 
+                    'msg'   => 'Solicitação enviada.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right'
+                ];
+            } else {
+                $data  = [
+                    'title' => 'Erro!', 
+                    'msg' => 'A solicitação não foi enviada.',
+                    'type' => 'error',
+                    'pos'   => 'top-center'
+                ];
+            }
+            
+            echo json_encode($data);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

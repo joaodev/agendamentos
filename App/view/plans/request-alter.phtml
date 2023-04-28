@@ -1,0 +1,82 @@
+<?php $plans = $this->view->plans; ?>
+<form method="post" name="formAlterPlan" id="formAlterPlan">
+    <div class="row" id="formBox">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="name">Plano Desejado*</label>
+                <select name="plan_uuid" id="plan_uuid" class="form-control text-center" required>
+                    <option value="">Selecione uma opção</option>
+                    <?php foreach ($plans as $plan): ?>
+                        <option value="<?php echo $plan['name']; ?>">
+                            <?php echo $plan['name']; ?> | R$ <?php echo number_format($plan['price'], 2, ",","."); ?>
+                        </option>        
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="name">Motivo da Alteração*</label>
+                <textarea name="description" id="description" class="form-control" rows="2" required></textarea>
+            </div>
+        </div>
+        <div class="col-12 text-center mt-2">
+            <button type="submit" class="btn btn-success btn-lg w-100">
+                <i class="fa fa-share pr-1"></i> ENCAMINHAR PEDIDO
+            </button>
+        </div>
+        <div class="col-12 text-center mt-3">
+            <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                <i class="fa fa-window-close pr-1"></i> Cancelar
+            </button>
+        </div>
+    </div>
+    <div class="row" id="msgBox" style="display: none;">
+        <div class="col-12">
+            <div class="text-center">
+                <h1><span class="fa fa-smile"></span> Sucesso</h1>
+                <hr>
+                <h4>Solicitação enviada! <br> Em breve nossa equipe entrará em contato, fique atento a sua caixa de emails.</h4>
+                <hr>
+                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">
+                    <i class="fa fa-window-close pr-1"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function(){
+        $('#formAlterPlan').validate({
+            submitHandler: function( form ){
+                let dados = $( form ).serialize();
+
+                $("#modalRequestAlterLoader").show();
+                $("#btnSubmit").show('disabled', true);
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>planos/envia-solicitacao-alteracao",
+                    data: dados,
+                    dataType: 'json',
+                    async: true
+                }).done(function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    $("#modalRequestAlterLoader").hide();
+                    $("#btnSubmit").attr('disabled', false);
+
+                    if (data.type === 'success') {
+                        $("#formBox").hide();
+                        $("#msgBox").show();
+                    }
+                }).fail(function() {
+                    showInternalErrorAlert(); 
+                    $("#modalRequestAlterLoader").hide();   
+                    $("#btnSubmit").attr('disabled', false);
+                }); 
+                
+                return false;
+            }
+        });
+    });
+</script>

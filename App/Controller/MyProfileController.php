@@ -62,19 +62,13 @@ class MyProfileController extends ActionController
 
             if (!empty($_FILES) && !empty( $_FILES["file"])) {
                 $image_name = $_FILES["file"]["name"];
+                $image_name = str_replace(" ", "_", $image_name);
                 if ($image_name != null) {
-                    $ext_img = explode(".", $image_name, 2);
-                    $new_name  = md5($ext_img[0]) . '.' . $ext_img[1];
-                    if ($ext_img[1] == 'jpg' || $ext_img[1] == 'jpeg'
-                        || $ext_img[1] == 'png' || $ext_img[1] == 'gif') {
-                        $tmp_name1  =  $_FILES["file"]["tmp_name"];
-                        $new_image_name = md5($new_name . time()).'.png';
-                        $dir1 = "../public/uploads/users/" . $new_image_name;
-
-                        if (move_uploaded_file($tmp_name1, $dir1)) {
-                            $_POST['file'] = $new_image_name;
-                        } 
-                    }
+                    $tmp_name1  =  $_FILES["file"]["tmp_name"];
+                    $dir1 = "../public/uploads/users/" . $image_name;
+                    if (move_uploaded_file($tmp_name1, $dir1)) {
+                        $_POST['file'] = $image_name;
+                    } 
                 }
             } else {
                 if (!empty($_POST['remove_image'])) {

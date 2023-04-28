@@ -1,31 +1,33 @@
 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('revenues'))): ?>
     <?php $entity = $this->view->entity; ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-info-circle pr-1"></i>
-                        Receita para <?php echo $this->formatDate($entity['revenue_date']); ?>
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary" title="Voltar para Receitas"
-                                onclick="openModule('receitas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
-                                <i class="fas fa-arrow-left"></i> 
-                            </button>
-                        </li>
-                    </ol>
+    <?php if(empty($_POST['modal'])): ?>
+        <section class="content-header mt-5">
+            <div class="container-fluid mt-2">
+                <div class="row">
+                    <div class="col-11" >
+                        <h1 style="position: relative; top: 5px; font-size: 25px;">
+                            <i class="fas fa-info-circle pr-1"></i>
+                            Receita para <?php echo $this->formatDate($entity['revenue_date']); ?>
+                        </h1>
+                    </div>
+                    <div class="col-1">
+                        <ol class="breadcrumb float-right">
+                            <li class="breadcrumb-item">
+                                <button type="button" class="btn btn-outline-primary" title="Voltar para Receitas"
+                                    onclick="openModule('receitas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
+                                    <i class="fas fa-arrow-left"></i> 
+                                </button>
+                            </li>
+                        </ol>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
+        </section>
+        <section class="content" style="margin-left: 9px; margin-right: 9px;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                    <?php endif; ?>
                     <div class="card">
                         <div class="card-body"> 
                             <div class="row">
@@ -76,12 +78,20 @@
                                 <div class="col-md-12 text-center">
                                     <b>Arquivos Enviados</b>
                                     <?php if (!empty($this->view->files)) : ?>
-                                        <?php foreach ($this->view->files as $file) : ?>
+                                        <?php foreach ($this->view->files as $file): ?>
                                             <div>
-                                                <a href="<?php echo baseUrl . 'public/uploads/revenues/' . $entity['uuid'] . '/' . $file['file']; ?>" 
-                                                    target="_blank">
-                                                    <?php echo $file['file']; ?>
-                                                </a>
+                                                <?php if ($this->isImage($file['file'])): ?>
+                                                    <a href="<?php echo baseUrl . 'public/uploads/revenues/' . $entity['uuid'] . '/' . $file['file']; ?>" 
+                                                        data-lightbox="image-1"
+                                                        data-title="<?php echo $file['file']; ?>">
+                                                        <span class="fa fa-image pr-1"></span> <?php echo $file['file']; ?>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <a href="<?php echo baseUrl . 'public/uploads/revenues/' . $entity['uuid'] . '/' . $file['file']; ?>" 
+                                                        target="_blank">
+                                                        <span class="fa fa-file-pdf pr-1"></span> <?php echo $file['file']; ?>
+                                                    </a>
+                                                <?php endif; ?>
                                             </div>
                                         <?php endforeach; ?>
                                     <?php else : ?>
@@ -106,46 +116,60 @@
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12"><hr></div>
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <?php if ($entity['status'] == '1'): ?>
-                                            <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                                <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('revenues'))): ?>
-                                                    <button type="button" class="btn btn-outline-danger"  title="Remover Receita"
-                                                        onclick="deleteRevenue('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                        <i class="fa fa-trash"></i> Remover
+                                <?php if(empty($_POST['modal'])): ?>
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <?php if ($entity['status'] == '1'): ?>
+                                                <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('revenues'))): ?>
+                                                        <button type="button" class="btn btn-outline-danger"  title="Remover Receita"
+                                                            onclick="deleteRevenue('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                            <i class="fa fa-trash"></i> Remover
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('revenues'))): ?>
+                                                        <button type="button" class="btn btn-outline-success"  title="Editar Receita"
+                                                            onclick="updateRevenue('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                            <i class="fa fa-pen pr-1"></i> Editar
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="col-md-12 col-lg-4 mt-2 mb-2">
+                                                    <button type="button" class="btn btn-outline-primary" title="Voltar para Receitas"
+                                                        onclick="openModule('receitas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
+                                                        <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                     </button>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                                <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('revenues'))): ?>
-                                                    <button type="button" class="btn btn-outline-success"  title="Editar Receita"
-                                                        onclick="updateRevenue('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                        <i class="fa fa-pen pr-1"></i> Editar
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="col-md-4 offset-md-4 mt-2 mb-2">
+                                                    <button type="button" class="btn btn-outline-primary" title="Voltar para Receitas"
+                                                        onclick="openModule('receitas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
+                                                        <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                     </button>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div class="col-md-12 col-lg-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary" title="Voltar para Receitas"
-                                                    onclick="openModule('receitas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
-                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                                </button>
-                                            </div>
-                                        <?php else: ?>
-                                            <div class="col-md-4 offset-md-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary" title="Voltar para Receitas"
-                                                    onclick="openModule('receitas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
-                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                                </button>
-                                            </div>
-                                        <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
-                                </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
+                    <?php if (!empty($_POST['modal']) && $_POST['modal'] == true): ?>
+                        <div class="col-12 text-center">
+                            <button type="button" class="btn btn-primary" onclick="openModDetails('<?php echo $entity['uuid']; ?>', 'receitas');">
+                                <i class="fa fa-external-link-alt pr-1"></i> Ir para Receita
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-dismiss="modal">
+                                <i class="fa fa-window-close pr-1"></i> Fechar
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                    <?php if(empty($_POST['modal'])): ?>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    <?php endif; ?>
 <?php endif; ?>

@@ -34,13 +34,17 @@ $entity = $this->view->entity;
                                     <div class="form-group">
                                         <label for="title">Imagem de Perfil</label>
                                         <?php if (!empty($entity['file'])): ?><br>
-                                            <img src="<?php echo baseUrl . 'public/uploads/users/'
-                                                . $entity['file']; ?>" style="max-height: 200px; margin-bottom: 15px;" alt="<?php echo $entity['name']; ?>">
+                                            <a href="<?php echo baseUrl . 'public/uploads/users/' . $entity['file']; ?>" 
+                                                data-lightbox="image-1"
+                                                data-title="<?php echo $entity['file']; ?>">
+                                                <img src="<?php echo baseUrl . 'public/uploads/users/'
+                                                    . $entity['file']; ?>" style="max-height: 200px; margin-bottom: 15px;" alt="<?php echo $entity['name']; ?>">
+                                            </a>
                                             <div class="mb-2">
                                                 <input type="checkbox" name="remove_image" id="remove_image" value="1" class="mr-1"> Remover imagem de perfil
                                             </div>
                                         <?php endif; ?>
-                                        <input type="file" class="form-control" name="file" id="file">
+                                        <input type="file" class="form-control" name="file" id="file" accept="jpg,jpeg,png">
                                     </div>
                                 </div>
                             </div>
