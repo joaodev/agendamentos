@@ -236,7 +236,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
         <script>
             function deleteCustomer(uuid) {
                 $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Cliente');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Cliente');
                 $("#modalDeleteLoader").hide();
                 $("#modalDelete").modal('show');
                 $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');

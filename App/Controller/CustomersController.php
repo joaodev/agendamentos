@@ -19,11 +19,11 @@ class CustomersController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        $data = $this->model->getAll();
+        $data = $this->model->getAll($this->parentUUID);
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
-        $totalServices = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+        $totalServices = $this->model->totalData($this->model->getTable(), $this->parentUUID);
         
         $totalFree = ($activePlan['total_customers'] - $totalServices);
         $this->view->total_free = $totalFree;
@@ -47,7 +47,7 @@ class CustomersController extends ActionController implements CrudInterface
     {
         if (!empty($_POST)) {
             $activePlan = self::getActivePlan();
-            $totalCustomers = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+            $totalCustomers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
             if ($totalCustomers >= $activePlan['total_customers']) {
                 $data  = [
                     'title' => 'Erro!',
@@ -57,7 +57,7 @@ class CustomersController extends ActionController implements CrudInterface
                 ];
             } else {
                 $_POST['uuid'] = $this->model->NewUUID();
-                $_POST['user_uuid'] = $_SESSION['COD'];
+                $_POST['parent_uuid'] = $this->parentUUID;
                 
                 $crud = new Crud();
                 $crud->setTable($this->model->getTable());
@@ -93,7 +93,7 @@ class CustomersController extends ActionController implements CrudInterface
 	public function readAction(): void
     {
         if (!empty($_POST['uuid'])) {
-            $entity = $this->model->getOne($_POST['uuid']);
+            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
             $this->render('read', false);
         }
@@ -102,7 +102,7 @@ class CustomersController extends ActionController implements CrudInterface
 	public function updateAction(): void
     {
         if (!empty($_POST)) {
-            $entity = $this->model->getOne($_POST['uuid']);
+            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
 
             $this->render('update', false);
@@ -198,7 +198,7 @@ class CustomersController extends ActionController implements CrudInterface
         if (!empty($_POST)) {
             $res  = [];
             if (!empty($_POST['term']) && strlen($_POST['term']) >= 1) {
-                $data = $this->model->searchData($_POST['term']);
+                $data = $this->model->searchData($_POST['term'], $this->parentUUID);
 
                 foreach ($data as $entity) {
                     $res[] = [

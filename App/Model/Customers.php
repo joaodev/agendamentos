@@ -13,7 +13,7 @@ class Customers extends Model
         $this->setTable('customers');
     }
 
-    public function getOne($uuid)
+    public function getOne($uuid, $parentUUID)
     {
         try {
             $query = "
@@ -24,13 +24,13 @@ class Customers extends Model
                 FROM customers
                 WHERE uuid = :uuid 
                     AND deleted = :deleted 
-                    AND user_uuid = :user_uuid
+                    AND parent_uuid = :parent_uuid
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":uuid", $uuid);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -44,7 +44,7 @@ class Customers extends Model
         }
     }
 
-    public function getAll(): bool|array|string
+    public function getAll($parentUUID): bool|array|string
     {
         try {
             $query = "
@@ -54,13 +54,13 @@ class Customers extends Model
                         status, created_at, updated_at
                 FROM customers
                 WHERE deleted = :deleted 
-                    AND user_uuid = :user_uuid
+                    AND parent_uuid = :parent_uuid
                 ORDER BY name 
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -74,7 +74,7 @@ class Customers extends Model
         }
     }
 
-    public function getAllActives(): bool|array|string
+    public function getAllActives($parentUUID): bool|array|string
     {
         try {
             $query = "
@@ -85,14 +85,14 @@ class Customers extends Model
                 FROM customers
                 WHERE deleted = :deleted 
                     AND status = :status
-                    AND user_uuid = :user_uuid
+                    AND parent_uuid = :parent_uuid
                 ORDER BY name 
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", '0');
             $stmt->bindValue(":status", '1');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -106,13 +106,13 @@ class Customers extends Model
         }
     }
 
-    public function searchData($postData): bool|array|string
+    public function searchData($postData, $parentUUID): bool|array|string
     {
         try {
             $query = "
                 SELECT uuid, name
                 FROM customers
-                WHERE user_uuid = {$_SESSION['COD']} AND  name LIKE '%$postData%' OR id LIKE '%$postData%'
+                WHERE parent_uuid = '$parentUUID' AND  name LIKE '%$postData%' OR id LIKE '%$postData%'
                 ORDER BY name  LIMIT 5
             ";
 
@@ -128,19 +128,19 @@ class Customers extends Model
         }
     }
 
-    public function totalCustomers(): int|string
+    public function totalCustomers($parentUUID): int|string
     {
         try {
             $query = "
                 SELECT uuid
                 FROM customers 
                 WHERE deleted = :deleted
-                    AND user_uuid = :user_uuid
+                    AND parent_uuid = :parent_uuid
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", "0");
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->execute();
             
             $result = $stmt->rowCount();

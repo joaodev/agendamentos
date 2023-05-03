@@ -14,9 +14,14 @@ class User extends Model
         $this->setTable('user');
     }
 
-    public function getOne($uuid)
+    public function getOne($uuid, $parentUUID = null)
     {
         try {
+            $whereParams = "";
+            if (!empty($parentUUID)) {
+                $whereParams = " AND u.parent_uuid = :parent_uuid";
+            }
+
             $query = "
                 SELECT u.uuid, u.name, u.email, u.status, u.role_uuid, u.whatsapp,
                         u.cellphone, u.job_role, r.name as role, u.phone,
@@ -24,18 +29,24 @@ class User extends Model
                         u.postal_code, u.address, u.number, u.complement, 
                         u.neighborhood, u.city, u.state, u.gender, u.birthdate,
                         u.start_date, u.end_date, u.salary,                 
-                        u.document_1, u.document_2, u.auth2factor 
+                        u.document_1, u.document_2, u.auth2factor,
+                        u.parent_uuid
                 FROM user AS u
                 INNER JOIN role AS r
                     ON u.role_uuid = r.uuid
                 WHERE u.uuid = :uuid AND u.deleted = '0'
+                $whereParams
                 ORDER BY u.name 
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":uuid", $uuid);
-            $stmt->execute();
 
+            if (!empty($parentUUID)) {
+                $stmt->bindValue(":parent_uuid", $parentUUID);
+            }
+
+            $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             $stmt = null;
@@ -47,7 +58,7 @@ class User extends Model
         }
     }
 
-    public function getAll(): bool|array|string
+    public function getAll($parent): bool|array|string
     {
         try {
             $query = "
@@ -56,15 +67,20 @@ class User extends Model
                         u.postal_code, u.address, u.number, u.complement, 
                         u.neighborhood, u.city, u.state, u.gender, u.birthdate,
                         u.start_date, u.end_date, u.salary,                         
-                        u.document_1, u.document_2, u.auth2factor 
+                        u.document_1, u.document_2, u.auth2factor, u.parent_uuid  
                 FROM user AS u
                 INNER JOIN role AS r
                     ON u.role_uuid = r.uuid
-                WHERE u.deleted = '0'
+                WHERE u.deleted = :deleted
+                    AND u.parent_uuid = :parent_uuid
                 ORDER BY u.name 
             ";
 
-            $stmt = $this->openDb()->query($query);
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":parent_uuid", $parent);
+            $stmt->execute();
+
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $stmt = null;

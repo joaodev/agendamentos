@@ -322,7 +322,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
         <script>
             function deleteExpense(uuid) {
                 $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Despesa');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Despesa');
                 $("#modalDeleteLoader").hide();
                 $("#modalDelete").modal('show');
                 $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');

@@ -16,6 +16,7 @@ class ActionController
     protected mixed $namespace;
     protected mixed $controller;
     protected mixed $view;
+    protected mixed $parentUUID;
     
     public function __construct()
     {
@@ -38,6 +39,8 @@ class ActionController
 
             self::dataValidation($data);
         }
+
+        $this->parentUUID = self::getParentUuid();
 
         $this->view = new stdClass();
     }
@@ -91,6 +94,11 @@ class ActionController
         return $this->action;
     }
     
+    public function getCustomerProfileUuid(): string
+    {
+        return 'ebd1a81c-2d47-21a7-4702-d1b26f04f23a';
+    }
+
     public function randomString(): string
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -218,11 +226,21 @@ class ActionController
     }
 
     public function getUser($uuid)
-
     {
         $userModel = Container::getClass("User", "app");
         $userData  = $userModel->getOne($uuid);
         return $userData;
+    }
+
+    public function getParentUuid()
+    {
+        if (!empty($_SESSION['COD'])) {
+            $userModel = Container::getClass("User", "app");
+            $userData  = $userModel->getOne($_SESSION['COD']);
+            return $userData['parent_uuid'] ? $userData['parent_uuid'] : 0;
+        } else {
+            return 0;
+        }
     }
 
     public function getCustomer($uuid)
@@ -337,6 +355,7 @@ class ActionController
             'user-plans' => '192631d7-87f0-4677-b446-a018ef4026e2',
             'revenues' => '2ee634af-df6f-49ce-b31b-50cff4826987',
             'tasks' => '1e184c91-a53c-4bae-a6b2-e43fb4364b8f',
+            'reports' => '91fee8d1-6dfa-4a69-bb78-1e69c743d5a8',
         ];
 
         return $codes[$key];
@@ -345,25 +364,25 @@ class ActionController
     public function getTotalExpensesByMonth($status, $month)
     {
         $expensesModel = Container::getClass("Expenses", "app");
-        return $expensesModel->getTotalByStatusByMonth($status, $month);
+        return $expensesModel->getTotalByStatusByMonth($status, $month, $this->parentUUID);
     }
 
     public function getTotalRevenuesByMonth($status, $month)
     {
         $revenuesModel = Container::getClass("Revenues", "app");
-        return $revenuesModel->getTotalByStatusByMonth($status, $month);
+        return $revenuesModel->getTotalByStatusByMonth($status, $month, $this->parentUUID);
     }
 
     public function getTotalSchedulesByMonth($status, $month)
     {
         $expensesModel = Container::getClass("Schedules", "app");
-        return $expensesModel->getTotalByStatusByMonth($status, $month);
+        return $expensesModel->getTotalByStatusByMonth($status, $month, $this->parentUUID);
     }    
 
     public function getTotalTasksByMonth($status, $month)
     {
         $expensesModel = Container::getClass("Tasks", "app");
-        return $expensesModel->getTotalByStatusByMonth($status, $month);
+        return $expensesModel->getTotalByStatusByMonth($status, $month, $this->parentUUID);
     }    
 
     public function formatMonth($month): string

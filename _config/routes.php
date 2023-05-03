@@ -164,6 +164,8 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/tarefas/excluir', 'controller' => 'tasks', 'action' => 'delete'],
 	['namespace' => 'app', 'route' => '/tarefas/remove-arquivo', 'controller' => 'tasks', 'action' => 'delete-file'],
 
+	['namespace' => 'app', 'route' => '/relatorios', 'controller' => 'reports', 'action' => 'index'],
+	['namespace' => 'app', 'route' => '/relatorios/gerar', 'controller' => 'reports', 'action' => 'generate'],
 ];
 
 $systemDir = match ($_SERVER['HTTP_HOST']) {

@@ -227,7 +227,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
         <script>
             function deletePlan(uuid) {
                 $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Plano');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Plano');
                 $("#modalDeleteLoader").hide();
                 $("#modalDelete").modal('show');
                 $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');

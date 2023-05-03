@@ -27,6 +27,8 @@ class SchedulesController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
+        $parentUUID = $this->parentUUID;
+
         if (!empty($_GET['m'])) {
             $month = $_GET['m'];
         } else {
@@ -35,12 +37,12 @@ class SchedulesController extends ActionController implements CrudInterface
 
         $this->view->month = self::formatMonth($month);
 
-        $data = $this->model->getAllByMonth('0', $month);
+        $data = $this->model->getAllByMonth('0', $month, $parentUUID);
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
         $totalSchedules = $this->model->totalMonthlyData(
-            $month, $this->model->getTable(), 'schedule_date', $_SESSION['COD']
+            $month, $this->model->getTable(), 'schedule_date', $parentUUID
         );
         
         $totalFree = ($activePlan['total_schedules'] - $totalSchedules);
@@ -63,15 +65,17 @@ class SchedulesController extends ActionController implements CrudInterface
 
     public function createAction(): void
     {
-        $customers = $this->customersModel->findAllActivesBy('uuid, name', 'user_uuid', $_SESSION['COD']);
+        $parentUUID = $this->parentUUID;
+
+        $customers = $this->customersModel->findAllActivesBy('uuid, name', 'parent_uuid', $parentUUID);
         $this->view->customers = $customers;
+
+        $stringFields = 'uuid, title, description, price';
+        $services = $this->servicesModel->findAllActivesBy($stringFields, 'parent_uuid', $parentUUID);
+        $this->view->services = $services;
 
         $paymentTypes = $this->paymentTypesModel->getAllActives();
         $this->view->paymentTypes = $paymentTypes;
-
-        $stringFields = 'uuid, title, description, price';
-        $services = $this->servicesModel->findAllActivesBy($stringFields, 'user_uuid', $_SESSION['COD']);
-        $this->view->services = $services;
 
         $this->render('create', false);
     }
@@ -79,10 +83,12 @@ class SchedulesController extends ActionController implements CrudInterface
     public function createProcessAction(): bool
     {
         if (!empty($_POST)) {
+            $parentUUID = $this->parentUUID;
+
             $activePlan = self::getActivePlan();
             $month = substr($_POST['schedule_date'], 0, 7);
             $totalSchedules = $this->model->totalMonthlyData(
-                $month, $this->model->getTable(), 'schedule_date', $_SESSION['COD']
+                $month, $this->model->getTable(), 'schedule_date', $parentUUID
             );
             
             if ($totalSchedules >= $activePlan['total_schedules']) {
@@ -95,7 +101,7 @@ class SchedulesController extends ActionController implements CrudInterface
             } else {
                 $uuid = $this->model->NewUUID();
                 $_POST['uuid'] = $uuid;
-                $_POST['user_uuid'] = $_SESSION['COD'];
+                $_POST['parent_uuid'] = $parentUUID;
                 $_POST['amount'] = $this->moneyToDb($_POST['amount']);
     
                 $crud = new Crud();
@@ -134,16 +140,18 @@ class SchedulesController extends ActionController implements CrudInterface
     public function updateAction(): void
     {
         if (!empty($_POST['uuid'])) {
-            $entity = $this->model->getOne($_POST['uuid']);
+            $parentUUID = $this->parentUUID;
+            $entity = $this->model->getOne($_POST['uuid'], $parentUUID);
             $this->view->entity = $entity;
     
-            $customers = $this->customersModel->findAllActives('uuid, name');
-            $this->view->customers = $customers;
-
             $paymentTypes = $this->paymentTypesModel->getAllActives();
             $this->view->paymentTypes = $paymentTypes;
 
-            $services = $this->servicesModel->findAllActives('uuid, title, description, price');
+            $customers = $this->customersModel->findAllActivesBy('uuid, name', 'parent_uuid', $parentUUID);
+            $this->view->customers = $customers;
+
+            $stringFields = 'uuid, title, description, price';
+            $services = $this->servicesModel->findAllActivesBy($stringFields, 'parent_uuid', $parentUUID);
             $this->view->services = $services;
             
             $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);
@@ -194,7 +202,7 @@ class SchedulesController extends ActionController implements CrudInterface
     public function readAction(): void
     {
         if (!empty($_POST['uuid'])) {
-            $entity = $this->model->getOne($_POST['uuid']);
+            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
 
             $files = $this->filesModel->findAllBy('file', 'parent_uuid', $_POST['uuid']);

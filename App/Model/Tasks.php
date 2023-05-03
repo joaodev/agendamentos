@@ -13,7 +13,7 @@ class Tasks extends Model
         $this->setTable('tasks');
     }
 
-    public function getAllByMonth($status, $month): bool|array|string
+    public function getAllByMonth($status, $month, $parentUUID): bool|array|string
     {
         try {
             $m = explode("-", $month);
@@ -29,7 +29,7 @@ class Tasks extends Model
                                 status, created_at, updated_at
                         FROM tasks
                         WHERE $whereStatus deleted = :deleted
-                            AND user_uuid = :user_uuid
+                            AND parent_uuid = :parent_uuid
                             AND YEAR(task_date) = :d1 AND MONTH(task_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
@@ -37,7 +37,7 @@ class Tasks extends Model
                 $stmt->bindValue(":status", $status);
             }
             $stmt->bindValue(":deleted", "0");
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();
@@ -53,7 +53,7 @@ class Tasks extends Model
         }
     }
     
-    public function getTotalByStatus($status)
+    public function getTotalByStatus($status, $parentUUID)
     {
         try {
             $d1 = date('Y');
@@ -63,13 +63,13 @@ class Tasks extends Model
                         FROM tasks 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND user_uuid = :user_uuid
+                        AND parent_uuid = :parent_uuid
                         AND YEAR(task_date) = :d1 AND MONTH(task_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();
@@ -89,7 +89,7 @@ class Tasks extends Model
         }
     }
 
-    public function getTotalByStatusByMonth($status, $month)
+    public function getTotalByStatusByMonth($status, $month, $parentUUID)
     {
         try {
             $month = explode("/", $month, 2);
@@ -100,13 +100,13 @@ class Tasks extends Model
                         FROM tasks 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND user_uuid = :user_uuid
+                        AND parent_uuid = :parent_uuid
                         AND YEAR(task_date) = :d1 AND MONTH(task_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();

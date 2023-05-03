@@ -15,15 +15,15 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
             <div class="row">
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-user-cog pr-1"></i>
-                        Colaboradores
+                        <i class="fas fa-users pr-1"></i>
+                        Usuários
                     </h1>
                 </div>
                 <div class="col-1">
                     <?php if ($canCreate): ?>
                         <ol class="breadcrumb float-right">
                             <li class="breadcrumb-item">
-                                <button type="button" class="btn btn-outline-success" title="Adicionar Colaborador"
+                                <button type="button" class="btn btn-outline-success" title="Adicionar Usuário"
                                     onclick="createUser();" style="width: 100%;">
                                     <i class="fas fa-plus"></i> 
                                 </button>
@@ -48,7 +48,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                             <th style="font-size: 14px;">Email</th>
                                             <th style="font-size: 14px;">Celular</th>
                                             <th style="font-size: 14px;">Cargo</th>
-                                            <th style="font-size: 14px;">Perfil</th>
+                                            <th style="font-size: 14px;">Líder</th>
                                             <th style="font-size: 14px;">Status</th>
                                             <th style="display: none;">CPF</th>
                                             <th style="display: none;">CNPJ</th>
@@ -64,6 +64,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                             <th style="display: none;">Status</th>
                                             <th style="display: none;">Cadastrado em</th>
                                             <th style="display: none;">Atualizado em</th>
+                                            <th style="display: none;"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -83,7 +84,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                                     <?php echo $entity['job_role']; ?>
                                                 </td>
                                                 <td style="font-size: 15px">
-                                                    <?php echo $entity['role']; ?>
+                                                    <?php echo ($entity['uuid'] == $entity['parent_uuid']) ? 'Sim' : 'Não'; ?>
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
@@ -134,6 +135,9 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                                 <td style="display: none;">
                                                     <?php echo $this->formatDateTime($entity['updated_at']); ?>
                                                 </td> 
+                                                <td style="display: none;">
+                                                    <?php echo $this->formatDateTime($entity['created_at'], false); ?>
+                                                </td> 
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -167,7 +171,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                         exportOptions: {columns: [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19]}
                     })
                 ],
-                order: [ [4, "asc"] ],
+                order: [ [20, "desc"] ],
                 columnDefs: [{orderable: false, targets: [5]}],
                 responsive: true,
                 info: true,
@@ -258,7 +262,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
         <script>
             function deleteUser(uuid) {
                 $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Usuário');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Usuário');
                 $("#modalDeleteLoader").hide();
                 $("#modalDelete").modal('show');
                 $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');

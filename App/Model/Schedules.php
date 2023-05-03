@@ -13,7 +13,7 @@ class Schedules extends Model
         $this->setTable('schedules');
     }
 
-    public function getOne($uuid)
+    public function getOne($uuid, $parentUUID)
     {
         try {
             $query = "SELECT o.id, o.uuid, o.title, o.description,
@@ -37,12 +37,12 @@ class Schedules extends Model
                             ON o.payment_type_uuid = p.uuid
                         WHERE o.uuid = :uuid 
                             AND o.deleted = :deleted
-                            AND o.user_uuid = :user_uuid";
+                            AND o.parent_uuid = :parent_uuid";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":uuid", $uuid);
             $stmt->bindValue(":deleted", "0");
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -56,7 +56,7 @@ class Schedules extends Model
         }
     }
 
-    public function getAll(): bool|array|string
+    public function getAll($parentUUID): bool|array|string
     {
         try {
             $query = "SELECT o.id, o.uuid, o.title, o.description,
@@ -75,11 +75,11 @@ class Schedules extends Model
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
                         WHERE o.deleted = :deleted
-                            AND o.user_uuid = :user_uuid";
+                            AND o.parent_uuid = :parent_uuid";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", "0");
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -93,7 +93,7 @@ class Schedules extends Model
         }
     }
    
-    public function getAllByMonth($status, $month): bool|array|string
+    public function getAllByMonth($status, $month, $parentUUID): bool|array|string
     {
         try {
             $m = explode("-", $month);
@@ -121,7 +121,7 @@ class Schedules extends Model
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
                         WHERE $whereStatus o.deleted = :deleted
-                            AND o.user_uuid = :user_uuid
+                            AND o.parent_uuid = :parent_uuid
                             AND YEAR(o.schedule_date) = :d1 AND MONTH(o.schedule_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
@@ -129,7 +129,7 @@ class Schedules extends Model
                 $stmt->bindValue(":status", $status);
             }
             $stmt->bindValue(":deleted", "0");
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();
@@ -145,7 +145,7 @@ class Schedules extends Model
         }
     }
 
-    public function getTotalByStatus($status)
+    public function getTotalByStatus($status, $parentUUID)
     {
         try {
             $d1 = date('Y');
@@ -155,13 +155,13 @@ class Schedules extends Model
                         FROM schedules 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND user_uuid = :user_uuid
+                        AND parent_uuid = :parent_uuid
                         AND YEAR(schedule_date) = :d1 AND MONTH(schedule_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();
@@ -181,7 +181,7 @@ class Schedules extends Model
         }
     }
 
-    public function getTotalByStatusByMonth($status, $month)
+    public function getTotalByStatusByMonth($status, $month, $parentUUID)
     {
         try {
             $month = explode("/", $month, 2);
@@ -192,13 +192,13 @@ class Schedules extends Model
                         FROM schedules 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND user_uuid = :user_uuid
+                        AND parent_uuid = :parent_uuid
                         AND YEAR(schedule_date) = :d1 AND MONTH(schedule_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();
@@ -218,7 +218,7 @@ class Schedules extends Model
         }
     }
 
-    public function getTotalAmountByStatus($status)
+    public function getTotalAmountByStatus($status, $parentUUID)
     {
         try {
             $d1 = date('Y');
@@ -228,13 +228,13 @@ class Schedules extends Model
                         FROM schedules 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND user_uuid = :user_uuid
+                        AND parent_uuid = :parent_uuid
                         AND YEAR(schedule_date) = :d1 AND MONTH(schedule_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();
@@ -254,7 +254,7 @@ class Schedules extends Model
         }
     }
 
-    public function getTotalAmountByMonth($month)
+    public function getTotalAmountByMonth($month, $parentUUID)
     {
         try {
             $m = explode("-", $month);
@@ -265,13 +265,13 @@ class Schedules extends Model
                         FROM schedules 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND user_uuid = :user_uuid
+                        AND parent_uuid = :parent_uuid
                         AND YEAR(schedule_date) = :d1 AND MONTH(schedule_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", '2');
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $_SESSION['COD']);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();

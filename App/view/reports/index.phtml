@@ -1,0 +1,129 @@
+<?php 
+$role = $_SESSION['ROLE'];
+
+$canView = $_SESSION['ROLE_ADM'] == '0' || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('reports'));
+?>
+<?php if ($canView): ?>
+    <section class="content-header mt-5">
+        <div class="container-fluid mt-2">
+            <div class="row">
+                <div class="col-11">
+                    <h1 style="position: relative; top: 5px; font-size: 25px;">
+                        <i class="fas fa-file pr-1"></i>
+                        Relatórios
+                    </h1>
+                </div>
+                <div class="col-1">
+                    <ol class="breadcrumb float-right">
+                        <li class="breadcrumb-item">
+                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inical">
+                                <i class="fas fa-home"></i> 
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content" style="margin-left: 9px; margin-right: 9px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" name="formExecuteReport" id="formExecuteReport">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="sis_module">Modulo*</label>
+                                            <select class="form-control" name="sis_module" id="sis_module" required>
+                                                <option value="">Selecione</option>
+                                                <option value="1">Agendamentos</option>
+                                                <option value="2">Clientes</option>
+                                                <option value="3">Despesas</option>
+                                                <option value="4">Receitas</option>
+                                                <option value="5">Serviços</option>
+                                                <option value="6">Tarefas</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                           
+                                    <div class="col-6 col-md-4">
+                                        <div class="form-group">
+                                            <label for="initial_date">Data Inical*</label>
+                                            <input type="date" class="form-control" name="initial_date" id="initial_date" required
+                                                value="<?php echo date('Y-m-d'); ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <div class="form-group">
+                                            <label for="final_date">Data Final*</label>
+                                            <input type="date" class="form-control" name="final_date" id="final_date" required
+                                                value="<?php echo date('Y-m-d'); ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="order_type">Ordenação</label>
+                                            <select class="form-control" name="order_type" id="order_type" required>
+                                                <option value="1">Mais antigo para recente</option>
+                                                <option value="2">Mais recente para antigo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <div class="form-group">
+                                            <label for="report_limit">Limite*</label>
+                                            <input type="number" class="form-control" name="report_limit" id="report_limit" min="0" max="1000" value="10"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <br>
+                                        <button type="submit" class="btn btn-primary btn-xl w-100 mt-2" id="btnSubmit">
+                                            <span class="fa fa-file pr-1"></span> Gerar 
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div id="results"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function() {
+            $('#formExecuteReport').validate({
+                submitHandler: function( form ){
+                    let dados = $( form ).serialize();
+
+                    $("#baseLoader").show();
+                    $("#btnSubmit").show('disabled', true);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>relatorios/gerar",
+                        data: dados,
+                        async: true
+                    }).done(function(data) {
+                        $("#baseLoader").hide();
+                        $("#btnSubmit").attr('disabled', false);
+                        $("#results").html(data);
+                    }).fail(function() {
+                        showInternalErrorAlert();
+                        $("#baseLoader").hide();
+                        $("#btnSubmit").attr('disabled', false);
+                    });
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

@@ -28,12 +28,12 @@ class TasksController extends ActionController implements CrudInterface
         }
 
         $this->view->month = self::formatMonth($month);
-        $data = $this->model->getAllByMonth('0', $month);
+        $data = $this->model->getAllByMonth('0', $month, $this->parentUUID);
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
         $totalTasks = $this->model->totalMonthlyData(
-            $month, $this->model->getTable(), 'task_date', $_SESSION['COD']
+            $month, $this->model->getTable(), 'task_date', $this->parentUUID
         );
 
         $totalFree = ($activePlan['total_tasks'] - $totalTasks);
@@ -45,6 +45,7 @@ class TasksController extends ActionController implements CrudInterface
             $reached_limit = false;
         }   
         $this->view->reached_limit = $reached_limit;
+        $this->view->parentUUID = $this->parentUUID;
         
         $this->render('index', false);
     }
@@ -60,7 +61,7 @@ class TasksController extends ActionController implements CrudInterface
             $activePlan = self::getActivePlan();
             $month = substr($_POST['task_date'], 0, 7);
             $totalTasks = $this->model->totalMonthlyData(
-                $month, $this->model->getTable(), 'task_date', $_SESSION['COD']
+                $month, $this->model->getTable(), 'task_date', $this->parentUUID
             );
 
             if ($totalTasks >= $activePlan['total_tasks']) {
@@ -73,7 +74,7 @@ class TasksController extends ActionController implements CrudInterface
             } else {
                 $uuid = $this->model->NewUUID();
                 $_POST['uuid'] = $uuid;
-                $_POST['user_uuid'] = $_SESSION['COD'];
+                $_POST['parent_uuid'] = $this->parentUUID;
     
                 $crud = new Crud();
                 $crud->setTable($this->model->getTable());

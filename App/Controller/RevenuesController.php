@@ -25,6 +25,8 @@ class RevenuesController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
+        $parentUUID = $this->parentUUID;
+
         if (!empty($_GET['m'])) {
             $month = $_GET['m'];
         } else {
@@ -33,12 +35,12 @@ class RevenuesController extends ActionController implements CrudInterface
 
         $this->view->month = self::formatMonth($month);
 
-        $data = $this->model->getAllByMonth('0', $month);
+        $data = $this->model->getAllByMonth('0', $month, $parentUUID);
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
         $totalData = $this->model->totalMonthlyData(
-            $month, $this->model->getTable(), 'revenue_date', $_SESSION['COD']
+            $month, $this->model->getTable(), 'revenue_date', $parentUUID
         );
 
         $totalFree = ($activePlan['total_revenues'] - $totalData);
@@ -56,7 +58,7 @@ class RevenuesController extends ActionController implements CrudInterface
 
     public function createAction(): void
     {
-        $customers = $this->customersModel->findAllActives('uuid, name');
+        $customers = $this->customersModel->findAllActivesBy('uuid, name', 'parent_uuid', $this->parentUUID);
         $this->view->customers = $customers;
 
         $paymentTypes = $this->paymentTypesModel->getAllActives();
@@ -68,10 +70,11 @@ class RevenuesController extends ActionController implements CrudInterface
     public function createProcessAction(): bool
     {
         if (!empty($_POST)) {
+            $parentUUID = $this->parentUUID;
             $activePlan = self::getActivePlan();
             $month = substr($_POST['revenue_date'], 0, 7);
             $totalRevenues = $this->model->totalMonthlyData(
-                $month, $this->model->getTable(), 'revenue_date', $_SESSION['COD']
+                $month, $this->model->getTable(), 'revenue_date', $parentUUID
             );
 
             if ($totalRevenues >= $activePlan['total_revenues']) {
@@ -84,7 +87,7 @@ class RevenuesController extends ActionController implements CrudInterface
             } else {
                 $uuid = $this->model->NewUUID();
                 $_POST['uuid'] = $uuid;
-                $_POST['user_uuid'] = $_SESSION['COD'];
+                $_POST['parent_uuid'] = $parentUUID;
                 $_POST['amount'] = $this->moneyToDb($_POST['amount']);
     
                 $crud = new Crud();
@@ -123,10 +126,12 @@ class RevenuesController extends ActionController implements CrudInterface
     public function updateAction(): void
     {
         if (!empty($_POST['uuid'])) {
-            $entity = $this->model->getOne($_POST['uuid']);
+            $parentUUID = $this->parentUUID; 
+
+            $entity = $this->model->getOne($_POST['uuid'], $parentUUID);
             $this->view->entity = $entity;
     
-            $customers = $this->customersModel->findAllActives('uuid, name');
+            $customers = $this->customersModel->findAllActivesBy('uuid, name', 'parent_uuid', $parentUUID);
             $this->view->customers = $customers;
 
             $paymentTypes = $this->paymentTypesModel->getAllActives();
@@ -180,7 +185,7 @@ class RevenuesController extends ActionController implements CrudInterface
     public function readAction(): void
     {
         if (!empty($_POST['uuid'])) {
-            $entity = $this->model->getOne($_POST['uuid']);
+            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
 
             $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);

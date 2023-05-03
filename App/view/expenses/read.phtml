@@ -126,9 +126,9 @@
                                     <?php if ($entity['status'] == '1'): ?>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('expenses'))): ?>
-                                                <button type="button" class="btn btn-outline-danger"  title="Remover Despesa"
+                                                <button type="button" class="btn btn-outline-danger"  title="Excluir Despesa"
                                                     onclick="deleteExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-trash"></i> Remover
+                                                    <i class="fa fa-trash"></i> Excluir
                                                 </button>
                                             <?php endif; ?>
                                         </div>
@@ -159,13 +159,24 @@
                         </div>
                     </div>
                     <?php if (!empty($_POST['modal']) && $_POST['modal'] == true): ?>
-                        <div class="col-12 text-center">
-                            <button type="button" class="btn btn-primary" onclick="openModDetails('<?php echo $entity['uuid']; ?>', 'despesas');">
-                                <i class="fa fa-external-link-alt pr-1"></i> Ir para Despesa
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" data-dismiss="modal">
-                                <i class="fa fa-window-close pr-1"></i> Fechar
-                            </button>
+                        <div class="row mt-md-4">
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-success w-100 mb-3" 
+                                    onclick="openModDetails('<?php echo $entity['uuid']; ?>', 'despesas', '<?php echo substr($entity['expense_date'], 0,7); ?>');">
+                                    <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-primary w-100 mb-3" title="Imprimir"
+                                    onclick="window.print();">
+                                    <i class="fas fa-print pr-1"></i> Imprimir
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-danger w-100" data-dismiss="modal">
+                                    <i class="fa fa-window-close pr-1"></i> Fechar
+                                </button>
+                            </div>
                         </div>
                     <?php endif; ?>
                     <?php if(empty($_POST['modal'])): ?>

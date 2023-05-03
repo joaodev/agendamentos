@@ -270,19 +270,19 @@ class Model extends InitDb
             . self::UuidGenerator(12);
     }
 
-    public function totalData($table, $user): int|string
+    public function totalData($table, $parentUUID): int|string
     {
         try {
             $query = "
                 SELECT uuid
                 FROM $table 
                 WHERE deleted = :deleted
-                AND user_uuid = :user_uuid
+                AND parent_uuid = :parent_uuid
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->execute();
             
             $result = $stmt->rowCount();
@@ -296,7 +296,7 @@ class Model extends InitDb
         }
     }
 
-    public function totalMonthlyData($month, $table, $column, $user): int|string
+    public function totalMonthlyData($month, $table, $column, $parent): int|string
     {
         try {
             $m = explode("-", $month);
@@ -307,13 +307,13 @@ class Model extends InitDb
                 SELECT uuid
                 FROM $table 
                 WHERE deleted = :deleted
-                AND user_uuid = :user_uuid
+                AND parent_uuid = :parent_uuid
                 AND YEAR($column) = :d1 AND MONTH($column) = :d2
             ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":parent_uuid", $parent);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->execute();
@@ -329,7 +329,7 @@ class Model extends InitDb
         }
     }
 
-    public function getTotalForToday($status, $user, $field, $table)
+    public function getTotalForToday($status, $parentUUID, $field, $table)
     {
         try {
             $d1 = date('Y');
@@ -340,7 +340,7 @@ class Model extends InitDb
                         FROM $table 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND user_uuid = :user_uuid
+                        AND parent_uuid = :parent_uuid
                         AND YEAR($field) = :d1 
                         AND MONTH($field) = :d2
                         AND DAY($field) = :d3
@@ -349,7 +349,7 @@ class Model extends InitDb
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":d1", $d1);
             $stmt->bindValue(":d2", $d2);
             $stmt->bindValue(":d3", $d3);
@@ -370,21 +370,21 @@ class Model extends InitDb
         }
     }
 
-    public function getTotalDelayed($status, $user, $field, $table)
+    public function getTotalDelayed($status, $parentUUID, $field, $table)
     {
         try {
             $query = "SELECT uuid
                         FROM $table 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND user_uuid = :user_uuid
+                        AND parent_uuid = :parent_uuid
                         AND $field < :dt
                         ";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":parent_uuid", $parentUUID);
             $stmt->bindValue(":dt", date('Y-m-d'));
             $stmt->execute();
 
@@ -400,6 +400,104 @@ class Model extends InitDb
             }
         } catch (Exception $e) {
             return $e->getMessage();
+        }
+    }
+
+    public function getDataForReport($params, $parentUUID)
+    {
+        if (!empty($params)) {
+
+            $join = "";
+            $fields = "*";
+            $whereDates = " AND tb.created_at BETWEEN '{$params['initial_date']} 00:00:00' 
+                            AND '{$params['final_date']} 23:59:59' ";
+
+            switch ($_POST['sis_module']) {
+                case 1:
+                    $whereDates = " AND tb.schedule_date BETWEEN '{$params['initial_date']} 00:00:00' 
+                                    AND '{$params['final_date']} 23:59:59' ";
+
+                    $fields = "tb.uuid, tb.schedule_date, tb.schedule_time, tb.amount,
+                                tb.description, 
+                                tb.status, tb.created_at, tb.updated_at,
+                                sv.title as serviceName, 
+                                ct.name as customerName,
+                                pt.name as paymentTypeName";
+                    
+                    $join = " INNER JOIN services AS sv ON tb.service_uuid = sv.uuid ";
+                    $join .= " LEFT JOIN customers AS ct ON tb.customer_uuid = ct.uuid ";
+                    $join .= " LEFT JOIN payment_types AS pt ON tb.payment_type_uuid = pt.uuid ";
+                    break;
+                case 2:
+                    $fields = "tb.uuid, tb.name, tb.email, tb.phone, tb.cellphone, 
+                                tb.document_1, tb.document_2,
+                                tb.postal_code, tb.address, tb.number, tb.complement, 
+                                tb.neighborhood, tb.city, tb.state,
+                                tb.status, tb.created_at, tb.updated_at";
+                    break;
+                case 3:
+                    $whereDates = " AND tb.expense_date BETWEEN '{$params['initial_date']} 00:00:00' 
+                                    AND '{$params['final_date']} 23:59:59' ";
+                    
+                    $fields = "tb.uuid, tb.expense_date,
+                                tb.title, tb.description, tb.amount, 
+                                tb.status, tb.created_at, tb.updated_at, 
+                                pt.name as paymentTypeName,
+                                ct.name as customerName";
+                    
+                    $join .= " INNER JOIN payment_types AS pt ON tb.payment_type_uuid = pt.uuid ";
+                    $join .= " LEFT JOIN customers AS ct ON tb.customer_uuid = ct.uuid ";
+                    break;
+                case 4:
+                    $whereDates = " AND tb.revenue_date BETWEEN '{$params['initial_date']} 00:00:00' 
+                                    AND '{$params['final_date']} 23:59:59' ";
+
+                    $fields = "tb.uuid, tb.revenue_date,
+                                tb.title, tb.description, tb.amount, 
+                                tb.status, tb.created_at, tb.updated_at, 
+                                pt.name as paymentTypeName,
+                                ct.name as customerName";
+                    
+                    $join .= " INNER JOIN payment_types AS pt ON tb.payment_type_uuid = pt.uuid ";
+                    $join .= " LEFT JOIN customers AS ct ON tb.customer_uuid = ct.uuid ";
+                    break;
+                case 5:
+                    $fields = "tb.uuid, tb.title, tb.description, tb.price, 
+                                tb.status, tb.created_at, tb.updated_at";
+                    break;
+                case 6:
+                    $whereDates = " AND tb.task_date BETWEEN '{$params['initial_date']} 00:00:00' 
+                                    AND '{$params['final_date']} 23:59:59' ";
+                                
+                    $fields = "tb.uuid, tb.title, tb.description, tb.task_date, tb.task_time,
+                                tb.status, tb.created_at, tb.updated_at";
+                    break;
+                default:
+                    break;
+            }
+
+            $query = "SELECT $fields
+                        FROM {$this->getTable()} AS tb
+                        $join
+                        WHERE tb.deleted = :deleted
+                        AND tb.parent_uuid = :parent_uuid
+                        $whereDates
+                        LIMIT {$params['report_limit']}
+                        ";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":parent_uuid", $parentUUID);
+            $stmt->execute();
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            $stmt = null;
+            $this->closeDb();
+
+            return $result;
+        } else {
+            return [];
         }
     }
 }

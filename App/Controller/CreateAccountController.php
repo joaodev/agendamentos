@@ -30,7 +30,7 @@ class CreateAccountController extends ActionController
             if ($_POST['password'] != $_POST['confirmation']) {
                 self::redirect('', 'senhas-incorretas&n=' . $_POST['name'] . '&e=' . $_POST['email']);
             } else {
-                $role = '4c139b44-a57f-4c53-0aa3-758080e8c95b';
+                $role = 'ebd1a81c-2d47-21a7-4702-d1b26f04f23a';
                 if ($this->roleModel->getOne($role)) {
                     unset($_POST['confirmation']);
                     $passwordMd5 = $_POST['password'];
@@ -38,6 +38,8 @@ class CreateAccountController extends ActionController
                     $_POST['role_uuid'] = $role;
 
                     $_POST['uuid'] = $this->model->NewUUID();
+                    $_POST['parent_uuid'] = $_POST['uuid'];
+
                     $crud = new Crud();
                     $crud->setTable($this->model->getTable());
                     $transaction = $crud->create($_POST);

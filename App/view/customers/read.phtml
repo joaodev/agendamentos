@@ -1,35 +1,37 @@
 <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('customers'))): ?>
     <?php $entity = $this->view->entity; ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-9">
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-info-circle pr-1"></i>
-                        Cliente
-                    </h1>
-                </div>
-                <div class="col-3">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-info mr-1" title="Imprimir"
-                                onclick="window.print();">
-                                <i class="fas fa-print"></i> 
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" title="Voltar para Clientes"
-                                onclick="openModule('clientes');" >
-                                <i class="fas fa-arrow-left"></i> 
-                            </button>
-                        </li>
-                    </ol>
+    <?php if(empty($_POST['modal'])): ?>
+        <section class="content-header mt-5">
+            <div class="container-fluid mt-2">
+                <div class="row">
+                    <div class="col-9">
+                        <h1 style="position: relative; top: 5px; font-size: 25px;">
+                            <i class="fas fa-info-circle pr-1"></i>
+                            Cliente
+                        </h1>
+                    </div>
+                    <div class="col-3">
+                        <ol class="breadcrumb float-right">
+                            <li class="breadcrumb-item">
+                                <button type="button" class="btn btn-outline-info mr-1" title="Imprimir"
+                                    onclick="window.print();">
+                                    <i class="fas fa-print"></i> 
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" title="Voltar para Clientes"
+                                    onclick="openModule('clientes');" >
+                                    <i class="fas fa-arrow-left"></i> 
+                                </button>
+                            </li>
+                        </ol>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
+        </section>
+        <section class="content" style="margin-left: 9px; margin-right: 9px;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                    <?php endif; ?>
                     <div class="card">
                         <div class="card-body"> 
                             <div class="row" id="printable">
@@ -115,34 +117,59 @@
                                 </div>
                                 <div class="col-md-12"><hr></div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('customers'))): ?>
-                                        <button type="button" class="btn btn-outline-danger" title="Remover Cliente"
-                                            onclick="deleteCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                            <i class="fa fa-trash"></i> Remover
+                            <?php if(empty($_POST['modal'])): ?>
+                                <div class="row">
+                                    <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                        <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('customers'))): ?>
+                                            <button type="button" class="btn btn-outline-danger" title="Excluir Cliente"
+                                                onclick="deleteCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                <i class="fa fa-trash"></i> Excluir
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 mt-2 mb-2">
+                                        <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('customers'))): ?>
+                                            <button type="button" class="btn btn-outline-success" title="Editar Cliente"
+                                                onclick="updateCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                <i class="fa fa-pen pr-1"></i> Editar
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-12 col-lg-4 mt-2 mb-2">
+                                        <button type="button" class="btn btn-outline-primary" onclick="openModule('clientes');" 
+                                            style="width: 100%;" title="Voltar para Clientes">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
-                                    <?php endif; ?>
+                                    </div>
                                 </div>
-                                <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('customers'))): ?>
-                                        <button type="button" class="btn btn-outline-success" title="Editar Cliente"
-                                            onclick="updateCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                            <i class="fa fa-pen pr-1"></i> Editar
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-12 col-lg-4 mt-2 mb-2">
-                                    <button type="button" class="btn btn-outline-primary" onclick="openModule('clientes');" 
-                                        style="width: 100%;" title="Voltar para Clientes">
-                                        <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                    </button>
-                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php if (!empty($_POST['modal']) && $_POST['modal'] == true): ?>
+                        <div class="row mt-md-4">
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-success w-100 mb-3" 
+                                    onclick="openModDetails('<?php echo $entity['uuid']; ?>', 'clientes');">
+                                    <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-primary w-100 mb-3" title="Imprimir"
+                                    onclick="window.print();">
+                                    <i class="fas fa-print pr-1"></i> Imprimir
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-danger w-100" data-dismiss="modal">
+                                    <i class="fa fa-window-close pr-1"></i> Fechar
+                                </button>
                             </div>
                         </div>
+                    <?php endif; ?>
+                    <?php if(empty($_POST['modal'])): ?>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    <?php endif; ?>
 <?php endif; ?>

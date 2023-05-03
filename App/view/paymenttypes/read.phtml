@@ -80,10 +80,10 @@
                                 <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                     <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('payment-types'))): ?>
                                         <button type="button" class="btn btn-outline-danger"
-                                            title="Remover Forma de Pagamento"
+                                            title="Excluir Forma de Pagamento"
                                             onclick="deleteTable('<?php echo $entity['uuid']; ?>');"
                                             style="width: 100%;">
-                                            <i class="fa fa-trash"></i> Remover
+                                            <i class="fa fa-trash"></i> Excluir
                                         </button>
                                     <?php endif; ?>
                                 </div>

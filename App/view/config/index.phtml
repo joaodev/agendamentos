@@ -46,7 +46,7 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                                         . $entity['logo']; ?>" alt="" style="max-height: 100px;">
                                                 </a>
                                                 <div class="my-2">
-                                                    <input type="checkbox" name="remove_image_logo" id="remove_image_logo" value="1"> Remover imagem
+                                                    <input type="checkbox" name="remove_image_logo" id="remove_image_logo" value="1"> Excluir imagem
                                                 </div>
                                             </div>
                                         <?php endif; ?>
@@ -65,7 +65,7 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                                         . $entity['logo_icon']; ?>" alt="" style="max-height: 100px;">
                                                 </a>
                                                 <div class="my-2">
-                                                    <input type="checkbox" name="remove_image_icon" id="remove_image_icon" value="1"> Remover imagem
+                                                    <input type="checkbox" name="remove_image_icon" id="remove_image_icon" value="1"> Excluir imagem
                                                 </div>
                                             </div>
                                         <?php endif; ?>
@@ -115,7 +115,7 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                                 </a>
                                                 <?php if ($canUpdate): ?>
                                                     <div class="my-2">
-                                                        <input type="checkbox" name="remove_image_menu" id="remove_image_menu" value="1"> Remover imagem
+                                                        <input type="checkbox" name="remove_image_menu" id="remove_image_menu" value="1"> Excluir imagem
                                                     </div>
                                                 <?php endif; ?>
                                             </div>

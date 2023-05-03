@@ -226,7 +226,7 @@ if ($canView):
         <script>
             function deleteUserPlan(uuid) {
                 $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Plano');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Plano');
                 $("#modalDeleteLoader").hide();
                 $("#modalDelete").modal('show');
                 $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runUserPlanDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
@@ -256,7 +256,7 @@ if ($canView):
 
             function deleteUserPlanFile(uuid, file) {
                 $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Comprovante de Pagamento');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Comprovante de Pagamento');
                 $("#modalDeleteLoader").hide();
                 $("#modalDelete").modal('show');
                 $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runUserPlanDeleteFile(\''+uuid+'\',\''+file+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');

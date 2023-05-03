@@ -16,6 +16,7 @@ $canViewFinancial = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), 
 $canViewPlans = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('plans'));
 $canViewRevenues = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('revenues'));
 $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('tasks'));
+$canViewReports = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('reports'));
 
 $config['logo'] = !empty($config['logo']) ? $config['logo'] : 'jaconsultoriati.png';
 $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'jaconsultoriati.png';
@@ -294,10 +295,13 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                             </a>
                         </li>
                         <?php if (
-                            $_SESSION['ROLE_ADM'] == '0'
+                            $_SESSION['ROLE_ADM'] == '1' || $_SESSION['ROLE_ADM'] == '0'
                             || $canViewCustomers
                             || $canViewServices
                             || $canViewTasks
+                            || $canViewPayments
+                            || $canViewUsers
+                            || $canViewPlans
                         ): ?>
                             <li class="nav-item">
                                 <a href="#" class="nav-link text-white">
@@ -308,7 +312,6 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview" style="display: none;">
-                                    
                                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('clientes');" class="nav-link text-white" style="cursor: pointer;">
@@ -319,7 +322,6 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    
                                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewServices): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('servicos');" class="nav-link text-white" style="cursor: pointer;">
@@ -340,18 +342,47 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                             </a>
                                         </li>
                                     <?php endif; ?>
+                                    <!-- ADMIN -->
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewUsers): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('usuarios');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-users"></i>
+                                                <p>
+                                                    Usuários
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPlans): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('planos');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-dollar-sign"></i>
+                                                <p>
+                                                    Planos
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPayments): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('formas-pagamento');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-th-list"></i>
+                                                <p>
+                                                    Formas de Pagamento
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
                                 </ul>
                             </li>
                         <?php endif; ?>
                         <?php if (
-                            $_SESSION['ROLE_ADM'] == '1'
+                            $_SESSION['ROLE_ADM'] == '0'
                             || $canViewSchedules
                             || $canViewExpenses
                             || $canViewRevenues
-                            || $canViewUsers
-                            || $canViewPlans
-                            || $canViewPayments
                             || $canViewFinancial
+                            || $canViewReports
                         ): ?>
                             <li class="nav-item">
                                 <a href="#" class="nav-link text-white">
@@ -402,43 +433,12 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    <!-- ADMIN -->
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewUsers): ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewReports): ?>
                                         <li class="nav-item ml-2">
-                                            <a onclick="openModule('usuarios');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-user-cog"></i>
+                                            <a onclick="openModule('relatorios');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-file"></i>
                                                 <p>
-                                                    Colaboradores
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPlans): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('planos');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-dollar-sign"></i>
-                                                <p>
-                                                    Planos
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPayments): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('formas-pagamento');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-th-list"></i>
-                                                <p>
-                                                    Formas de Pagamento
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('controle-acesso');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-lock"></i>
-                                                <p>
-                                                    Controle de Acesso
+                                                    Relatórios
                                                 </p>
                                             </a>
                                         </li>
@@ -471,6 +471,16 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                             </a>
                                         </li>
                                     <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('controle-acesso');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-lock"></i>
+                                                <p>
+                                                    Controle de Acesso
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
                                     <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewLogs): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('logs');" class="nav-link text-white" style="cursor: pointer;">
@@ -494,7 +504,7 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                 </ul>
                             </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['ROLE_ADM'] == '0'): ?>
+                        <?php if ($_SESSION['ROLE_ADM'] == '0' && $_SESSION['COD'] == $this->getParentUUID()): ?>
                             <li class="nav-item">
                                 <a onclick="openModule('planos-usuario');" class="nav-link text-white" style="cursor: pointer;">
                                     <i class="nav-icon fas fa-dollar-sign"></i>
@@ -673,6 +683,22 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                             </button>
                         </div>
                         <div class="modal-body" id="modalFinancialDetailsResult"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalReportDetails" data-keyboard="false">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="overlay" id="modalReportDetailsLoader">
+                            <i class="fas fa-2x fa-sync fa-spin"></i>
+                        </div>
+                        <div class="modal-header text-white bg-primary">
+                            <h4 class="modal-title" id="modalReportDetailsTitle"></h4>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="modalReportDetailsResult"></div>
                     </div>
                 </div>
             </div>

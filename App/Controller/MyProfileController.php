@@ -19,7 +19,7 @@ class MyProfileController extends ActionController
 
     public function indexAction(): void
     {
-        $entity = $this->model->getOne($_SESSION['COD']);
+        $entity = $this->model->getOne($_SESSION['COD'], $this->parentUUID);
         $this->view->entity = $entity;
         $this->render('index', false);
     }

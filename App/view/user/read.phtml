@@ -16,7 +16,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                 <div class="col-9" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-info-circle pr-1"></i>
-                        Colaborador
+                        Usuário
                     </h1>
                 </div>
                 <div class="col-3">
@@ -43,7 +43,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                     <div class="card">
                         <div class="card-body">
                             <div class="row" id="printable">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <?php if ($entity['status'] == '1'): ?>
                                         <i class="fa fa-circle pr-1" style="color: green;"></i> Usuário ativo no sistema
                                     <?php endif; ?>
@@ -51,6 +51,14 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                         <i class="fa fa-circle pr-1" style="color: red;"></i> Usuário inativo no sistema
                                     <?php endif; ?>
                                 </div>
+                                <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="role">Nível de Acesso</label>:
+                                            <span><?php echo $entity['role'] ? $entity['role'] : 'Não Informado'; ?></span>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
                                 <div class="col-md-12">
                                     <hr>
                                 </div>
@@ -76,40 +84,34 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                         <p><?php echo $entity['document_2'] ? $entity['document_2'] : 'Não Informado'; ?></p>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="job_role">Cargo</label>
                                         <p><?php echo $entity['job_role'] ? $entity['job_role'] : 'Não Informado'; ?></p>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="role">Nível de Acesso</label>
-                                        <p><?php echo $entity['role'] ? $entity['role'] : 'Não Informado'; ?></p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="name">Email</label>
-                                        <p><?php echo $entity['email'] ? $entity['email'] : 'Não Informado'; ?></p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="phone">Telefone</label>
                                         <p><?php echo $entity['phone'] ? $entity['phone'] : 'Não Informado'; ?></p>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="cellphone">Celular</label>
                                         <p><?php echo $entity['cellphone'] ? $entity['cellphone'] : 'Não Informado'; ?></p>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="whatsapp">WhatsApp</label>
                                         <p><?php echo $entity['whatsapp'] ? $entity['whatsapp'] : 'Não Informado'; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="name">Email</label>
+                                        <p><?php echo $entity['email'] ? $entity['email'] : 'Não Informado'; ?></p>
                                     </div>
                                 </div>
                                 <div class="col-md-12" style="border-radius: 5px;">
@@ -178,27 +180,27 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                 <div class="col-md-12"><hr></div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                    <?php if ($entity['uuid'] != $_SESSION['COD'] && $canDelete): ?>
+                                <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canDelete) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
+                                    <div class="col-md-6 col-lg-3 mt-2 mb-2">
                                         <button type="button" class="btn btn-outline-danger" onclick="deleteUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                            <i class="fa fa-trash"></i> Remover
+                                            <i class="fa fa-trash"></i> Excluir
                                         </button>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                    <?php if ($canUpdate): ?>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canUpdate) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
+                                    <div class="col-md-6 col-lg-3 mt-2 mb-2">
                                         <button type="button" class="btn btn-outline-success" onclick="updateUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                             <i class="fa fa-pen pr-1"></i> Editar
                                         </button>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                    <?php if ($canViewAcl): ?>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canViewAcl) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
+                                    <div class="col-md-6 col-lg-3 mt-2 mb-2">
                                         <button type="button" class="btn btn-outline-info" onclick="aclUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                             <i class="fa fa-users pr-1"></i> Permissões
                                         </button>
-                                    <?php endif; ?>
-                                </div>
+                                    </div>
+                                <?php endif; ?>
                                 <div class="col-md-6 col-lg-3 mt-2 mb-2">
                                     <button type="button" class="btn btn-outline-primary" onclick="openModule('usuarios');" style="width: 100%;">
                                         <i class="fas fa-arrow-left pr-1"></i> Voltar

@@ -20,11 +20,11 @@ class ServicesController extends ActionController implements CrudInterface
     public function indexAction(): void
     {
         $stringFields = 'uuid, title, description, price, status, created_at, updated_at';
-        $data = $this->model->findAllBy($stringFields, 'user_uuid', $_SESSION['COD']);
+        $data = $this->model->findAllBy($stringFields, 'parent_uuid', $this->parentUUID);
         $this->view->data = $data;
 
         $activePlan = self::getActivePlan();
-        $totalServices = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+        $totalServices = $this->model->totalData($this->model->getTable(), $this->parentUUID);
 
         $totalFree = ($activePlan['total_services'] - $totalServices);
         $this->view->total_free = $totalFree;
@@ -48,7 +48,7 @@ class ServicesController extends ActionController implements CrudInterface
     {
         if (!empty($_POST)) {
             $activePlan = self::getActivePlan();
-            $totalServices = $this->model->totalData($this->model->getTable(), $_SESSION['COD']);
+            $totalServices = $this->model->totalData($this->model->getTable(), $this->parentUUID);
             if ($totalServices >= $activePlan['total_services']) {
                 $data  = [
                     'title' => 'Erro!',
@@ -59,7 +59,7 @@ class ServicesController extends ActionController implements CrudInterface
             } else {
                 $uuid = $this->model->NewUUID();
                 $_POST['uuid'] = $uuid;
-                $_POST['user_uuid'] = $_SESSION['COD'];
+                $_POST['parent_uuid'] = $this->parentUUID;
                 $_POST['price'] = $this->moneyToDb($_POST['price']);
     
                 $crud = new Crud();
