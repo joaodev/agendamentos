@@ -13,6 +13,7 @@ class ReportsController extends ActionController
     private mixed $revenuesModel;
     private mixed $servicesModel;
     private mixed $tasksModel;
+    private mixed $usersModel;
 
     public function __construct()
     {
@@ -24,6 +25,7 @@ class ReportsController extends ActionController
         $this->revenuesModel = Container::getClass("Revenues", "app");
         $this->servicesModel = Container::getClass("Services", "app");
         $this->tasksModel = Container::getClass("Tasks", "app");
+        $this->usersModel = Container::getClass("User", "app");
     }
 
     public function indexAction(): void
@@ -73,6 +75,12 @@ class ReportsController extends ActionController
                     $moduleModel = $this->tasksModel;
                     $moduleTitle = 'Tarefas';
                     $modalTitle = 'Tarefa';
+                    break;
+                case 7:
+                    $module = 'usuarios';
+                    $moduleModel = $this->usersModel;
+                    $moduleTitle = 'Usuários';
+                    $modalTitle = 'Usuário';
                     break;
                 default:
                     $module = null;

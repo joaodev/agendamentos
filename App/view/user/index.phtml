@@ -271,7 +271,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
             function runDelete(uuid) {
                 if (uuid !== null) {
                     $("#modalDeleteLoader").show();
-
+                    let currentUser = '<?php echo $_SESSION['COD'] ?>';
                     $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>usuarios/excluir",
@@ -282,7 +282,12 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                         showAlert(data.type, data.title, data.msg, data.pos);
                         $("#modalDelete").modal('hide');
                         $("#modalXL").modal('hide');
-                        openModule('usuarios');
+
+                        if (uuid == currentUser) {
+                            location.reload();
+                        } else {
+                            openModule('usuarios');
+                        }
                     }).fail(function() {
                         showInternalErrorAlert();
                         $("#modalDeleteLoader").hide();

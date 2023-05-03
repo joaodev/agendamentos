@@ -412,6 +412,14 @@ class Model extends InitDb
             $whereDates = " AND tb.created_at BETWEEN '{$params['initial_date']} 00:00:00' 
                             AND '{$params['final_date']} 23:59:59' ";
 
+            if ($params['order_type'] == '1') {
+                $orderBy = " ORDER BY tb.created_at ASC ";
+            } elseif ($params['order_type'] == '2') {
+                $orderBy = " ORDER BY tb.created_at DESC ";
+            } else {
+                $orderBy = "";
+            }
+
             switch ($_POST['sis_module']) {
                 case 1:
                     $whereDates = " AND tb.schedule_date BETWEEN '{$params['initial_date']} 00:00:00' 
@@ -472,6 +480,14 @@ class Model extends InitDb
                     $fields = "tb.uuid, tb.title, tb.description, tb.task_date, tb.task_time,
                                 tb.status, tb.created_at, tb.updated_at";
                     break;
+                case 7:
+                    $fields = "tb.uuid, tb.name, tb.email, tb.status, tb.role_uuid, 
+                                tb.cellphone, tb.job_role, tb.phone, tb.whatsapp,
+                                tb.created_at, tb.updated_at, 
+                                tb.postal_code, tb.address, tb.number, tb.complement, 
+                                tb.neighborhood, tb.city, tb.state, tb.gender, tb.birthdate,
+                                tb.document_1, tb.document_2, tb.parent_uuid";
+                    break;
                 default:
                     break;
             }
@@ -482,6 +498,7 @@ class Model extends InitDb
                         WHERE tb.deleted = :deleted
                         AND tb.parent_uuid = :parent_uuid
                         $whereDates
+                        $orderBy
                         LIMIT {$params['report_limit']}
                         ";
 

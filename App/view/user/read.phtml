@@ -10,6 +10,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
 $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('privileges'));
 ?>
 <?php if ($canView): ?>
+    <?php if(empty($_POST['modal'])): ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
@@ -40,6 +41,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
+                    <?php endif; ?>
                     <div class="card">
                         <div class="card-body">
                             <div class="row" id="printable">
@@ -179,38 +181,63 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                 </div>
                                 <div class="col-md-12"><hr></div>
                             </div>
-                            <div class="row">
-                                <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canDelete) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
+                            <?php if(empty($_POST['modal'])): ?>
+                                <div class="row">
+                                    <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canDelete) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
+                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                            <button type="button" class="btn btn-outline-danger" onclick="deleteUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                <i class="fa fa-trash"></i> Excluir
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canUpdate) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
+                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                            <button type="button" class="btn btn-outline-success" onclick="updateUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                <i class="fa fa-pen pr-1"></i> Editar
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canViewAcl) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
+                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
+                                            <button type="button" class="btn btn-outline-info" onclick="aclUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+                                                <i class="fa fa-users pr-1"></i> Permissões
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                        <button type="button" class="btn btn-outline-danger" onclick="deleteUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                            <i class="fa fa-trash"></i> Excluir
+                                        <button type="button" class="btn btn-outline-primary" onclick="openModule('usuarios');" style="width: 100%;">
+                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
-                                <?php endif; ?>
-                                <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canUpdate) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
-                                    <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                        <button type="button" class="btn btn-outline-success" onclick="updateUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                            <i class="fa fa-pen pr-1"></i> Editar
-                                        </button>
-                                    </div>
-                                <?php endif; ?>
-                                <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canViewAcl) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
-                                    <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                        <button type="button" class="btn btn-outline-info" onclick="aclUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                            <i class="fa fa-users pr-1"></i> Permissões
-                                        </button>
-                                    </div>
-                                <?php endif; ?>
-                                <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                    <button type="button" class="btn btn-outline-primary" onclick="openModule('usuarios');" style="width: 100%;">
-                                        <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                    </button>
                                 </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php if (!empty($_POST['modal']) && $_POST['modal'] == true): ?>
+                        <div class="row mt-md-4">
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-success w-100 mb-3" 
+                                    onclick="openModDetails('<?php echo $entity['uuid']; ?>', 'usuarios');">
+                                    <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-primary w-100 mb-3" title="Imprimir"
+                                    onclick="window.print();">
+                                    <i class="fas fa-print pr-1"></i> Imprimir
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <button type="button" class="btn btn-outline-danger w-100" data-dismiss="modal">
+                                    <i class="fa fa-window-close pr-1"></i> Fechar
+                                </button>
                             </div>
                         </div>
+                    <?php endif; ?>
+                    <?php if(empty($_POST['modal'])): ?>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    <?php endif; ?>
 <?php endif; ?>

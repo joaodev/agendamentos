@@ -307,7 +307,7 @@
                                 <td style="font-size: 15px">
                                     <?php echo $entity['title']; ?>
                                 </td> 
-                                <td style="font-size: 15px">
+                                <td style="font-size: 15px; color: red;">
                                     <?php echo number_format($entity['amount'], 2, ",","."); ?>
                                 </td> 
                                 <td style="width: 80px;">
@@ -436,7 +436,7 @@
                                 <td style="font-size: 15px">
                                     <?php echo $entity['title']; ?>
                                 </td> 
-                                <td style="font-size: 15px">
+                                <td style="font-size: 15px; color: green;">
                                     <?php echo number_format($entity['amount'], 2, ",","."); ?>
                                 </td> 
                                 <td style="width: 80px;">
@@ -744,6 +744,167 @@
                         "pageLength": 10,
                         "language": {
                             "sEmptyTask": "Nenhum registro encontrado",
+                            "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                            "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                            "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                            "sInfoPostFix": "",
+                            "sInfoThousands": ".",
+                            "sLengthMenu": "_MENU_ &nbsp;",
+                            "sLoadingRecords": "Carregando...",
+                            "sProcessing": "Processando...",
+                            "sZeroRecords": "Nenhum registro encontrado",
+                            "sSearch": "Filtrar",
+                            "oPaginate": {
+                                "sNext": "Próximo",
+                                "sPrevious": "Anterior",
+                                "sFirst": "Primeiro",
+                                "sLast": "Último"
+                            },
+                            "oAria": {
+                                "sSortAscending": ": Ordenar colunas de forma ascendente",
+                                "sSortDescending": ": Ordenar colunas de forma descendente"
+                            }
+                        }
+                    });
+                });
+            </script>
+        <?php endif; ?>
+        <?php if ($_POST['sis_module'] == 7): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="table_users" style="width: 100%;">
+                    <thead>
+                        <tr class="text-center" style="height: 30px;">
+                            <th style="font-size: 14px;">Data</th>
+                            <th style="font-size: 14px;">Nome</th>
+                            <th style="font-size: 14px;">Líder</th>
+                            <th style="font-size: 14px;">Status</th>
+                            <th style="display: none;">Cargo</th>
+                            <th style="display: none;">CPF</th>
+                            <th style="display: none;">CNPJ</th>
+                            <th style="display: none;">Email</th>
+                            <th style="display: none;">Celular</th>
+                            <th style="display: none;">Telefone</th>
+                            <th style="display: none;">Whatsapp</th>
+                            <th style="display: none;">CEP</th>
+                            <th style="display: none;">Endereço</th>
+                            <th style="display: none;">Número</th>
+                            <th style="display: none;">Complemento</th>
+                            <th style="display: none;">Bairro</th>
+                            <th style="display: none;">Cidade</th>
+                            <th style="display: none;">UF</th>
+                            <th style="display: none;">Status</th>
+                            <th style="display: none;">Atualizado em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($data as $entity): ?>
+                            <tr class="text-center" style="cursor: pointer;"
+                                onclick="openModalDetails('<?php echo $entity['uuid']; ?>');">
+                                <td style="font-size: 15px">
+                                    <?php echo $this->formatDateTime($entity['created_at'], false); ?>
+                                </td>
+                                <td style="font-size: 15px; ">
+                                    <?php echo $entity['name']; ?>
+                                </td>
+                                
+                                <td style="font-size: 15px">
+                                    <?php echo ($entity['uuid'] == $entity['parent_uuid']) ? 'Sim' : 'Não'; ?>
+                                </td>
+                                <td style="width: 80px;">
+                                    <?php if ($entity['status'] == '1'): ?>
+                                        <i class="fa fa-circle" style="color: green;"></i>
+                                    <?php else: ?>
+                                        <i class="fa fa-circle" style="color: red;"></i>
+                                    <?php endif; ?>
+                                </td>  
+                                <td style="display: none;">
+                                    <?php echo $entity['job_role']; ?>
+                                </td>
+                                <td style="display: none;">
+                                    <?php echo $entity['document_1']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['document_2']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['email']; ?>
+                                </td>
+                                <td style="display: none;">
+                                    <?php echo $entity['cellphone']; ?>
+                                </td>
+                                <td style="display: none;">
+                                    <?php echo $entity['phone']; ?>
+                                </td>  
+                                <td style="display: none;">
+                                    <?php echo $entity['whatsapp']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['postal_code']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['address']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['number']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['complement']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['neighborhood']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['city']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $entity['state']; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
+                                </td> 
+                                <td style="display: none;">
+                                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                </td> 
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    let buttonCommon = {
+                        exportOptions: {
+                            format: {
+                                body: function ( data ) {
+                                    return data;
+                                }
+                            }
+                        }
+                    };	
+
+                    $('#table_users').DataTable({
+                        "sDom": 'flBtip',
+                        searching: true,
+                        buttons: [
+                            $.extend( true, {}, buttonCommon, {
+                                extend: 'excel',
+                                title: 'Relatório de Usuários',
+                                exportOptions: {columns: [0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]}
+                            })
+                        ],
+                        order: [ [0, "<?php echo $this->view->orderType; ?>"] ], 
+                        columnDefs: [
+                            {type: 'date-eu', targets: [0]},
+                            {orderable: false, targets: [3]}
+                        ],
+                        responsive: true,
+                        info: true,
+                        processing: true,
+                        scrollCollapse: true,
+                        paging: true,
+                        "pageLength": 10,
+                        "language": {
+                            "sEmptyTable": "Nenhum registro encontrado",
                             "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
                             "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
                             "sInfoFiltered": "(Filtrados de _MAX_ registros)",

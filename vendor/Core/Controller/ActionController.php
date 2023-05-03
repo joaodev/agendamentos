@@ -237,7 +237,12 @@ class ActionController
         if (!empty($_SESSION['COD'])) {
             $userModel = Container::getClass("User", "app");
             $userData  = $userModel->getOne($_SESSION['COD']);
-            return $userData['parent_uuid'] ? $userData['parent_uuid'] : 0;
+
+            if ($userData) {
+                return $userData['parent_uuid'] ? $userData['parent_uuid'] : 0;
+            } else {
+                return 0;
+            }
         } else {
             return 0;
         }
