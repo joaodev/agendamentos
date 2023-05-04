@@ -74,12 +74,8 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                     <thead>
                                         <tr class="text-center" style="height: 30px;">
                                             <th style="font-size: 14px;">Cliente</th>
-                                            <th style="font-size: 14px;">Email</th>
-                                            <th style="font-size: 14px;">Celular</th>
-                                            <th style="font-size: 14px;">Status</th>
-                                            <th style="display: none;">Status</th>
-                                            <th style="display: none;">Cadastrado em</th>
-                                            <th style="display: none;">Atualizado em</th>
+                                            <th style="font-size: 14px;">Situação</th>
+                                            <th style="display: none;">Situação</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -88,12 +84,6 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
                                                     <?php echo $entity['name']; ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <?php echo ($entity['email']); ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <?php echo (!empty($entity['cellphone']) ? $entity['cellphone'] : 'Não informado'); ?>
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
@@ -104,12 +94,6 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                                 </td>  
                                                 <td style="display: none;">
                                                     <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['created_at']); ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
                                                 </td> 
                                             </tr>
                                         <?php endforeach; ?>
@@ -141,17 +125,17 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     $.extend( true, {}, buttonCommon, {
                         extend: 'excel',
                         title: 'Clientes',
-                        exportOptions: {columns: [0,1,2,4,5]}
+                        exportOptions: {columns: [0,2]}
                     })
                 ],
                 order: [ [0, "asc"] ],
-                columnDefs: [{orderable: false, targets: [3]}],
+                columnDefs: [{orderable: false, targets: [1]}],
                 responsive: true,
                 info: true,
                 processing: true,
                 scrollCollapse: true,
                 paging: true,
-                "pageLength": 25,
+                "pageLength": 10,
                 "language": {
                     "sEmptyTable": "Nenhum registro encontrado",
                     "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",

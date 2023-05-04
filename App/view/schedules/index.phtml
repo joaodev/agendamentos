@@ -108,13 +108,9 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                             <th style="font-size: 14px;">Horário</th>
                                             <th style="font-size: 14px;">Serviço</th>
                                             <th style="font-size: 14px;">Cliente</th>
-                                            <th style="font-size: 14px;">Valor</th>
-                                            <th style="font-size: 14px;">Status</th>
-                                            <th style="display: none;">Descrição</th>
-                                            <th style="display: none;">Forma de Pagamento</th>
-                                            <th style="display: none;">Status</th>
-                                            <th style="display: none;">Cadastrado em</th>
-                                            <th style="display: none;">Atualizado em</th>
+                                            <th style="font-size: 14px;">Responsável</th>
+                                            <th style="font-size: 14px;">Situação</th>
+                                            <th style="display: none;">Situação</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -139,7 +135,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                                     <?php echo $entity['customerName'] ?? 'Não informado'; ?>
                                                 </td> 
                                                 <td style="font-size: 15px">
-                                                    <?php echo number_format($entity['amount'], 2, ",","."); ?>
+                                                    <?php echo $entity['customerName'] ?? 'Não informado'; ?>
                                                 </td> 
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
@@ -153,21 +149,9 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                                     <?php endif; ?>
                                                 </td>  
                                                 <td style="display: none;">
-                                                    <?php echo $entity['description']; ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $entity['paymentTypeName']; ?>   
-                                                </td> 
-                                                <td style="display: none;">
                                                     <?php echo ($entity['status'] == '1') ? 'Agendado' : ''; ?>
                                                     <?php echo ($entity['status'] == '2') ? 'Concluído' : ''; ?>
                                                     <?php echo ($entity['status'] == '3') ? 'Cancelado' : ''; ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['created_at']); ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
                                                 </td> 
                                             </tr>
                                         <?php endforeach; ?>
@@ -194,9 +178,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 exportOptions: {
                     format: {
                         body: function ( data, row, column ) {
-                            return  column === 4  ?
-                                parseFloat(data.replace(/[.]/g, '' ).replace( ',', '.' )).toLocaleString('en-IN',
-                                {minimumFractionDigits: 2 , maximumFractionDigits: 2}) : data;
+                            return data;
                         }
                     }
                 }
@@ -209,13 +191,12 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     $.extend( true, {}, buttonCommon, {
                         extend: 'excel',
                         title: 'Agendamentos',
-                        exportOptions: {columns: [0,1,2,3,4,6,7,8,9,10]}
+                        exportOptions: {columns: [0,1,2,3,4,6]}
                     })
                 ],
                 order: [ [0, "desc"] ],
                 columnDefs: [
                     {type: 'date-eu', targets: [0]},
-                    {type: 'valoresemreais', targets: [4]},
                     {orderable: false, targets: [5]},
                 ],
                 responsive: true,
@@ -223,7 +204,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 processing: true,
                 scrollCollapse: true,
                 paging: true,
-                "pageLength": 25,
+                "pageLength": 10,
                 "language": {
                     "sEmptyTable": "Nenhum registro encontrado",
                     "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",

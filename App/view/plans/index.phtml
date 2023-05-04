@@ -47,8 +47,8 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                                         <tr class="text-center" style="height: 30px;">
                                             <th style="font-size: 14px;">Plano</th>
                                             <th style="font-size: 14px;">Totais</th>
-                                            <th style="font-size: 14px;">Status</th>
-                                            <th style="display: none;">Status</th>
+                                            <th style="font-size: 14px;">Situação</th>
+                                            <th style="display: none;">Situação</th>
                                             <th style="display: none;">Cadastrado em</th>
                                             <th style="display: none;">Atualizado em</th>
                                         </tr>
@@ -124,7 +124,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                 processing: true,
                 scrollCollapse: true,
                 paging: true,
-                "pageLength": 25,
+                "pageLength": 10,
                 "language": {
                     "sEmptyTable": "Nenhum registro encontrado",
                     "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",

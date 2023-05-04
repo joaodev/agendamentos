@@ -107,13 +107,8 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                             <th style="font-size: 14px;">Data</th>
                                             <th style="font-size: 14px;">Despesa</th>
                                             <th style="font-size: 14px;">Valor</th>
-                                            <th style="font-size: 14px;">Status</th>
-                                            <th style="display: none;">Descrição</th>
-                                            <th style="display: none;">Forma de Pagamento</th>
-                                            <th style="display: none;">Cliente</th>
-                                            <th style="display: none;">Status</th>
-                                            <th style="display: none;">Cadastrado em</th>
-                                            <th style="display: none;">Atualizado em</th>
+                                            <th style="font-size: 14px;">Situação</th>
+                                            <th style="display: none;">Situação</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -146,24 +141,9 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                                     <?php endif; ?>
                                                 </td>  
                                                 <td style="display: none;">
-                                                    <?php echo $entity['description']; ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $entity['paymentTypeName']; ?>   
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $entity['customerName']; ?>
-                                                </td>
-                                                <td style="display: none;">
                                                     <?php echo ($entity['status'] == '1') ? 'Pendente' : ''; ?>
                                                     <?php echo ($entity['status'] == '2') ? 'Concluída' : ''; ?>
                                                     <?php echo ($entity['status'] == '3') ? 'Cancelada' : ''; ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['created_at']); ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
                                                 </td> 
                                             </tr>
                                         <?php endforeach; ?>
@@ -204,7 +184,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                     $.extend( true, {}, buttonCommon, {
                         extend: 'excel',
                         title: 'Despesas',
-                        exportOptions: {columns: [0,1,2,4,5,6,7,8,9]}
+                        exportOptions: {columns: [0,1,2,4]}
                     })
                 ],
                 order: [ [0, "desc"] ],
@@ -218,7 +198,7 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                 processing: true,
                 scrollCollapse: true,
                 paging: true,
-                "pageLength": 25,
+                "pageLength": 10,
                 "language": {
                     "sEmptyTable": "Nenhum registro encontrado",
                     "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
