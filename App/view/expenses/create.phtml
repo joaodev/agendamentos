@@ -1,4 +1,4 @@
-<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('expenses'))): ?>
+<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('expenses'))): ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">

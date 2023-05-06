@@ -1,13 +1,15 @@
 <?php 
 $data = $this->view->data; 
 
-$isAdmin = $_SESSION['ROLE_ADM'] == '1';
+$isAdmin = $_SESSION['ROLE_ADM'] == '0';
 $role    = $_SESSION['ROLE'];
 
 $canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('schedules'));
 $canCreate  = $isAdmin || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('schedules'));
 $canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('schedules'));
 $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('schedules'));
+
+$isParent = $this->isUserParent();
 ?>
 <?php if ($canView): ?>
     <section class="content-header mt-5">
@@ -29,10 +31,12 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
                                         <i class="fas fa-plus"></i> 
                                     </button>
                                 <?php else: ?>
-                                    <button type="button" class="btn btn-outline-primary" title="Limite de cadastros atingido, altere seu plano para aumentar o limite atual."
-                                        onclick="openModule('planos-usuario');" style="width: 100%;">
-                                        <i class="fas fa-sync"></i> 
-                                    </button>
+                                    <?php if ($isParent): ?>
+                                        <button type="button" class="btn btn-outline-primary" title="Limite de cadastros atingido, altere seu plano para aumentar o limite atual."
+                                            onclick="openModule('planos-usuario');" style="width: 100%;">
+                                            <i class="fas fa-sync"></i> 
+                                        </button>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </li>
                         </ol>
@@ -42,20 +46,24 @@ $canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $thi
             <div class="row">
                 <div class="col-12 mt-3">
                     <?php if ($this->view->reached_limit): ?>
-                        <div class="alert bg-red" role="alert">
-                            <span class="fa fa-info-circle pr-1"></span>
-                            Limite de cadastros atingido! 
-                            <a onclick="openModule('planos-usuario');" 
-                                class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para aumentar o limite atual.
-                        </div>
+                        <?php if ($isParent): ?>
+                            <div class="alert bg-red" role="alert">
+                                <span class="fa fa-info-circle pr-1"></span>
+                                Limite de cadastros atingido! 
+                                <a onclick="openModule('planos-usuario');" 
+                                    class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para aumentar o limite atual.
+                            </div>
+                        <?php endif; ?>
                     <?php else: ?>
                         <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
-                            <div class="alert alert-info" role="alert">
-                                <span class="fa fa-users pr-1"></span> 
-                                Você está utilizando o Plano Gratuito. 
-                                <a onclick="openModule('planos-usuario');" 
-                                    class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para alterar e liberar todos os recursos do sistema.
-                            </div>
+                            <?php if ($isParent): ?>
+                                <div class="alert alert-info" role="alert">
+                                    <span class="fa fa-users pr-1"></span> 
+                                    Você está utilizando o Plano Gratuito. 
+                                    <a onclick="openModule('planos-usuario');" 
+                                        class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para alterar e liberar todos os recursos do sistema.
+                                </div>
+                            <?php endif; ?>
                         <?php else: ?>
                             <div class="alert alert-info" role="alert">
                                 <span class="fa fa-info-circle pr-1"></span> 

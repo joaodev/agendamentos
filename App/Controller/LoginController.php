@@ -53,7 +53,7 @@ class LoginController extends ActionController
 	            $_SESSION['ROLE_ADM']    = $credentials['is_admin'];
 	            $_SESSION['PHOTO']       = $credentials['file'];
 
-                $userPlan = $this->getActiveUserPlan($credentials['uuid']);
+                $userPlan = $this->getActiveUserPlan($credentials['parent_uuid']);
                 if (!empty($userPlan)) {
                     $_SESSION['PLAN_NAME'] = $userPlan['planName'];
                     $_SESSION['PLAN'] = $userPlan['plan_uuid'];

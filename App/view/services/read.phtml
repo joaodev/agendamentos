@@ -1,4 +1,4 @@
-<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'))): ?>
+<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'))): ?>
     <?php $entity = $this->view->entity; ?>
     <?php if(empty($_POST['modal'])): ?>
         <section class="content-header mt-5">
@@ -80,7 +80,7 @@
                             <?php if(empty($_POST['modal'])): ?>
                                 <div class="row">
                                     <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                        <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('services'))): ?>
+                                        <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('services'))): ?>
                                             <button type="button" class="btn btn-outline-danger" title="Excluir Serviço"
                                                 onclick="deleteService('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                 <i class="fa fa-trash"></i> Excluir
@@ -88,7 +88,7 @@
                                         <?php endif; ?>
                                     </div>
                                     <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                        <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('services'))): ?>
+                                        <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('services'))): ?>
                                             <button type="button" class="btn btn-outline-success" title="Editar Serviço"
                                                 onclick="updateService('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                 <i class="fa fa-pen pr-1"></i> Editar

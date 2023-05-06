@@ -26,6 +26,19 @@ class UserController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
+        $activePlan = self::getActivePlan();
+        $totalUsers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
+        
+        $totalFree = ($activePlan['total_users'] - $totalUsers);
+        $this->view->total_free = $totalFree;
+
+        if ($totalUsers >= $activePlan['total_users']) {
+            $reached_limit = true;
+        } else {
+            $reached_limit = false;
+        }   
+        $this->view->reached_limit = $reached_limit;
+
         $data = $this->model->getAll($this->parentUUID);
         $this->view->data = $data;
         $this->render('index', false);
@@ -42,72 +55,83 @@ class UserController extends ActionController implements CrudInterface
     public function createProcessAction(): bool
     {
         if (!empty($_POST)) {
-            if (!empty($_POST['role_uuid'])) {
-                $role = $this->roleModel->getOne($_POST['role_uuid']);
-                if (!$role) {
-                    $data  = [
-                        'title' => 'Erro!', 
-                        'msg' => 'Nível de acesso inválido.',
-                        'type' => 'error',
-                        'pos'   => 'top-center'
-                    ];
-                    
-                    echo json_encode($data);
-                    return true;
-                }
-            } else {
-                $customerProfileUuid = $this->getCustomerProfileUuid();
-                $_POST['role_uuid'] = $customerProfileUuid;
-            }
-
-            if ($_POST['password'] != $_POST['confirmation']) {
+            $activePlan = self::getActivePlan();
+            $totalUsers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
+            if ($totalUsers >= $activePlan['total_users']) {
                 $data  = [
-                    'title' => 'Erro!', 
-                    'msg' => 'Senhas incorretas.',
+                    'title' => 'Erro!',
+                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plano.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
             } else {
-                unset($_POST['confirmation']);
-                $_POST['password'] = Bcrypt::hash($_POST['password']);
-
-                $_POST['code'] = md5($this->randomString());
-                $_POST['code_validated'] = 1;
-    
-                $_POST['uuid'] = $this->model->NewUUID();
-                $_POST['parent_uuid'] = $this->parentUUID;
-
-                $crud = new Crud();
-                $crud->setTable($this->model->getTable());
-                $transaction = $crud->create($_POST);
-    
-                if ($transaction) {
-                    $privileges = $this->privilegeModel->getAllByRoleUuid($_POST['role_uuid']);
-                    foreach ($privileges as $privilege) {
-                        $aclData = [
-                            'uuid' => $this->privilegeModel->NewUUID(),
-                            'user_uuid' => $_POST['uuid'],
-                            'privilege_uuid' => $privilege['uuid']
+                if (!empty($_POST['role_uuid'])) {
+                    $role = $this->roleModel->getOne($_POST['role_uuid']);
+                    if (!$role) {
+                        $data  = [
+                            'title' => 'Erro!', 
+                            'msg' => 'Nível de acesso inválido.',
+                            'type' => 'error',
+                            'pos'   => 'top-center'
                         ];
-    
-                        $crud->setTable($this->aclModel->getTable());
-                        $crud->create($aclData);
+                        
+                        echo json_encode($data);
+                        return true;
                     }
-    
-                    $this->toLog("Cadastrou o usuário: {$_POST['name']} #{$_POST['uuid']}");
-                    $data  = [
-                        'title' => 'Sucesso!', 
-                        'msg'   => 'Usuário cadastrado.',
-                        'type'  => 'success',
-                        'pos'   => 'top-right'
-                    ];
                 } else {
+                    $customerProfileUuid = $this->getCustomerProfileUuid();
+                    $_POST['role_uuid'] = $customerProfileUuid;
+                }
+
+                if ($_POST['password'] != $_POST['confirmation']) {
                     $data  = [
                         'title' => 'Erro!', 
-                        'msg' => 'O Usuário não foi cadastrado.',
+                        'msg' => 'Senhas incorretas.',
                         'type' => 'error',
                         'pos'   => 'top-center'
                     ];
+                } else {
+                    unset($_POST['confirmation']);
+                    $_POST['password'] = Bcrypt::hash($_POST['password']);
+
+                    $_POST['code'] = md5($this->randomString());
+                    $_POST['code_validated'] = 1;
+        
+                    $_POST['uuid'] = $this->model->NewUUID();
+                    $_POST['parent_uuid'] = $this->parentUUID;
+
+                    $crud = new Crud();
+                    $crud->setTable($this->model->getTable());
+                    $transaction = $crud->create($_POST);
+        
+                    if ($transaction) {
+                        $privileges = $this->privilegeModel->getAllByRoleUuid($_POST['role_uuid']);
+                        foreach ($privileges as $privilege) {
+                            $aclData = [
+                                'uuid' => $this->privilegeModel->NewUUID(),
+                                'user_uuid' => $_POST['uuid'],
+                                'privilege_uuid' => $privilege['uuid']
+                            ];
+        
+                            $crud->setTable($this->aclModel->getTable());
+                            $crud->create($aclData);
+                        }
+        
+                        $this->toLog("Cadastrou o usuário: {$_POST['name']} #{$_POST['uuid']}");
+                        $data  = [
+                            'title' => 'Sucesso!', 
+                            'msg'   => 'Usuário cadastrado.',
+                            'type'  => 'success',
+                            'pos'   => 'top-right'
+                        ];
+                    } else {
+                        $data  = [
+                            'title' => 'Erro!', 
+                            'msg' => 'O Usuário não foi cadastrado.',
+                            'type' => 'error',
+                            'pos'   => 'top-center'
+                        ];
+                    }
                 }
             }
 

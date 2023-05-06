@@ -1,4 +1,4 @@
-<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('tasks'))): ?>
+<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('tasks'))): ?>
     <?php $entity = $this->view->entity; ?>
     <?php if(empty($_POST['modal'])): ?>
         <section class="content-header mt-5">
@@ -116,7 +116,7 @@
                                 <div class="row">
                                     <?php if ($entity['status'] == '1'): ?>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('tasks'))): ?>
+                                            <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('tasks'))): ?>
                                                 <button type="button" class="btn btn-outline-danger" title="Excluir Tarefa"
                                                     onclick="deleteTask('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-trash"></i> Excluir
@@ -124,7 +124,7 @@
                                             <?php endif; ?>
                                         </div>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('tasks'))): ?>
+                                            <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('tasks'))): ?>
                                                 <button type="button" class="btn btn-outline-success" title="Editar Tarefa"
                                                     onclick="updateTask('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                     <i class="fa fa-pen pr-1"></i> Editar

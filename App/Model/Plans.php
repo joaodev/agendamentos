@@ -19,8 +19,8 @@ class Plans extends Model
             $query = "
                 SELECT uuid, name, description, price, 
                     total_customers, total_services, total_schedules,
-                    total_tasks, total_revenues, total_expenses, btn_link,
-                    status, created_at, updated_at
+                    total_tasks, total_revenues, total_expenses, total_users,
+                    btn_link, status, created_at, updated_at
                 FROM plans
                 WHERE uuid = :uuid
             ";
@@ -46,8 +46,8 @@ class Plans extends Model
             $query = "
                 SELECT uuid, name, description, price, 
                     total_customers, total_services, total_schedules, 
-                    total_tasks, total_revenues, total_expenses, btn_link,
-                    status, created_at, updated_at
+                    total_tasks, total_revenues, total_expenses,  total_users,
+                    btn_link, status, created_at, updated_at
                 FROM plans
                 WHERE uuid = :uuid
                     AND deleted = :deleted
@@ -77,8 +77,8 @@ class Plans extends Model
             $query = "
                  SELECT uuid, name,  description, price, 
                     total_customers, total_services, total_schedules,
-                    total_tasks, total_revenues, total_expenses, btn_link,
-                    status, created_at, updated_at
+                    total_tasks, total_revenues, total_expenses,  total_users,
+                    btn_link, status, created_at, updated_at
                 FROM plans
                 WHERE deleted = :deleted
                 ORDER BY name";
@@ -104,8 +104,8 @@ class Plans extends Model
             $query = "
                  SELECT uuid, name,  description, price, 
                     total_customers, total_services, total_schedules,
-                    total_tasks, total_revenues, total_expenses, btn_link,
-                    status, created_at, updated_at
+                    total_tasks, total_revenues, total_expenses,  total_users, 
+                    btn_link, status, created_at, updated_at
                 FROM plans
                 WHERE deleted = :deleted AND status = :status
                 ORDER BY name";
@@ -132,8 +132,8 @@ class Plans extends Model
             $query = "
                  SELECT uuid, name,  description, price, 
                     total_customers, total_services, total_schedules,
-                    total_tasks, total_revenues, total_expenses, btn_link,
-                    status, created_at, updated_at
+                    total_tasks, total_revenues, total_expenses, total_users,
+                    btn_link, status, created_at, updated_at
                 FROM plans
                 WHERE deleted = :deleted AND status = :status
                 ORDER BY id";

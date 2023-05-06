@@ -1,7 +1,7 @@
 <?php 
 $entity = $this->view->entity; 
 
-$isAdmin = $_SESSION['ROLE_ADM'] == '1';
+$isAdmin = $_SESSION['ROLE_ADM'] == '0';
 $role    = $_SESSION['ROLE'];
 
 $canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('user'));
@@ -53,7 +53,7 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                                         <i class="fa fa-circle pr-1" style="color: red;"></i> Usuário inativo no sistema
                                     <?php endif; ?>
                                 </div>
-                                <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
+                                <?php if ($_SESSION['ROLE_ADM'] == '0'): ?>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="role">Nível de Acesso</label>:

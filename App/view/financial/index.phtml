@@ -1,5 +1,5 @@
 <?php 
-$isAdmin = $_SESSION['ROLE_ADM'] == '1';
+$isAdmin = $_SESSION['ROLE_ADM'] == '0';
 $role    = $_SESSION['ROLE'];
 
 $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('financial'));

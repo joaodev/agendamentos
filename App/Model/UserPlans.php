@@ -13,10 +13,10 @@ class UserPlans extends Model
         $this->setTable('user_plans');
     }
     
-    public function getAllByUser($user): bool|array|string
+    public function getAllByUser($parent): bool|array|string
     {
         try {
-            $query = "SELECT up.uuid, up.user_uuid, up.plan_uuid,
+            $query = "SELECT up.uuid, up.parent_uuid, up.plan_uuid,
                                 p.name as planName, up.status, 
                                 up.approved_at, up.canceled_at,
                                 p.price as planPrice, 
@@ -27,11 +27,11 @@ class UserPlans extends Model
                         FROM user_plans AS up
                         INNER JOIN plans AS p
                             ON up.plan_uuid = p.uuid
-                        WHERE up.user_uuid = :user_uuid
+                        WHERE up.parent_uuid = :parent_uuid
                             ORDER BY up.created_at DESC LIMIT 1";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":parent_uuid", $parent);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -48,7 +48,7 @@ class UserPlans extends Model
     public function getOne($uuid): bool|array|string
     {
         try {
-            $query = "SELECT up.uuid, up.user_uuid, up.plan_uuid,
+            $query = "SELECT up.uuid, up.parent_uuid, up.plan_uuid,
                                 p.name as planName, up.status, 
                                 up.approved_at, up.canceled_at,
                                 p.price as planPrice, 
@@ -59,7 +59,7 @@ class UserPlans extends Model
                         INNER JOIN plans AS p
                             ON up.plan_uuid = p.uuid
                         INNER JOIN user AS u
-                            ON up.user_uuid = u.uuid
+                            ON up.parent_uuid = u.uuid
                         WHERE up.uuid = :uuid";
 
             $stmt = $this->openDb()->prepare($query);
@@ -80,7 +80,7 @@ class UserPlans extends Model
     public function getAllUsersPlans($plan_uuid): bool|array|string
     {
         try {
-            $query = "SELECT up.uuid, up.user_uuid, up.plan_uuid,
+            $query = "SELECT up.uuid, up.parent_uuid, up.plan_uuid,
                                 p.name as planName, up.status, 
                                 up.approved_at, up.canceled_at,
                                 p.price as planPrice, 
@@ -91,7 +91,7 @@ class UserPlans extends Model
                         INNER JOIN plans AS p
                             ON up.plan_uuid = p.uuid
                         INNER JOIN user AS u
-                            ON up.user_uuid = u.uuid
+                            ON up.parent_uuid = u.uuid
                         WHERE up.plan_uuid = :plan_uuid";
 
             $stmt = $this->openDb()->prepare($query);
@@ -109,10 +109,10 @@ class UserPlans extends Model
         }
     }
 
-    public function getActiveUserPlanByUuid($user): bool|array|string
+    public function getActiveUserPlanByUuid($parent): bool|array|string
     {
         try {
-            $query = "SELECT up.uuid, up.user_uuid, up.plan_uuid,
+            $query = "SELECT up.uuid, up.parent_uuid, up.plan_uuid,
                             p.name as planName, up.status, 
                             up.approved_at, up.canceled_at,
                             p.price as planPrice, 
@@ -123,11 +123,11 @@ class UserPlans extends Model
                     FROM user_plans AS up
                     INNER JOIN plans AS p
                         ON up.plan_uuid = p.uuid
-                    WHERE up.user_uuid = :user_uuid
+                    WHERE up.parent_uuid = :parent_uuid
                      AND up.status = '1'";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":parent_uuid", $parent);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);

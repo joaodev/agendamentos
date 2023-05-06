@@ -5,6 +5,7 @@ $canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $
 $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('expenses'));
 $canViewRevenues = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('revenues'));
 $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('tasks'));
+$canViewUsers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('user'));
 ?>
 <section class="content mt-5 pt-4" style="margin-left: 9px; margin-right: 9px;">
     <div class="container-fluid mt-2">
@@ -115,32 +116,6 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                             </div>
                         </div>
                     <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
-                        <div class="col-6 col-lg-4">
-                            <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Agendamentos <br>Pendentes</p>
-                                    <h3><?php echo $this->view->total_pending_schedules; ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-calendar text-white"></i>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
-                        <div class="col-6 col-lg-4">
-                            <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Agendamentos <br>Concluídos</p>
-                                    <h3><?php echo $this->view->total_finished_schedules; ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-calendar-check text-white"></i>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
                     <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
                         <div class="col-6 col-lg-4">
                             <div class="small-box bg-gradient-dark" onclick="openModule('clientes')" style="cursor: pointer;">
@@ -149,7 +124,7 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                     <h3><?php echo $this->view->total_customers; ?></h3>
                                 </div>
                                 <div class="icon">
-                                    <i class="fas fa-users text-white"></i>
+                                    <i class="fas fa-building text-white"></i>
                                 </div>
                             </div>
                         </div>
@@ -167,8 +142,34 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                             </div>
                         </div>
                     <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
+                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewUsers): ?>
                         <div class="col-6 col-lg-4">
+                            <div class="small-box bg-gradient-dark" onclick="openModule('usuarios')" style="cursor: pointer;">
+                                <div class="inner">
+                                    <p>Usuários <br>Cadastrados</p>
+                                    <h3><?php echo $this->view->total_users; ?></h3>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-users text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
+                        <div class="col-6">
+                            <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
+                                <div class="inner">
+                                    <p>Agendamentos <br>Pendentes</p>
+                                    <h3><?php echo $this->view->total_pending_schedules; ?></h3>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-calendar text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
+                        <div class="col-6">
                             <div class="small-box bg-gradient-dark" onclick="openModule('tarefas')" style="cursor: pointer;">
                                 <div class="inner">
                                     <p>Tarefas <br>Pendentes</p>
@@ -176,17 +177,6 @@ $canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-tasks text-white"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-lg-4">
-                            <div class="small-box bg-gradient-dark" onclick="openModule('tarefas')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Tarefas <br>Concluídas</p>
-                                    <h3><?php echo $this->view->total_finished_tasks; ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-check-square text-white"></i>
                                 </div>
                             </div>
                         </div>

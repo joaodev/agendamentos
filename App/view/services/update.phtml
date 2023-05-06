@@ -2,7 +2,7 @@
 $entity = $this->view->entity; 
 $role = $_SESSION['ROLE'];
 ?>
-<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('services'))): ?>
+<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('services'))): ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">

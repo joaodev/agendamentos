@@ -342,8 +342,7 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                    <!-- ADMIN -->
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewUsers): ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewUsers): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('usuarios');" class="nav-link text-white" style="cursor: pointer;">
                                                 <i class="nav-icon fas fa-users"></i>
@@ -353,6 +352,7 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                             </a>
                                         </li>
                                     <?php endif; ?>
+                                    <!-- ADMIN -->
                                     <?php if ($_SESSION['ROLE_ADM'] == '1' || $canViewPlans): ?>
                                         <li class="nav-item ml-2">
                                             <a onclick="openModule('planos');" class="nav-link text-white" style="cursor: pointer;">
@@ -504,7 +504,7 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                 </ul>
                             </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['ROLE_ADM'] == '0' && $_SESSION['COD'] == $this->getParentUUID()): ?>
+                        <?php if ($_SESSION['ROLE_ADM'] == '0' && $_SESSION['COD'] == $this->getParentUUID() && $_SESSION['COD'] == $this->getParentUuid()): ?>
                             <li class="nav-item">
                                 <a onclick="openModule('planos-usuario');" class="nav-link text-white" style="cursor: pointer;">
                                     <i class="nav-icon fas fa-dollar-sign"></i>

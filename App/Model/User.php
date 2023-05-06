@@ -30,7 +30,7 @@ class User extends Model
                         u.neighborhood, u.city, u.state, u.gender, u.birthdate,
                         u.start_date, u.end_date, u.salary,                 
                         u.document_1, u.document_2, u.auth2factor,
-                        u.parent_uuid
+                        u.parent_uuid, u.parent_uuid
                 FROM user AS u
                 INNER JOIN role AS r
                     ON u.role_uuid = r.uuid
@@ -117,7 +117,7 @@ class User extends Model
     {
         try {
             $query = "
-                SELECT u.uuid, u.name, u.email, u.status, u.file,  u.phone,
+                SELECT u.uuid, u.name, u.email, u.status, u.file,  u.phone, u.parent_uuid,
                         u.cellphone, u.job_role, r.name as role, u.created_at
                 FROM user AS u
                 INNER JOIN role AS r
@@ -146,7 +146,8 @@ class User extends Model
             if (!empty($email) && !empty($password) && !empty($token)) {
                 $query = "
                     SELECT u.uuid, u.name, u.email, u.password, u.file,
-                            r.name as role, u.role_uuid, r.is_admin, u.auth2factor 
+                            r.name as role, u.role_uuid, 
+                            r.is_admin, u.auth2factor, u.parent_uuid 
                     FROM user AS u
                     INNER JOIN role AS r
                         ON u.role_uuid = r.uuid
@@ -191,7 +192,7 @@ class User extends Model
                 $query = "
                     SELECT u.uuid, u.name, u.email, u.password, u.file,
                             r.name as role, u.role_uuid, r.is_admin,
-                            u.code, u.auth2factor 
+                            u.code, u.auth2factor, u.parent_uuid 
                     FROM user AS u
                     INNER JOIN role AS r
                         ON u.role_uuid = r.uuid

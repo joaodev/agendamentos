@@ -3,7 +3,7 @@ $entity = $this->view->entity;
 $roles = $this->view->roles; 
 $role = $_SESSION['ROLE'];
 ?>
-<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('user'))): ?>
+<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('user'))): ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
@@ -38,7 +38,7 @@ $role = $_SESSION['ROLE'];
                                         <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
                                         <hr>
                                     </div>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0'): ?>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="name">Nível de Acesso</label>

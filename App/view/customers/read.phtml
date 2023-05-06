@@ -1,4 +1,4 @@
-<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('customers'))): ?>
+<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('customers'))): ?>
     <?php $entity = $this->view->entity; ?>
     <?php if(empty($_POST['modal'])): ?>
         <section class="content-header mt-5">
@@ -120,7 +120,7 @@
                             <?php if(empty($_POST['modal'])): ?>
                                 <div class="row">
                                     <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                        <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('customers'))): ?>
+                                        <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('customers'))): ?>
                                             <button type="button" class="btn btn-outline-danger" title="Excluir Cliente"
                                                 onclick="deleteCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                 <i class="fa fa-trash"></i> Excluir
@@ -128,7 +128,7 @@
                                         <?php endif; ?>
                                     </div>
                                     <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                        <?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('customers'))): ?>
+                                        <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('customers'))): ?>
                                             <button type="button" class="btn btn-outline-success" title="Editar Cliente"
                                                 onclick="updateCustomer('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
                                                 <i class="fa fa-pen pr-1"></i> Editar

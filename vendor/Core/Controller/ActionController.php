@@ -414,7 +414,8 @@ class ActionController
                 'total_schedules' => $plans['total_schedules'],
                 'total_tasks' => $plans['total_tasks'],
                 'total_revenues' => $plans['total_revenues'],
-                'total_expenses' =>$plans['total_expenses']
+                'total_expenses' =>$plans['total_expenses'],
+                'total_users' =>$plans['total_users']
             ];
         } else {
             return [
@@ -423,7 +424,8 @@ class ActionController
                 'total_schedules' => 10,
                 'total_tasks' => 10,
                 'total_revenues' => 10,
-                'total_expenses' => 10
+                'total_expenses' => 10,
+                'total_users' => 3
             ];
         }
     }
@@ -554,6 +556,15 @@ class ActionController
             } else {
                 return false;
             }
+        } else {
+            return false;
+        }
+    }
+
+    public function isUserParent(): bool
+    {
+        if (!empty($_SESSION['COD'])) {
+            return $_SESSION['COD'] == self::getParentUuid() ? true : false;
         } else {
             return false;
         }

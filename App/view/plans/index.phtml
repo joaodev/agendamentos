@@ -67,6 +67,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                                                     <b>Receitas:</b> <?php echo $entity['total_revenues']; ?> <br />
                                                     <b>Despesas:</b> <?php echo $entity['total_expenses']; ?> <br />
                                                     <b>Tarefas:</b> <?php echo $entity['total_tasks']; ?> <br />
+                                                    <b>Usuários:</b> <?php echo $entity['total_users']; ?> <br />
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
