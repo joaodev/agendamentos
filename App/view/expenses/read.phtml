@@ -63,6 +63,12 @@
                                         <p><?php echo $entity['customerName']; ?></p>
                                     </div>
                                 <?php endif; ?>
+                                <?php if (!empty($entity['userName'])): ?>
+                                    <div class="col-md-12">
+                                        <b>Usuário</b>
+                                        <p><?php echo $entity['userName']; ?></p>
+                                    </div>
+                                <?php endif; ?>
                                 <div class="col-md-12"><hr></div>
                                 <div class="col-md-3">
                                     <b>Data</b>

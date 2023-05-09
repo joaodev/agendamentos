@@ -27,7 +27,8 @@ class Schedules extends Model
                                 c.name as customerName,
                                 c.email as customerEmail,
                                 c.cellphone as customerCellphone,
-                                p.name as paymentTypeName
+                                p.name as paymentTypeName,
+                                u.name as userName, o.user_uuid
                         FROM schedules AS o
                         INNER JOIN services AS s
                             ON o.service_uuid = s.uuid
@@ -35,6 +36,8 @@ class Schedules extends Model
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
+                        LEFT JOIN user AS u
+                            ON o.user_uuid = u.uuid
                         WHERE o.uuid = :uuid 
                             AND o.deleted = :deleted
                             AND o.parent_uuid = :parent_uuid";
@@ -66,7 +69,8 @@ class Schedules extends Model
                                 o.schedule_date, o.schedule_time,
                                 s.title as serviceName, 
                                 c.name as customerName,
-                                p.name as paymentTypeName
+                                p.name as paymentTypeName,
+                                u.name as userName, o.user_uuid
                         FROM schedules AS o
                         INNER JOIN services AS s
                             ON o.service_uuid = s.uuid
@@ -74,6 +78,8 @@ class Schedules extends Model
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
+                        LEFT JOIN user AS u
+                            ON o.user_uuid = u.uuid
                         WHERE o.deleted = :deleted
                             AND o.parent_uuid = :parent_uuid";
 
@@ -112,7 +118,8 @@ class Schedules extends Model
                                 o.schedule_date, o.schedule_time,
                                 s.title as serviceName, 
                                 c.name as customerName,
-                                p.name as paymentTypeName
+                                p.name as paymentTypeName,
+                                u.name as userName, o.user_uuid
                         FROM schedules AS o
                         INNER JOIN services AS s
                             ON o.service_uuid = s.uuid
@@ -120,6 +127,8 @@ class Schedules extends Model
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
+                        LEFT JOIN user AS u
+                            ON o.user_uuid = u.uuid
                         WHERE $whereStatus o.deleted = :deleted
                             AND o.parent_uuid = :parent_uuid
                             AND YEAR(o.schedule_date) = :d1 AND MONTH(o.schedule_date) = :d2";

@@ -81,14 +81,31 @@
                                         </div>
                                     </div>
                                     <div class="col-12"><hr></div>
-                                    <div class="col-12 col-md-12">
+                                    <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="customer_uuid">Atribuir Cliente</label>
+                                            <a onclick="newCustomer();" class="text-success" 
+                                                style="cursor: pointer; float: right" title="Adicionar Serviço">
+                                                <span class="fa fa-plus-circle"></span>
+                                            </a> 
                                             <select name="customer_uuid" id="customer_uuid" class="form-control">
                                                 <option value="">Selecione</option>
                                                 <?php foreach ($this->view->customers as $customer): ?>
                                                     <option value="<?php echo $customer['uuid']; ?>">
                                                         <?php echo $customer['name']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="title">Atribuir Usuário</label>
+                                            <select name="user_uuid" id="user_uuid" class="form-control">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->users as $user): ?>
+                                                    <option value="<?php echo $user['uuid']; ?>">
+                                                        <?php echo $user['name'] . ' (' . $user['email'] . ')'; ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
@@ -140,6 +157,7 @@
                     form_data.append('payment_type_uuid', $("#payment_type_uuid").val());    
                     form_data.append('expense_date', $("#expense_date").val());    
                     form_data.append('customer_uuid', $("#customer_uuid").val());    
+                    form_data.append('user_uuid', $("#user_uuid").val());    
                     form_data.append('status', $("#status_1").val());
 
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');
@@ -171,5 +189,29 @@
                 }
             });
         });
+    </script>
+    <script>
+        function newCustomer() {
+            $("#modalGreenLargeResult").empty();
+            $("#modalGreenLarge").modal('hide');
+            $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Cliente');
+            $("#modalGreenLargeLoader").show();
+            $("#modalGreenLarge").modal('show');
+
+            $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>despesas/cadastrar-cliente",
+                data: {
+                    target: '<?php echo $this->getTarget(); ?>'
+                },
+                async: true
+            }).done(function(data) {
+                $("#modalGreenLargeResult").html(data);
+                $("#modalGreenLargeLoader").hide();
+            }).fail(function() {
+                showInternalErrorAlert();
+                $("#modalGreenLargeLoader").hide();
+            });
+        }
     </script>
 <?php endif; ?>

@@ -11,12 +11,14 @@ class TasksController extends ActionController implements CrudInterface
 {
     private mixed $model;
     private mixed $filesModel;
+    private mixed $userModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->model = Container::getClass("Tasks", "app");
         $this->filesModel = Container::getClass("Files", "app");
+        $this->userModel = Container::getClass("User", "app");
     }
 
     public function indexAction(): void
@@ -55,6 +57,8 @@ class TasksController extends ActionController implements CrudInterface
     public function createAction(): void
     {
         if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $users = $this->userModel->getAllActives($this->parentUUID);
+            $this->view->users = $users;
             $this->render('create', false);
         }
     }
@@ -118,12 +122,14 @@ class TasksController extends ActionController implements CrudInterface
     public function updateAction(): void
     {
         if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $fields = "uuid, title, description, task_date, task_time, status";
-            $entity = $this->model->find($_POST['uuid'], $fields, 'uuid');
+            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
 
             $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);
             $this->view->files = $files;
+
+            $users = $this->userModel->getAllActives($this->parentUUID);
+            $this->view->users = $users;
 
             $this->render('update', false);
         }
@@ -170,8 +176,7 @@ class TasksController extends ActionController implements CrudInterface
     public function readAction(): void
     {
         if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $fields = "uuid, title, description, task_date, task_time, status, created_at, updated_at";
-            $entity = $this->model->find($_POST['uuid'], $fields, 'uuid');
+            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
 
             $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);

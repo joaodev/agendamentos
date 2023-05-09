@@ -119,6 +119,7 @@ $isParent = $this->isUserParent();
                                             <th style="font-size: 14px;">Data</th>
                                             <th style="font-size: 14px;">Horário</th>
                                             <th style="font-size: 14px;">Tarefa</th>
+                                            <th style="font-size: 14px;">Responsável</th>
                                             <th style="font-size: 14px;">Situação</th>
                                             <th style="display: none;">Situação</th>
                                         </tr>
@@ -140,6 +141,9 @@ $isParent = $this->isUserParent();
                                                 </td>
                                                 <td style="font-size: 15px">
                                                     <?php echo $entity['title']; ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php echo $entity['userName'] ? $entity['userName'] : 'Não atribuido'; ?>
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>

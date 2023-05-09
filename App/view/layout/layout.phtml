@@ -298,7 +298,6 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                             $_SESSION['ROLE_ADM'] == '1' || $_SESSION['ROLE_ADM'] == '0'
                             || $canViewCustomers
                             || $canViewServices
-                            || $canViewTasks
                             || $canViewPayments
                             || $canViewUsers
                             || $canViewPlans
@@ -328,16 +327,6 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                                 <i class="nav-icon fas fa-cubes"></i>
                                                 <p>
                                                     Serviços
-                                                </p>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
-                                        <li class="nav-item ml-2">
-                                            <a onclick="openModule('tarefas');" class="nav-link text-white" style="cursor: pointer;">
-                                                <i class="nav-icon fas fa-tasks"></i>
-                                                <p>
-                                                    Tarefas
                                                 </p>
                                             </a>
                                         </li>
@@ -383,6 +372,7 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                             || $canViewRevenues
                             || $canViewFinancial
                             || $canViewReports
+                            || $canViewTasks
                         ): ?>
                             <li class="nav-item">
                                 <a href="#" class="nav-link text-white">
@@ -439,6 +429,16 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
                                                 <i class="nav-icon fas fa-file"></i>
                                                 <p>
                                                     Relatórios
+                                                </p>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
+                                        <li class="nav-item ml-2">
+                                            <a onclick="openModule('tarefas');" class="nav-link text-white" style="cursor: pointer;">
+                                                <i class="nav-icon fas fa-tasks"></i>
+                                                <p>
+                                                    Tarefas
                                                 </p>
                                             </a>
                                         </li>

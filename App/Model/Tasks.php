@@ -13,6 +13,36 @@ class Tasks extends Model
         $this->setTable('tasks');
     }
 
+    public function getOne($uuid, $parentUUID): bool|array|string
+    {
+        try {
+            $query = "SELECT t.uuid, t.title, t.description, t.task_date, t.task_time,
+                                t.status, t.created_at, t.updated_at,
+                                t.user_uuid, u.name as userName
+                        FROM tasks AS t
+                        LEFT JOIN user AS u 
+                            ON t.user_uuid = u.uuid
+                        WHERE t.uuid = :uuid 
+                            AND t.deleted = :deleted
+                            AND t.parent_uuid = :parent_uuid";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":uuid", $uuid);
+            $stmt->bindValue(":deleted", "0");
+            $stmt->bindValue(":parent_uuid", $parentUUID);
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+            
+            return $result;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
     public function getAllByMonth($status, $month, $parentUUID): bool|array|string
     {
         try {
@@ -22,15 +52,18 @@ class Tasks extends Model
 
             $whereStatus = "";
             if ($status != '0') {
-                $whereStatus = ' status = :status AND ';
+                $whereStatus = ' t.status = :status AND ';
             }
 
-            $query = "SELECT uuid, title, description, task_date, task_time,
-                                status, created_at, updated_at
-                        FROM tasks
-                        WHERE $whereStatus deleted = :deleted
-                            AND parent_uuid = :parent_uuid
-                            AND YEAR(task_date) = :d1 AND MONTH(task_date) = :d2";
+            $query = "SELECT t.uuid, t.title, t.description, t.task_date, t.task_time,
+                                t.status, t.created_at, t.updated_at,
+                                u.name as userName
+                        FROM tasks AS t
+                        LEFT JOIN user AS u 
+                            ON t.user_uuid = u.uuid
+                        WHERE $whereStatus t.deleted = :deleted
+                            AND t.parent_uuid = :parent_uuid
+                            AND YEAR(t.task_date) = :d1 AND MONTH(t.task_date) = :d2";
 
             $stmt = $this->openDb()->prepare($query);
             if ($status != '0') {

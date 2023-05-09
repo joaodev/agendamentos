@@ -13,6 +13,7 @@ class ExpensesController extends ActionController implements CrudInterface
     private mixed $customersModel;
     private mixed $paymentTypesModel;
     private mixed $filesModel;
+    private mixed $userModel;
 
     public function __construct()
     {
@@ -21,6 +22,7 @@ class ExpensesController extends ActionController implements CrudInterface
         $this->customersModel = Container::getClass("Customers", "app");
         $this->paymentTypesModel = Container::getClass("PaymentTypes", "app");
         $this->filesModel = Container::getClass("Files", "app");
+        $this->userModel = Container::getClass("User", "app");
     }
 
     public function indexAction(): void
@@ -66,6 +68,9 @@ class ExpensesController extends ActionController implements CrudInterface
 
             $paymentTypes = $this->paymentTypesModel->getAllActives();
             $this->view->paymentTypes = $paymentTypes;
+
+            $users = $this->userModel->getAllActives($this->parentUUID);
+            $this->view->users = $users;    
 
             $this->render('create', false);
         }
@@ -146,6 +151,9 @@ class ExpensesController extends ActionController implements CrudInterface
 
             $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);
             $this->view->files = $files;
+
+            $users = $this->userModel->getAllActives($this->parentUUID);
+            $this->view->users = $users;    
     
             $this->render('update', false);
         }
@@ -246,6 +254,13 @@ class ExpensesController extends ActionController implements CrudInterface
             return $crud->update(['deleted' => '1'], $_POST['uuid'], 'uuid');
         } else {
             return false;
+        }
+    }
+    
+    public function createCustomerAction(): void
+    {
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $this->render('create-customer', false);
         }
     }
 }

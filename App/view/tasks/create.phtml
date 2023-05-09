@@ -56,6 +56,19 @@
                                                 placeholder="Descrição completa da Tarefa"></textarea>
                                         </div>
                                     </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="title">Responsável</label>
+                                            <select name="user_uuid" id="user_uuid" class="form-control">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->users as $user): ?>
+                                                    <option value="<?php echo $user['uuid']; ?>">
+                                                        <?php echo $user['name'] . ' (' . $user['email'] . ')'; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label for="description">Anexar Arquivos</label>
@@ -95,6 +108,7 @@
                     form_data.append('title', $("#title").val());    
                     form_data.append('description', $("#description").val());    
                     form_data.append('task_date', $("#task_date").val());    
+                    form_data.append('user_uuid', $("#user_uuid").val());    
                     form_data.append('task_time', $("#task_time").val());    
 
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');

@@ -46,11 +46,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                                     <thead>
                                         <tr class="text-center" style="height: 30px;">
                                             <th style="font-size: 14px;">Plano</th>
-                                            <th style="font-size: 14px;">Totais</th>
                                             <th style="font-size: 14px;">Situação</th>
-                                            <th style="display: none;">Situação</th>
-                                            <th style="display: none;">Cadastrado em</th>
-                                            <th style="display: none;">Atualizado em</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -58,16 +54,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                                             <tr class="text-center" style="cursor: pointer;"
                                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');">
                                                 <td style="font-size: 15px">
-                                                    <h3 class="pt-3"><?php echo $entity['name']; ?></h3>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <b>Clientes:</b> <?php echo $entity['total_customers']; ?> <br />
-                                                    <b>Serviços:</b> <?php echo $entity['total_services']; ?> <br />
-                                                    <b>Agendamentos:</b> <?php echo $entity['total_schedules']; ?> <br />
-                                                    <b>Receitas:</b> <?php echo $entity['total_revenues']; ?> <br />
-                                                    <b>Despesas:</b> <?php echo $entity['total_expenses']; ?> <br />
-                                                    <b>Tarefas:</b> <?php echo $entity['total_tasks']; ?> <br />
-                                                    <b>Usuários:</b> <?php echo $entity['total_users']; ?> <br />
+                                                    <?php echo $entity['name']; ?>
                                                 </td>
                                                 <td style="width: 80px;">
                                                     <?php if ($entity['status'] == '1'): ?>
@@ -75,15 +62,6 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                                                     <?php else: ?>
                                                         <i class="fa fa-circle pt-3" style="color: red;"></i>
                                                     <?php endif; ?>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['created_at']); ?>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -98,28 +76,11 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
     </section>
     <script type="text/javascript">
         $(document).ready(function() {
-            let buttonCommon = {
-                exportOptions: {
-                    format: {
-                        body: function ( data ) {
-                            return data;
-                        }
-                    }
-                }
-            };
-
             $('#table_pt').DataTable({
-                "sDom": 'flBtip',
+                "sDom": 'fltip',
                 searching: true,
-                buttons: [
-                    $.extend( true, {}, buttonCommon, {
-                        extend: 'excel',
-                        title: 'Planos',
-                        exportOptions: {columns: [0,1,3,4]}
-                    })
-                ],
                 order: [ [0, "asc"] ],
-                columnDefs: [{orderable: false, targets: [2]}],
+                columnDefs: [{orderable: false, targets: [1]}],
                 responsive: true,
                 info: true,
                 processing: true,

@@ -22,12 +22,15 @@ class Expenses extends Model
                                 o.created_at, o.updated_at,
                                 o.expense_date, o.file,
                                 c.name as customerName,
-                                p.name as paymentTypeName
+                                p.name as paymentTypeName,
+                                o.user_uuid, u.name as userName
                         FROM expenses AS o
                         LEFT JOIN customers AS c
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
+                        LEFT JOIN user AS u 
+                            ON o.user_uuid = u.uuid
                         WHERE o.uuid = :uuid 
                             AND o.deleted = :deleted
                             AND o.parent_uuid = :parent_uuid";
@@ -58,12 +61,15 @@ class Expenses extends Model
                                 o.created_at, o.updated_at,
                                 o.expense_date,
                                 c.name as customerName,
-                                p.name as paymentTypeName
+                                p.name as paymentTypeName,
+                                o.user_uuid, u.name as userName
                         FROM expenses AS o
                         LEFT JOIN customers AS c
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
+                        LEFT JOIN user AS u 
+                            ON o.user_uuid = u.uuid
                         WHERE o.deleted = :deleted
                             AND o.parent_uuid = :parent_uuid";
 
@@ -101,12 +107,15 @@ class Expenses extends Model
                                 o.created_at, o.updated_at,
                                 o.expense_date,
                                 c.name as customerName,
-                                p.name as paymentTypeName
+                                p.name as paymentTypeName,
+                                o.user_uuid, u.name as userName
                         FROM expenses AS o
                         LEFT JOIN customers AS c
                             ON o.customer_uuid = c.uuid
                         LEFT JOIN payment_types AS p
                             ON o.payment_type_uuid = p.uuid
+                        LEFT JOIN user AS u 
+                            ON o.user_uuid = u.uuid
                         WHERE $whereStatus o.deleted = :deleted
                             AND o.parent_uuid = :parent_uuid
                             AND YEAR(o.expense_date) = :d1 AND MONTH(o.expense_date) = :d2";

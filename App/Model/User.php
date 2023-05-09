@@ -92,6 +92,42 @@ class User extends Model
         }
     }
 
+    public function getAllActives($parent): bool|array|string
+    {
+        try {
+            $query = "
+                SELECT u.uuid, u.name, u.email, u.status, u.file, u.phone, u.whatsapp,
+                        u.cellphone, u.job_role, r.name as role, u.created_at, u.updated_at,
+                        u.postal_code, u.address, u.number, u.complement, 
+                        u.neighborhood, u.city, u.state, u.gender, u.birthdate,
+                        u.start_date, u.end_date, u.salary,                         
+                        u.document_1, u.document_2, u.auth2factor, u.parent_uuid  
+                FROM user AS u
+                INNER JOIN role AS r
+                    ON u.role_uuid = r.uuid
+                WHERE u.deleted = :deleted
+                    AND u.status = :status
+                    AND u.parent_uuid = :parent_uuid
+                ORDER BY u.name 
+            ";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":status", '1');
+            $stmt->bindValue(":parent_uuid", $parent);
+            $stmt->execute();
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+
+            return $result;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
     public function totalUsers(): int|string
     {
         try {

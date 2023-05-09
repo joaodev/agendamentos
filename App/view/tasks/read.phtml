@@ -70,6 +70,11 @@
                                     <p><?php echo $entity['description']; ?></p>
                                 </div>
                                 <div class="col-md-12"><hr></div>
+                                <div class="col-md-12">
+                                    <b>Responsável</b>
+                                    <p><?php echo $entity['userName'] ? $entity['userName'] : 'Não atribuido'; ?></p>
+                                </div>
+                                <div class="col-md-12"><hr></div>
                                 <div class="col-md-12 text-center">
                                     <b>Arquivos Enviados</b>
                                     <?php if (!empty($this->view->files)) : ?>

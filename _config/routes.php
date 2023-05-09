@@ -93,6 +93,7 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/despesas/processa-edicao', 'controller' => 'expenses', 'action' => 'update-process'],
 	['namespace' => 'app', 'route' => '/despesas/excluir', 'controller' => 'expenses', 'action' => 'delete'],
 	['namespace' => 'app', 'route' => '/despesas/remove-arquivo', 'controller' => 'expenses', 'action' => 'delete-file'],
+	['namespace' => 'app', 'route' => '/despesas/cadastrar-cliente', 'controller' => 'expenses', 'action' => 'create-customer'],
 
 	['namespace' => 'app', 'route' => '/formas-pagamento', 'controller' => 'payment-types', 'action' => 'index'],
 	['namespace' => 'app', 'route' => '/formas-pagamento/cadastrar', 'controller' => 'payment-types', 'action' => 'create'],
@@ -154,6 +155,7 @@ $router['app'] = [
 	['namespace' => 'app', 'route' => '/receitas/processa-edicao', 'controller' => 'revenues', 'action' => 'update-process'],
 	['namespace' => 'app', 'route' => '/receitas/excluir', 'controller' => 'revenues', 'action' => 'delete'],
 	['namespace' => 'app', 'route' => '/receitas/remove-arquivo', 'controller' => 'revenues', 'action' => 'delete-file'],
+	['namespace' => 'app', 'route' => '/receitas/cadastrar-cliente', 'controller' => 'revenues', 'action' => 'create-customer'],
 
 	['namespace' => 'app', 'route' => '/tarefas', 'controller' => 'tasks', 'action' => 'index'],
 	['namespace' => 'app', 'route' => '/tarefas/cadastrar', 'controller' => 'tasks', 'action' => 'create'],

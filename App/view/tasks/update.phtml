@@ -76,6 +76,21 @@ $role = $_SESSION['ROLE'];
                                         </div>
                                     </div>
                                     <div class="col-12"><hr></div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="title">Responsável</label>
+                                            <select name="user_uuid" id="user_uuid" class="form-control">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->users as $user): ?>
+                                                    <option value="<?php echo $user['uuid']; ?>"
+                                                        <?php echo ($entity['user_uuid'] == $user['uuid'] ? 'selected' : ''); ?>>
+                                                        <?php echo $user['name'] . ' (' . $user['email'] . ')'; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label for="user_uuid">Anexar Arquivos</label>
@@ -150,6 +165,7 @@ $role = $_SESSION['ROLE'];
                     form_data.append('task_date', $("#task_date").val());    
                     form_data.append('task_time', $("#task_time").val());    
                     form_data.append('status', $("#status_1").val());    
+                    form_data.append('user_uuid', $("#user_uuid").val());    
                     form_data.append('uuid', $("#uuid").val());    
                     
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');

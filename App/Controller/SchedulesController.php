@@ -14,6 +14,7 @@ class SchedulesController extends ActionController implements CrudInterface
     private mixed $paymentTypesModel;
     private mixed $servicesModel;
     private mixed $filesModel;
+    private mixed $userModel;
 
     public function __construct()
     {
@@ -23,6 +24,7 @@ class SchedulesController extends ActionController implements CrudInterface
         $this->paymentTypesModel = Container::getClass("PaymentTypes", "app");
         $this->servicesModel = Container::getClass("Services", "app");
         $this->filesModel = Container::getClass("Files", "app");
+        $this->userModel = Container::getClass("User", "app");
     }
 
     public function indexAction(): void
@@ -79,6 +81,9 @@ class SchedulesController extends ActionController implements CrudInterface
 
             $paymentTypes = $this->paymentTypesModel->getAllActives();
             $this->view->paymentTypes = $paymentTypes;
+
+            $users = $this->userModel->getAllActives($this->parentUUID);
+            $this->view->users = $users;
 
             $this->render('create', false);
         }
@@ -161,6 +166,9 @@ class SchedulesController extends ActionController implements CrudInterface
             
             $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);
             $this->view->files = $files;
+
+            $users = $this->userModel->getAllActives($this->parentUUID);
+            $this->view->users = $users;
 
             $this->render('update', false);
         }

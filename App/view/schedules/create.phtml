@@ -79,6 +79,20 @@
                                         </div>
                                     </div>
                                     <div class="col-12"><hr></div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="title">Responsável</label>
+                                            <select name="user_uuid" id="user_uuid" class="form-control">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->users as $user): ?>
+                                                    <option value="<?php echo $user['uuid']; ?>">
+                                                        <?php echo $user['name'] . ' (' . $user['email'] . ')'; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-12 col-md-3">
                                         <div class="form-group">
                                             <label for="schedule_date">Data*</label>
@@ -162,6 +176,7 @@
                     form_data.append('schedule_time', $("#schedule_time").val());    
                     form_data.append('customer_uuid', $("#customer_uuid").val());    
                     form_data.append('service_uuid', $("#service_uuid").val());    
+                    form_data.append('user_uuid', $("#user_uuid").val());    
                     form_data.append('status', $("#status_1").val());
 
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');
@@ -200,7 +215,7 @@
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>agendamentos/detalhes-servico",
-                    data: {uuid: serviceUuid},
+                    data: {uuid: serviceUuid, target: '<?php echo $this->getTarget(); ?>'},
                     async: true
                 }).done(function(data) {
                     $("#amount").val(data);
@@ -222,6 +237,9 @@
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>agendamentos/cadastrar-servico",
+                data: {
+                    target: '<?php echo $this->getTarget(); ?>'
+                },
                 async: true
             }).done(function(data) {
                 $("#modalGreenLargeResult").html(data);
@@ -242,6 +260,9 @@
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>agendamentos/cadastrar-cliente",
+                data: {
+                    target: '<?php echo $this->getTarget(); ?>'
+                },
                 async: true
             }).done(function(data) {
                 $("#modalGreenLargeResult").html(data);

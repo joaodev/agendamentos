@@ -2,8 +2,8 @@
 $entity = $this->view->entity; 
 $role = $_SESSION['ROLE'];
 
-$canView = $this->canView;
-$canUpdate = $this->canUpdate;
+$canView    = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('config'));
+$canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('config'));
 ?>
 <?php if ($canView): ?>
     <section class="content-header mt-5">
