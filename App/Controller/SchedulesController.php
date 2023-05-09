@@ -95,6 +95,20 @@ class SchedulesController extends ActionController implements CrudInterface
             unset($_POST['target']);
             $parentUUID = $this->parentUUID;
 
+            if (!empty($_POST['send_email_customer'])) {
+                $sendEmailCustomer = $_POST['send_email_customer'];
+                unset($_POST['send_email_customer']);
+            } else {
+                $sendEmailCustomer = false;
+            }
+
+            if (!empty($_POST['send_email_user'])) {
+                $sendEmailUser = $_POST['send_email_user'];
+                unset($_POST['send_email_user']);
+            } else {
+                $sendEmailUser = false;
+            }
+
             $activePlan = self::getActivePlan();
             $month = substr($_POST['schedule_date'], 0, 7);
             $totalSchedules = $this->model->totalMonthlyData(
@@ -121,6 +135,32 @@ class SchedulesController extends ActionController implements CrudInterface
                 if ($transaction) {
                     if (!empty($_FILES)) {
                         $this->filesModel->uploadFiles($_FILES, "schedules", $uuid);
+                    }
+                    
+                    $scheduledTo = $this->formatDate($_POST['schedule_date']);
+                    $scheduledTime = substr($_POST['schedule_time'], 0, 5);
+                    if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
+                        $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
+                        $message = "<p>Novo agendamento para: $scheduledTo às $scheduledTime.</p>";
+
+                        $this->sendMail([
+                            'title' => 'Novo agendamento',
+                            'message' => $message,
+                            'name' => $customer['name'],
+                            'toAddress' => $customer['email']
+                        ]);
+                    }
+
+                    if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
+                        $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
+                        $message = "<p>Você foi atribuído como responsável em um agendamento para: $scheduledTo às $scheduledTime.</p>";
+
+                        $this->sendMail([
+                            'title' => 'Novo agendamento atribuído',
+                            'message' => $message,
+                            'name' => $user['name'],
+                            'toAddress' => $user['email']
+                        ]);
                     }
 
                     $this->toLog("Cadastrou o agendamento $uuid");
@@ -178,6 +218,21 @@ class SchedulesController extends ActionController implements CrudInterface
     {
         if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             unset($_POST['target']);
+
+            if (!empty($_POST['send_email_customer'])) {
+                $sendEmailCustomer = $_POST['send_email_customer'];
+                unset($_POST['send_email_customer']);
+            } else {
+                $sendEmailCustomer = false;
+            }
+
+            if (!empty($_POST['send_email_user'])) {
+                $sendEmailUser = $_POST['send_email_user'];
+                unset($_POST['send_email_user']);
+            } else {
+                $sendEmailUser = false;
+            }
+
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $_POST['amount']  = $this->moneyToDb($_POST['amount']);
 
@@ -188,6 +243,32 @@ class SchedulesController extends ActionController implements CrudInterface
             if ($transaction) {
                 if (!empty($_FILES)) {
                     $this->filesModel->uploadFiles($_FILES, "schedules", $_POST['uuid']);
+                }
+
+                $scheduledTo = $this->formatDate($_POST['schedule_date']);
+                $scheduledTime = substr($_POST['schedule_time'], 0, 5);
+                if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
+                    $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
+                    $message = "<p>Novo agendamento para: $scheduledTo às $scheduledTime.</p>";
+
+                    $this->sendMail([
+                        'title' => 'Novo agendamento',
+                        'message' => $message,
+                        'name' => $customer['name'],
+                        'toAddress' => $customer['email']
+                    ]);
+                }
+
+                if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
+                    $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
+                    $message = "<p>Você foi atribuído como responsável em um agendamento para: $scheduledTo às $scheduledTime.</p>";
+
+                    $this->sendMail([
+                        'title' => 'Novo agendamento atribuído',
+                        'message' => $message,
+                        'name' => $user['name'],
+                        'toAddress' => $user['email']
+                    ]);
                 }
 
                 $this->toLog("Atualizou o agendamento {$_POST['uuid']}");

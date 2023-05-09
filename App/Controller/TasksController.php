@@ -67,6 +67,14 @@ class TasksController extends ActionController implements CrudInterface
     {
         if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             unset($_POST['target']);
+
+            if (!empty($_POST['send_email'])) {
+                $sendEmail = $_POST['send_email'];
+                unset($_POST['send_email']);
+            } else {
+                $sendEmail = false;
+            }
+
             $activePlan = self::getActivePlan();
             $month = substr($_POST['task_date'], 0, 7);
             $totalTasks = $this->model->totalMonthlyData(
@@ -92,6 +100,19 @@ class TasksController extends ActionController implements CrudInterface
                 if ($transaction) { 
                     if (!empty($_FILES)) {
                         $this->filesModel->uploadFiles($_FILES, "tasks", $uuid);
+                    }
+
+                    if (!empty($_POST['user_uuid']) && $sendEmail == 1) {
+                        $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
+                        $message = "<p>Você foi atribuído como responsável pela tarefa:</p>
+                                    <p><b>{$_POST['title']}</b></p>";
+
+                        $this->sendMail([
+                            'title' => 'Nova tarefa atribuída',
+                            'message' => $message,
+                            'name' => $user['name'],
+                            'toAddress' => $user['email']
+                        ]);
                     }
 
                     $this->toLog("Cadastrou a tarefa $uuid");
@@ -141,6 +162,13 @@ class TasksController extends ActionController implements CrudInterface
             unset($_POST['target']);
             $_POST['updated_at'] = date('Y-m-d H:i:s');
 
+            if (!empty($_POST['send_email'])) {
+                $sendEmail = $_POST['send_email'];
+                unset($_POST['send_email']);
+            } else {
+                $sendEmail = false;
+            }
+
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
@@ -148,6 +176,19 @@ class TasksController extends ActionController implements CrudInterface
             if ($transaction) {
                 if (!empty($_FILES)) {
                     $this->filesModel->uploadFiles($_FILES, "tasks", $_POST['uuid']);
+                }
+
+                if (!empty($_POST['user_uuid']) && $sendEmail == 1) {
+                    $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
+                    $message = "<p>Você foi atribuído como responsável pela tarefa:</p>
+                                <p><b>{$_POST['title']}</b></p>";
+
+                    $this->sendMail([
+                        'title' => 'Nova tarefa atribuída',
+                        'message' => $message,
+                        'name' => $user['name'],
+                        'toAddress' => $user['email']
+                    ]);
                 }
 
                 $this->toLog("Atualizou a tarefa {$_POST['uuid']}");

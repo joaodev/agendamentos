@@ -92,7 +92,7 @@ $role = $_SESSION['ROLE'];
                                         </div>
                                     </div>
                                     <div class="col-12"><hr></div>
-                                    <div class="col-12 col-md-6">
+                                    <div class="col-12">
                                         <div class="form-group">
                                             <label for="customer_uuid">Atribuir Cliente</label>
                                             <?php if ($canCreateCustomer): ?>
@@ -113,7 +113,11 @@ $role = $_SESSION['ROLE'];
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-md-6">
+                                    <div class="col-12">
+                                        <input type="checkbox" name="send_email_customer" id="send_email_customer" value="1" class="mr-1"> Enviar email de notificação para o cliente.</small>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <div class="col-12">
                                         <div class="form-group">
                                             <label for="title">Atribuir Usuário</label>
                                             <select name="user_uuid" id="user_uuid" class="form-control">
@@ -126,6 +130,9 @@ $role = $_SESSION['ROLE'];
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <input type="checkbox" name="send_email_user" id="send_email_user" value="1" class="mr-1"> Enviar email de notificação para o usuário.</small>
                                     </div>
                                     <div class="col-12"><hr></div>
                                     <div class="col-12">
@@ -210,6 +217,14 @@ $role = $_SESSION['ROLE'];
                     form_data.append('uuid', $("#id_receita").val());    
 
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');
+
+                    if ($('#send_email_customer').is(':checked')) {
+                        form_data.append('send_email_customer', $("#send_email_customer").val());    
+                    }
+
+                    if ($('#send_email_user').is(':checked')) {
+                        form_data.append('send_email_user', $("#send_email_user").val());    
+                    }
                     
                     $("#baseLoader").show();
                     $("#btnSubmit").attr('disabled', true);

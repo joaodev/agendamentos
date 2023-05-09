@@ -56,6 +56,7 @@
                                                 placeholder="Descrição completa da Tarefa"></textarea>
                                         </div>
                                     </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="title">Responsável</label>
@@ -69,6 +70,10 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-12">
+                                        <input type="checkbox" name="send_email" id="send_email" value="1" class="mr-1"> Enviar email de notificação para o responsável.</small>
+                                    </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label for="description">Anexar Arquivos</label>
@@ -112,6 +117,10 @@
                     form_data.append('task_time', $("#task_time").val());    
 
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');
+                    
+                    if ($('#send_email').is(':checked')) {
+                        form_data.append('send_email', $("#send_email").val());    
+                    }
                     
                     $("#baseLoader").show();
                     $("#btnSubmit").show('disabled', true);

@@ -80,6 +80,20 @@ class ExpensesController extends ActionController implements CrudInterface
     {
         if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             unset($_POST['target']);
+
+            if (!empty($_POST['send_email_customer'])) {
+                $sendEmailCustomer = $_POST['send_email_customer'];
+                unset($_POST['send_email_customer']);
+            } else {
+                $sendEmailCustomer = false;
+            }
+
+            if (!empty($_POST['send_email_user'])) {
+                $sendEmailUser = $_POST['send_email_user'];
+                unset($_POST['send_email_user']);
+            } else {
+                $sendEmailUser = false;
+            }
             
             $parentUUID = $this->parentUUID;
         
@@ -109,6 +123,31 @@ class ExpensesController extends ActionController implements CrudInterface
                 if ($transaction) {
                     if (!empty($_FILES)) {
                         $this->filesModel->uploadFiles($_FILES, "expenses", $uuid);
+                    }
+
+                    $expenseTo = $this->formatDate($_POST['expense_date']);
+                    if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
+                        $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
+                        $message = "<p>Nova despesa para: $expenseTo.</p>";
+
+                        $this->sendMail([
+                            'title' => 'Nova despesa',
+                            'message' => $message,
+                            'name' => $customer['name'],
+                            'toAddress' => $customer['email']
+                        ]);
+                    }
+
+                    if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
+                        $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
+                        $message = "<p>Nova despesa para: $expenseTo.</p>";
+
+                        $this->sendMail([
+                            'title' => 'Nova despesa atribuída',
+                            'message' => $message,
+                            'name' => $user['name'],
+                            'toAddress' => $user['email']
+                        ]);
                     }
                 
                     $this->toLog("Cadastrou a despesa $uuid");
@@ -163,6 +202,20 @@ class ExpensesController extends ActionController implements CrudInterface
     {
         if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             unset($_POST['target']);
+
+            if (!empty($_POST['send_email_customer'])) {
+                $sendEmailCustomer = $_POST['send_email_customer'];
+                unset($_POST['send_email_customer']);
+            } else {
+                $sendEmailCustomer = false;
+            }
+
+            if (!empty($_POST['send_email_user'])) {
+                $sendEmailUser = $_POST['send_email_user'];
+                unset($_POST['send_email_user']);
+            } else {
+                $sendEmailUser = false;
+            }
             
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $_POST['amount']  = $this->moneyToDb($_POST['amount']);
@@ -174,6 +227,31 @@ class ExpensesController extends ActionController implements CrudInterface
             if ($transaction) {
                 if (!empty($_FILES)) {
                     $this->filesModel->uploadFiles($_FILES, "expenses", $_POST['uuid']);
+                }
+
+                $expenseTo = $this->formatDate($_POST['expense_date']);
+                if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
+                    $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
+                    $message = "<p>Nova despesa para: $expenseTo.</p>";
+
+                    $this->sendMail([
+                        'title' => 'Nova despesa',
+                        'message' => $message,
+                        'name' => $customer['name'],
+                        'toAddress' => $customer['email']
+                    ]);
+                }
+
+                if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
+                    $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
+                    $message = "<p>Nova despesa para: $expenseTo.</p>";
+
+                    $this->sendMail([
+                        'title' => 'Nova despesa atribuída',
+                        'message' => $message,
+                        'name' => $user['name'],
+                        'toAddress' => $user['email']
+                    ]);
                 }
 
                 $this->toLog("Atualizou a despesa {$_POST['uuid']}");
