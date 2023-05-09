@@ -21,34 +21,36 @@ class FinancialController extends ActionController
     
     public function indexAction(): void
     {
-        $parentUUID = $this->parentUUID;
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $parentUUID = $this->parentUUID;
 
-        if (!empty($_GET['m'])) {
-            $month = $_GET['m'];
-        } else {
-            $month = date('Y-m');
+            if (!empty($_GET['m'])) {
+                $month = $_GET['m'];
+            } else {
+                $month = date('Y-m');
+            }
+
+            $this->view->month = self::formatMonth($month);
+
+            $total_expenses = $this->expensesModel->getTotalAmountByMonth($month, $parentUUID);
+            $this->view->total_expenses = $total_expenses;
+
+            $total_revenues = $this->revenuesModel->getTotalAmountByMonth($month, $parentUUID);
+            $this->view->total_revenues = $total_revenues;
+
+            $total_schedules = $this->schedulesModel->getTotalAmountByMonth($month, $parentUUID);
+            $this->view->total_schedules = $total_schedules;
+
+            $schedules = $this->schedulesModel->getAllByMonth('2', $month, $parentUUID);
+            $this->view->schedules = $schedules;
+
+            $expenses = $this->expensesModel->getAllByMonth('2', $month, $parentUUID);
+            $this->view->expenses = $expenses;
+
+            $revenues = $this->revenuesModel->getAllByMonth('2', $month, $parentUUID);
+            $this->view->revenues = $revenues;
+
+            $this->render('index', false);
         }
-
-        $this->view->month = self::formatMonth($month);
-
-        $total_expenses = $this->expensesModel->getTotalAmountByMonth($month, $parentUUID);
-        $this->view->total_expenses = $total_expenses;
-
-        $total_revenues = $this->revenuesModel->getTotalAmountByMonth($month, $parentUUID);
-        $this->view->total_revenues = $total_revenues;
-
-        $total_schedules = $this->schedulesModel->getTotalAmountByMonth($month, $parentUUID);
-        $this->view->total_schedules = $total_schedules;
-
-        $schedules = $this->schedulesModel->getAllByMonth('2', $month, $parentUUID);
-        $this->view->schedules = $schedules;
-
-        $expenses = $this->expensesModel->getAllByMonth('2', $month, $parentUUID);
-        $this->view->expenses = $expenses;
-
-        $revenues = $this->revenuesModel->getAllByMonth('2', $month, $parentUUID);
-        $this->view->revenues = $revenues;
-
-        $this->render('index', false);
     }
 }

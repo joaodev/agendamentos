@@ -25,14 +25,18 @@ class RoleController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        $data = $this->model->getAll();
-        $this->view->data = $data;
-        $this->render('index', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $data = $this->model->getAll();
+            $this->view->data = $data;
+            $this->render('index', false);
+        }
     }
 
     public function createAction(): void
     {
-        $this->render('create', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $this->render('create', false);
+        }
     }
 
     private function savePrivilege($role, $resource, $module): void
@@ -51,7 +55,8 @@ class RoleController extends ActionController implements CrudInterface
 
     public function createProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $_POST['uuid'] = $this->model->NewUUID();
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
@@ -102,7 +107,7 @@ class RoleController extends ActionController implements CrudInterface
 
 	public function readAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid']);
             $this->view->entity = $entity;
             $this->render('read', false);
@@ -111,7 +116,7 @@ class RoleController extends ActionController implements CrudInterface
 
 	public function updateAction(): void
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid']);
             $this->view->entity = $entity;
 
@@ -121,7 +126,8 @@ class RoleController extends ActionController implements CrudInterface
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
@@ -153,7 +159,7 @@ class RoleController extends ActionController implements CrudInterface
 
 	public function deleteAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $checkDeletePermission = $this->userModel->checkDeletePermission($_POST['uuid']);
             if ($checkDeletePermission) {
                 $updateData = [

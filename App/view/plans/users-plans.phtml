@@ -210,7 +210,7 @@ if ($canView):
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>planos/planos-usuarios/atualizar",
-                    data: {uuid:uuid},
+                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                     async: true
                 }).done(function(data) {
                     $("#modalLargeResult").html(data);
@@ -239,7 +239,7 @@ if ($canView):
                     $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>planos/planos-usuarios/excluir",
-                        data: {uuid: uuid},
+                        data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                         dataType: 'json',
                         async: true
                     }).done(function(data) {
@@ -268,7 +268,8 @@ if ($canView):
                     url: "<?php echo baseUrl; ?>planos/planos-usuarios/excluir-comprovante",
                     data: {
                         uuid: uuid,
-                        file: file
+                        file: file,
+                        target: '<?php echo $this->getTarget(); ?>'
                     },
                     dataType: 'json',
                     async: true

@@ -171,6 +171,8 @@ $entity = $this->view->entity;
                 if ($('#auth2factor').is(':checked')) {
                     form_data.append('auth2factor', $("#auth2factor").val());    
                 }
+                
+                form_data.append('target', '<?php echo $this->getTarget(); ?>');
 
                 $("#baseLoader").show();
                 $("#btnSubmit").attr('disabled', true);

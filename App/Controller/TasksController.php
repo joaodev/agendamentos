@@ -21,43 +21,48 @@ class TasksController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        if (!empty($_GET['m'])) {
-            $month = $_GET['m'];
-        } else {
-            $month = date('Y-m');
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            if (!empty($_GET['m'])) {
+                $month = $_GET['m'];
+            } else {
+                $month = date('Y-m');
+            }
+
+            $this->view->month = self::formatMonth($month);
+            $data = $this->model->getAllByMonth('0', $month, $this->parentUUID);
+            $this->view->data = $data;
+
+            $activePlan = self::getActivePlan();
+            $totalTasks = $this->model->totalMonthlyData(
+                $month, $this->model->getTable(), 'task_date', $this->parentUUID
+            );
+
+            $totalFree = ($activePlan['total_tasks'] - $totalTasks);
+            $this->view->total_free = $totalFree;
+
+            if ($totalTasks >= $activePlan['total_tasks']) {
+                $reached_limit = true;
+            } else {
+                $reached_limit = false;
+            }   
+            $this->view->reached_limit = $reached_limit;
+            $this->view->parentUUID = $this->parentUUID;
+            
+            $this->render('index', false);
         }
-
-        $this->view->month = self::formatMonth($month);
-        $data = $this->model->getAllByMonth('0', $month, $this->parentUUID);
-        $this->view->data = $data;
-
-        $activePlan = self::getActivePlan();
-        $totalTasks = $this->model->totalMonthlyData(
-            $month, $this->model->getTable(), 'task_date', $this->parentUUID
-        );
-
-        $totalFree = ($activePlan['total_tasks'] - $totalTasks);
-        $this->view->total_free = $totalFree;
-
-        if ($totalTasks >= $activePlan['total_tasks']) {
-            $reached_limit = true;
-        } else {
-            $reached_limit = false;
-        }   
-        $this->view->reached_limit = $reached_limit;
-        $this->view->parentUUID = $this->parentUUID;
-        
-        $this->render('index', false);
     }
 
     public function createAction(): void
     {
-        $this->render('create', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $this->render('create', false);
+        }
     }
 
     public function createProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $activePlan = self::getActivePlan();
             $month = substr($_POST['task_date'], 0, 7);
             $totalTasks = $this->model->totalMonthlyData(
@@ -112,7 +117,7 @@ class TasksController extends ActionController implements CrudInterface
 
     public function updateAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $fields = "uuid, title, description, task_date, task_time, status";
             $entity = $this->model->find($_POST['uuid'], $fields, 'uuid');
             $this->view->entity = $entity;
@@ -126,7 +131,8 @@ class TasksController extends ActionController implements CrudInterface
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $_POST['updated_at'] = date('Y-m-d H:i:s');
 
             $crud = new Crud();
@@ -163,7 +169,7 @@ class TasksController extends ActionController implements CrudInterface
 
     public function readAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $fields = "uuid, title, description, task_date, task_time, status, created_at, updated_at";
             $entity = $this->model->find($_POST['uuid'], $fields, 'uuid');
             $this->view->entity = $entity;
@@ -177,7 +183,7 @@ class TasksController extends ActionController implements CrudInterface
 
     public function deleteAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update([
@@ -211,7 +217,7 @@ class TasksController extends ActionController implements CrudInterface
 
     public function deleteFileAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->filesModel->getTable());
             return $crud->update(['deleted' => '1'], $_POST['uuid'], 'uuid');

@@ -48,6 +48,7 @@ $canUpdate = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCo
                                                 </div>
                                                 <div class="col-md-12">
                                                     <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
+                                                    <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
                                                     <div class="row">
                                                         <div class="col-md-8 mt-2 mb-2">
                                                             <button type="submit" class="btn btn-success w-100" id="btnSubmit"

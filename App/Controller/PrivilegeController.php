@@ -20,18 +20,20 @@ class PrivilegeController extends ActionController
 
     public function indexAction(): void
     {
-        $role = $this->roleModel->getOne($_POST['uuid']);
-        $this->view->role = $role;
-        
-        $data = $this->model->getAllByRoleUuid($_POST['uuid']);
-        $this->view->data = $data;
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $role = $this->roleModel->getOne($_POST['uuid']);
+            $this->view->role = $role;
+            
+            $data = $this->model->getAllByRoleUuid($_POST['uuid']);
+            $this->view->data = $data;
 
-        $this->render('index', false);
+            $this->render('index', false);
+        }
     }
 
     public function changePrivilegeAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $update = [
                 'status' => $_POST['status'],
             ];

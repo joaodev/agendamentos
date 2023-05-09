@@ -235,7 +235,8 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                 data: {
                     uuid:uuid,
                     month: $("#f_month").val(),
-                    modal: true
+                    modal: true,
+                    target: '<?php echo $this->getTarget(); ?>'
                 },
                 async: true
             }).done(function(data) {
@@ -270,7 +271,8 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                 url: "<?php echo baseUrl; ?>"+mod+"/detalhes",
                 data: {
                     uuid:uuid,
-                    month: $("#f_month").val()
+                    month: $("#f_month").val(),
+                    target: '<?php echo $this->getTarget(); ?>'
                 },
                 async: true
             }).done(function(data) {

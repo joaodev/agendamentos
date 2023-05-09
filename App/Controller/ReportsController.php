@@ -30,7 +30,9 @@ class ReportsController extends ActionController
 
     public function indexAction(): void
     {
-        $this->render('index', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $this->render('index', false);
+        }
     }
 
     /**
@@ -38,7 +40,7 @@ class ReportsController extends ActionController
      */
     public function generateAction(): void
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             switch ($_POST['sis_module']) {
                 case 1:
                     $module = 'agendamentos';

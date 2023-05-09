@@ -124,6 +124,7 @@ $role = $_SESSION['ROLE'];
                                         </button>
                                     </div>
                                     <div class="col-md-4 mt-3 mb-2">
+                                        <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
                                         <button type="button" class="btn btn-outline-primary w-100"
                                                 onclick="openModule('clientes');" title="Voltar para Clientes">
                                             <i class="fas fa-arrow-left pr-1"></i> Voltar

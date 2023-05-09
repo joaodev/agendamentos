@@ -18,14 +18,16 @@ class PoliticsController extends ActionController
 
     public function indexAction(): void
     {
-        $entity = $this->model->getOne();
-        $this->view->entity = $entity;
-        $this->render('index', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $entity = $this->model->getOne();
+            $this->view->entity = $entity;
+            $this->render('index', false);
+        }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $postData = [
                 'description' => $_POST['description'],
             ];

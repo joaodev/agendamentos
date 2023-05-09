@@ -786,6 +786,9 @@ $config['logo_icon'] = !empty($config['logo_icon']) ? $config['logo_icon'] : 'ja
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>" + urlParam,
+                data: {
+                    target: '<?php echo $this->getTarget(); ?>'
+                },  
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);

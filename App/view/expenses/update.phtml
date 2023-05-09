@@ -185,6 +185,8 @@ $role = $_SESSION['ROLE'];
                     form_data.append('status', $("#status_1").val());
                     form_data.append('uuid', $("#id_despesa").val());    
 
+                    form_data.append('target', '<?php echo $this->getTarget(); ?>');
+
                     $("#baseLoader").show();
                     $("#btnSubmit").attr('disabled', true);
 
@@ -223,7 +225,8 @@ $role = $_SESSION['ROLE'];
                 type: "POST",
                 url: "<?php echo baseUrl; ?>despesas/remove-arquivo",
                 data: {
-                    uuid: uuid
+                    uuid: uuid,
+                    target: '<?php echo $this->getTarget(); ?>'
                 },
                 async: true
             });

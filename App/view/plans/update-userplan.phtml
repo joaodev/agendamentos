@@ -46,6 +46,7 @@ $plans = $this->view->plans;
                 <div class="col-12"><hr></div>
                 <div class="col-12 text-center">
                     <input type="hidden" name="uuid" id="uuid" value="<?php echo $entity['uuid']; ?>">
+                    <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
                     <button type="submit" class="btn btn-primary" id="btnSubmit">
                         <i class="fa fa-save pr-1"></i> Salvar
                     </button>

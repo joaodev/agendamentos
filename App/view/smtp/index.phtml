@@ -115,6 +115,8 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                         form_data.append('mail_from_address', $("#mail_from_address").val());
                         form_data.append('mail_to_address', $("#mail_to_address").val());
 
+                        form_data.append('target', '<?php echo $this->getTarget(); ?>');
+                        
                         $("#baseLoader").show();
                         $("#btnSubmit").attr('disabled', true);
 

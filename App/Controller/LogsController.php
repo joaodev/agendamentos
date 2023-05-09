@@ -24,7 +24,7 @@ class LogsController extends ActionController
 
     public function readAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid']);
             $this->view->entity = $entity;
             $this->render('read', false);

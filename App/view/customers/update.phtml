@@ -142,6 +142,7 @@ $role = $_SESSION['ROLE'];
                                     </div>
                                     <div class="col-md-4 mt-3 mb-2">
                                         <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
+                                        <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
                                         <button type="button" class="btn btn-outline-primary w-100"
                                                 onclick="openDetails('<?php echo $entity['uuid']; ?>');" title="Voltar para Detalhamento">
                                             <i class="fas fa-arrow-left pr-1"></i> Voltar

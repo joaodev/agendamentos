@@ -25,35 +25,37 @@ class RevenuesController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        $parentUUID = $this->parentUUID;
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $parentUUID = $this->parentUUID;
 
-        if (!empty($_GET['m'])) {
-            $month = $_GET['m'];
-        } else {
-            $month = date('Y-m');
+            if (!empty($_GET['m'])) {
+                $month = $_GET['m'];
+            } else {
+                $month = date('Y-m');
+            }
+
+            $this->view->month = self::formatMonth($month);
+
+            $data = $this->model->getAllByMonth('0', $month, $parentUUID);
+            $this->view->data = $data;
+
+            $activePlan = self::getActivePlan();
+            $totalData = $this->model->totalMonthlyData(
+                $month, $this->model->getTable(), 'revenue_date', $parentUUID
+            );
+
+            $totalFree = ($activePlan['total_revenues'] - $totalData);
+            $this->view->total_free = $totalFree;
+
+            if ($totalData >= $activePlan['total_revenues']) {
+                $reached_limit = true;
+            } else {
+                $reached_limit = false;
+            }   
+            $this->view->reached_limit = $reached_limit;
+
+            $this->render('index', false);
         }
-
-        $this->view->month = self::formatMonth($month);
-
-        $data = $this->model->getAllByMonth('0', $month, $parentUUID);
-        $this->view->data = $data;
-
-        $activePlan = self::getActivePlan();
-        $totalData = $this->model->totalMonthlyData(
-            $month, $this->model->getTable(), 'revenue_date', $parentUUID
-        );
-
-        $totalFree = ($activePlan['total_revenues'] - $totalData);
-        $this->view->total_free = $totalFree;
-
-        if ($totalData >= $activePlan['total_revenues']) {
-            $reached_limit = true;
-        } else {
-            $reached_limit = false;
-        }   
-        $this->view->reached_limit = $reached_limit;
-
-        $this->render('index', false);
     }
 
     public function createAction(): void
@@ -69,7 +71,8 @@ class RevenuesController extends ActionController implements CrudInterface
     
     public function createProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $parentUUID = $this->parentUUID;
             $activePlan = self::getActivePlan();
             $month = substr($_POST['revenue_date'], 0, 7);
@@ -125,7 +128,7 @@ class RevenuesController extends ActionController implements CrudInterface
     
     public function updateAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $parentUUID = $this->parentUUID; 
 
             $entity = $this->model->getOne($_POST['uuid'], $parentUUID);
@@ -146,7 +149,8 @@ class RevenuesController extends ActionController implements CrudInterface
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $_POST['amount']  = $this->moneyToDb($_POST['amount']);
 
@@ -184,7 +188,7 @@ class RevenuesController extends ActionController implements CrudInterface
 
     public function readAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
 
@@ -197,7 +201,7 @@ class RevenuesController extends ActionController implements CrudInterface
 
 	public function deleteAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update([
@@ -231,7 +235,7 @@ class RevenuesController extends ActionController implements CrudInterface
 
     public function deleteFileAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->filesModel->getTable());
             return $crud->update(['deleted' => '1'], $_POST['uuid'], 'uuid');

@@ -73,7 +73,6 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '0' || $this->acl($role, $this->resourceC
         </div>
     </section>
     <script>
-        
         $(document).ready(function() {
             $("input[data-bootstrap-switch]").each(function(){
                 $(this).bootstrapSwitch();
@@ -154,7 +153,8 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '0' || $this->acl($role, $this->resourceC
                     url: "<?php echo baseUrl; ?>usuarios/altera-permissao",
                     data: {
                         uuid: uuid,
-                        status: status_acl
+                        status: status_acl,
+                        target: '<?php echo $this->getTarget(); ?>'
                     },
                     dataType: 'json',
                     async: true

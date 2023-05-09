@@ -164,6 +164,8 @@
                     form_data.append('service_uuid', $("#service_uuid").val());    
                     form_data.append('status', $("#status_1").val());
 
+                    form_data.append('target', '<?php echo $this->getTarget(); ?>');
+
                     $("#baseLoader").show();
                     $("#btnSubmit").attr('disabled', true);
 

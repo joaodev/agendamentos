@@ -73,6 +73,7 @@
 
                                                             form_data.append('file_renew', file_data);    
                                                             form_data.append('order', $("#order").val());    
+                                                            form_data.append('target', '<?php echo $this->getTarget(); ?>');
                                                             
                                                             $("#baseLoader").show();
                                                             $("#btnSubmit").show('disabled', true);
@@ -122,6 +123,9 @@
                                                     $.ajax({
                                                         type: 'post',
                                                         url: "<?php echo baseUrl; ?>planos/solicitar-alteracao",
+                                                        data: {
+                                                            target: '<?php echo $this->getTarget(); ?>'
+                                                        },
                                                         async: true
                                                     }).done(function(data) {
                                                         $("#modalRequestAlterResult").html(data);
@@ -190,6 +194,7 @@
 
                                 form_data.append('file', file_data);    
                                 form_data.append('order', $("#order").val());    
+                                form_data.append('target', '<?php echo $this->getTarget(); ?>');
                                 
                                 $("#baseLoader").show();
                                 $("#btnSubmit").show('disabled', true);
@@ -237,7 +242,7 @@
                             $.ajax({
                                 type: 'post',
                                 url: "<?php echo baseUrl; ?>planos/plano-cancelado",
-                                data: {uuid:uuid},
+                                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                                 dataType: 'json',
                                 async: true
                             }).done(function(data) {
@@ -286,7 +291,7 @@
                         $.ajax({
                             type: 'post',
                             url: "<?php echo baseUrl; ?>planos/plano-selecionado",
-                            data: {uuid:uuid},
+                            data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                             dataType: 'json',
                             async: true
                         }).done(function(data) {

@@ -19,33 +19,39 @@ class CustomersController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        $data = $this->model->getAll($this->parentUUID);
-        $this->view->data = $data;
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $data = $this->model->getAll($this->parentUUID);
+            $this->view->data = $data;
 
-        $activePlan = self::getActivePlan();
-        $totalServices = $this->model->totalData($this->model->getTable(), $this->parentUUID);
-        
-        $totalFree = ($activePlan['total_customers'] - $totalServices);
-        $this->view->total_free = $totalFree;
+            $activePlan = self::getActivePlan();
+            $totalServices = $this->model->totalData($this->model->getTable(), $this->parentUUID);
+            
+            $totalFree = ($activePlan['total_customers'] - $totalServices);
+            $this->view->total_free = $totalFree;
 
-        if ($totalServices >= $activePlan['total_customers']) {
-            $reached_limit = true;
-        } else {
-            $reached_limit = false;
-        }   
-        $this->view->reached_limit = $reached_limit;
+            if ($totalServices >= $activePlan['total_customers']) {
+                $reached_limit = true;
+            } else {
+                $reached_limit = false;
+            }   
+            $this->view->reached_limit = $reached_limit;
 
-        $this->render('index', false);
+            $this->render('index', false);
+        }
     }
 
     public function createAction(): void
     {
-        $this->render('create', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $this->render('create', false);
+        }
     }
 
     public function createProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
+
             $activePlan = self::getActivePlan();
             $totalCustomers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
             if ($totalCustomers >= $activePlan['total_customers']) {
@@ -92,7 +98,7 @@ class CustomersController extends ActionController implements CrudInterface
 
 	public function readAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
             $this->render('read', false);
@@ -101,7 +107,7 @@ class CustomersController extends ActionController implements CrudInterface
 
 	public function updateAction(): void
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
 
@@ -111,7 +117,9 @@ class CustomersController extends ActionController implements CrudInterface
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
+            
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
@@ -143,7 +151,7 @@ class CustomersController extends ActionController implements CrudInterface
 
 	public function deleteAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update(['deleted' => 1], $_POST['uuid'], 'uuid');

@@ -26,35 +26,40 @@ class UserController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        $activePlan = self::getActivePlan();
-        $totalUsers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
-        
-        $totalFree = ($activePlan['total_users'] - $totalUsers);
-        $this->view->total_free = $totalFree;
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $activePlan = self::getActivePlan();
+            $totalUsers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
+            
+            $totalFree = ($activePlan['total_users'] - $totalUsers);
+            $this->view->total_free = $totalFree;
 
-        if ($totalUsers >= $activePlan['total_users']) {
-            $reached_limit = true;
-        } else {
-            $reached_limit = false;
-        }   
-        $this->view->reached_limit = $reached_limit;
+            if ($totalUsers >= $activePlan['total_users']) {
+                $reached_limit = true;
+            } else {
+                $reached_limit = false;
+            }   
+            $this->view->reached_limit = $reached_limit;
 
-        $data = $this->model->getAll($this->parentUUID);
-        $this->view->data = $data;
-        $this->render('index', false);
+            $data = $this->model->getAll($this->parentUUID);
+            $this->view->data = $data;
+            $this->render('index', false);
+        }
     }
 
     public function createAction(): void
     {
-        $roles = $this->roleModel->getAll(null);
-        $this->view->roles = $roles;
-      
-        $this->render('create', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $roles = $this->roleModel->getAll(null);
+            $this->view->roles = $roles;
+        
+            $this->render('create', false);
+        }
     }
 
     public function createProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $activePlan = self::getActivePlan();
             $totalUsers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
             if ($totalUsers >= $activePlan['total_users']) {
@@ -144,7 +149,7 @@ class UserController extends ActionController implements CrudInterface
 
 	public function readAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->entity = $entity;
             $this->render('read', false);
@@ -153,7 +158,7 @@ class UserController extends ActionController implements CrudInterface
 
 	public function updateAction(): void
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $roles = $this->roleModel->getAll(null);
             $this->view->roles = $roles;
 
@@ -166,7 +171,8 @@ class UserController extends ActionController implements CrudInterface
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             if (!empty($_POST['password'])) {
                 unset($_POST['password']);
@@ -212,7 +218,7 @@ class UserController extends ActionController implements CrudInterface
 
 	public function deleteAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $updateData = [
                 'updated_at' => date('Y-m-d H:i:s'),
                 'deleted' => '1'
@@ -267,7 +273,7 @@ class UserController extends ActionController implements CrudInterface
 
     public function aclAction(): void
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $user = $this->model->getOne($_POST['uuid'], $this->parentUUID);
             $this->view->user = $user;
             
@@ -279,7 +285,8 @@ class UserController extends ActionController implements CrudInterface
 
     public function alterPrivilegeAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $crud = new Crud();
             $crud->setTable($this->aclModel->getTable());
             $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');

@@ -81,6 +81,7 @@ $canView = $_SESSION['ROLE_ADM'] == '0' || $this->acl($role, $this->resourceCode
                                     </div>
                                     <div class="col-6 col-md-4">
                                         <br>
+                                        <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
                                         <button type="submit" class="btn btn-primary btn-xl w-100 mt-2" id="btnSubmit">
                                             <span class="fa fa-file pr-1"></span> Gerar 
                                         </button>

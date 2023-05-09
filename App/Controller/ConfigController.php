@@ -18,15 +18,17 @@ class ConfigController extends ActionController
 
     public function indexAction(): void
     {
-        $entity = $this->model->getEntity();
-        $this->view->entity = $entity;
-        $this->render('index', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $entity = $this->model->getEntity();
+            $this->view->entity = $entity;
+            $this->render('index', false);
+        }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
-
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             if (!empty($_FILES["logo"])) {
                 $image_name_f1 = $_FILES["logo"]["name"];
                 if ($image_name_f1 != null) {

@@ -158,7 +158,7 @@ $canView = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCode
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>logs/detalhes",
-                data: {uuid:uuid},
+                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                 async: true
             }).done(function(data) {
                 $("#modalLargeResult").html(data);

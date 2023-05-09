@@ -569,4 +569,23 @@ class ActionController
             return false;
         }
     }
+
+    public function getTarget(): string
+    {
+        return md5($_SESSION['COD'] . $_SERVER["HTTP_USER_AGENT"]);
+    }
+
+    public function targetValidated($target): bool
+    {
+        if (!empty($target)) {
+            $currentTarget = md5($_SESSION['COD'] . $_SERVER["HTTP_USER_AGENT"]);
+            if ($currentTarget && md5($target)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

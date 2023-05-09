@@ -19,14 +19,18 @@ class MyProfileController extends ActionController
 
     public function indexAction(): void
     {
-        $entity = $this->model->getOne($_SESSION['COD'], $this->parentUUID);
-        $this->view->entity = $entity;
-        $this->render('index', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $entity = $this->model->getOne($_SESSION['COD'], $this->parentUUID);
+            $this->view->entity = $entity;
+            $this->render('index', false);
+        }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
+            
             $exists = $this->model->fieldExists('email', $_POST['email'], 'uuid', $_SESSION['COD']);
             if ($exists) {
                 $data  = [

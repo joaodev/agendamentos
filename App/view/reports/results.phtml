@@ -943,7 +943,8 @@
             url: "<?php echo baseUrl . $this->view->module; ?>/detalhes",
             data: {
                 uuid:uuid,
-                modal: true
+                modal: true,
+                target: '<?php echo $this->getTarget(); ?>'
             },
             async: true
         }).done(function(data) {
@@ -964,7 +965,8 @@
             url: "<?php echo baseUrl; ?>"+mod+"/detalhes",
             data: {
                 uuid:uuid,
-                month: month
+                month: month,
+                target: '<?php echo $this->getTarget(); ?>'
             },
             async: true
         }).done(function(data) {

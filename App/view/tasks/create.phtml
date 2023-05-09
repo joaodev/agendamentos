@@ -97,6 +97,8 @@
                     form_data.append('task_date', $("#task_date").val());    
                     form_data.append('task_time', $("#task_time").val());    
 
+                    form_data.append('target', '<?php echo $this->getTarget(); ?>');
+                    
                     $("#baseLoader").show();
                     $("#btnSubmit").show('disabled', true);
 

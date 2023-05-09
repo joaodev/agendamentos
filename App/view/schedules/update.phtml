@@ -211,6 +211,8 @@ $role = $_SESSION['ROLE'];
                     form_data.append('status', $("#status_1").val());
                     form_data.append('uuid', $("#id_agendamento").val());    
 
+                    form_data.append('target', '<?php echo $this->getTarget(); ?>');
+                    
                     $("#baseLoader").show();
                     $("#btnSubmit").attr('disabled', true);
 

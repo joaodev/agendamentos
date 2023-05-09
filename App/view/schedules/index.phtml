@@ -248,7 +248,8 @@ $isParent = $this->isUserParent();
                 url: "<?php echo baseUrl; ?>agendamentos/detalhes",
                 data: {
                     uuid:uuid,
-                    month: $("#f_month").val()
+                    month: $("#f_month").val(),
+                    target: '<?php echo $this->getTarget(); ?>'
                 },
                 async: true
             }).done(function(data) {
@@ -282,7 +283,8 @@ $isParent = $this->isUserParent();
                     type: 'post',
                     url: "<?php echo baseUrl; ?>agendamentos/cadastrar",
                     data: {
-                        month: $("#f_month").val()
+                        month: $("#f_month").val(),
+                        target: '<?php echo $this->getTarget(); ?>'
                     },  
                     async: true
                 }).done(function(data) {
@@ -303,7 +305,8 @@ $isParent = $this->isUserParent();
                     type: 'post',
                     url: "<?php echo baseUrl; ?>agendamentos/editar",
                     data: {
-                        uuid:uuid
+                        uuid:uuid,
+                        target: '<?php echo $this->getTarget(); ?>'
                     },
                     async: true
                 }).done(function(data) {
@@ -333,7 +336,7 @@ $isParent = $this->isUserParent();
                     $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>agendamentos/excluir",
-                        data: {uuid: uuid},
+                        data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                         dataType: 'json',
                         async: true
                     }).done(function(data) {

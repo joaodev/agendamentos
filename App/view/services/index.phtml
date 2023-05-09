@@ -185,7 +185,7 @@ $isParent = $this->isUserParent();
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>servicos/detalhes",
-                data: {uuid:uuid},
+                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
@@ -203,6 +203,9 @@ $isParent = $this->isUserParent();
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>servicos/cadastrar",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },      
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
@@ -221,7 +224,7 @@ $isParent = $this->isUserParent();
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>servicos/editar",
-                    data: {uuid:uuid},
+                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
@@ -250,7 +253,7 @@ $isParent = $this->isUserParent();
                     $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>servicos/excluir",
-                        data: {uuid: uuid},
+                        data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                         dataType: 'json',
                         async: true
                     }).done(function(data) {

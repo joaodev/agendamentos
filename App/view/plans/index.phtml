@@ -157,7 +157,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>planos/detalhes",
-                data: {uuid:uuid},
+                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
@@ -175,7 +175,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>planos/planos-usuarios",
-                    data: {uuid:uuid},
+                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
@@ -194,6 +194,9 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>planos/cadastrar",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
@@ -212,7 +215,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>planos/editar",
-                    data: {uuid:uuid},
+                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
@@ -241,7 +244,7 @@ $canViewUserPlans  = $isAdmin || $this->acl($role, $this->resourceCodes('view'),
                     $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>planos/excluir",
-                        data: {uuid: uuid},
+                        data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                         dataType: 'json',
                         async: true
                     }).done(function(data) {

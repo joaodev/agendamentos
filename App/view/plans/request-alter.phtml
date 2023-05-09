@@ -1,6 +1,7 @@
 <?php $plans = $this->view->plans; ?>
 <form method="post" name="formAlterPlan" id="formAlterPlan">
     <div class="row" id="formBox">
+        <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
         <div class="col-md-12">
             <div class="form-group">
                 <label for="name">Plano Desejado*</label>

@@ -117,7 +117,7 @@
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>controle-acesso/detalhes",
-                data: {uuid:uuid},
+                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
@@ -133,7 +133,7 @@
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>controle-acesso/permissoes",
-                data: {uuid:uuid},
+                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
@@ -149,6 +149,9 @@
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>controle-acesso/cadastrar",
+                data: {
+                    target: '<?php echo $this->getTarget(); ?>'
+                },
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
@@ -164,7 +167,7 @@
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>controle-acesso/editar",
-                data: {uuid:uuid},
+                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
@@ -190,7 +193,7 @@
                 $.ajax({
                     type: "POST",
                     url: "<?php echo baseUrl; ?>controle-acesso/excluir",
-                    data: {uuid: uuid},
+                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                     dataType: 'json',
                     async: true
                 }).done(function(data) {

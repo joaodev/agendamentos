@@ -125,6 +125,7 @@ $role = $_SESSION['ROLE'];
                                         <div class="row">
                                             <div class="col-md-8 mt-2 mb-2">
                                                 <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
+                                                <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
                                                 <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Plano">
                                                     <i class="fa fa-save pr-1"></i> Salvar
                                                 </button>

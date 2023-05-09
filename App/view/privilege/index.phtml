@@ -145,7 +145,8 @@ $data = $this->view->data;
                 url: "<?php echo baseUrl; ?>controle-acesso/altera-permissao",
                 data: {
                     uuid: uuid,
-                    status: status_acl
+                    status: status_acl,
+                    target: '<?php echo $this->getTarget(); ?>'
                 },
                 dataType: 'json',
                 async: true

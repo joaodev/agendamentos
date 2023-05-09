@@ -183,7 +183,7 @@ $isParent = $this->isUserParent();
             $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>usuarios/detalhes",
-                data: {uuid:uuid},
+                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
@@ -201,6 +201,9 @@ $isParent = $this->isUserParent();
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>usuarios/cadastrar",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
@@ -219,7 +222,7 @@ $isParent = $this->isUserParent();
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>usuarios/editar",
-                    data: {uuid:uuid},
+                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
@@ -248,7 +251,7 @@ $isParent = $this->isUserParent();
                     $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>usuarios/excluir",
-                        data: {uuid: uuid},
+                        data: {uuid: uuid, target: '<?php echo $this->getTarget(); ?>'},
                         dataType: 'json',
                         async: true
                     }).done(function(data) {
@@ -276,7 +279,7 @@ $isParent = $this->isUserParent();
                 $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>usuarios/acl",
-                    data: {uuid:uuid},
+                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);

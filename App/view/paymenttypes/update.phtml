@@ -54,7 +54,7 @@ $role = $_SESSION['ROLE'];
                                     </div>
                                     <div class="col-12">
                                         <div class="row">
-                                            <input type="hidden" name="uuid" id="id_mesa"
+                                            <input type="hidden" name="uuid" id="uuid_pgto"
                                                 value="<?php echo $entity['uuid']; ?>">
                                             <div class="col-md-8 mt-2 mb-2">
                                                 <button type="submit" class="btn btn-success w-100" id="btnSubmit"
@@ -101,7 +101,8 @@ $role = $_SESSION['ROLE'];
 
                     form_data.append('name', $("#name").val());
                     form_data.append('status', $("#status_1").val());
-                    form_data.append('uuid', $("#id_mesa").val());
+                    form_data.append('uuid', $("#uuid_pgto").val());
+                    form_data.append('target', '<?php echo $this->getTarget(); ?>');
 
                     $("#baseLoader").show();
                     $("#btnSubmit").attr('disabled', true);

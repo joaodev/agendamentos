@@ -21,19 +21,24 @@ class PlansController extends ActionController implements CrudInterface
 
     public function indexAction(): void
     {
-        $data = $this->model->getAll();
-        $this->view->data = $data;
-        $this->render('index', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $data = $this->model->getAll();
+            $this->view->data = $data;
+            $this->render('index', false);
+        }
     }
 
     public function createAction(): void
     {
-        $this->render('create', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $this->render('create', false);
+        }
     }
     
     public function createProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $uuid = $this->model->NewUUID();
             $_POST['uuid'] = $uuid;
             $_POST['price'] = $this->moneyToDb($_POST['price']);
@@ -69,7 +74,7 @@ class PlansController extends ActionController implements CrudInterface
     
     public function updateAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid']);
             $this->view->entity = $entity;
             $this->render('update', false);
@@ -78,7 +83,8 @@ class PlansController extends ActionController implements CrudInterface
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $_POST['price'] = $this->moneyToDb($_POST['price']);
             $_POST['btn_link'] = base64_encode($_POST['btn_link']);
@@ -113,7 +119,7 @@ class PlansController extends ActionController implements CrudInterface
 
     public function readAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $entity = $this->model->getOne($_POST['uuid']);
             $this->view->entity = $entity;
             $this->render('read', false);
@@ -122,7 +128,7 @@ class PlansController extends ActionController implements CrudInterface
 
 	public function deleteAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update([
@@ -173,18 +179,22 @@ class PlansController extends ActionController implements CrudInterface
 
     public function userPlansAction(): void
     {
-        $userPlans = $this->userPlansModel->getAllByUser($_SESSION['COD']);
-        $this->view->user_plans = $userPlans;
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $userPlans = $this->userPlansModel->getAllByUser($_SESSION['COD']);
+            $this->view->user_plans = $userPlans;
 
-        $data = $this->model->getAllPlans();
-        $this->view->data = $data;
+            $data = $this->model->getAllPlans();
+            $this->view->data = $data;
 
-        $this->render('user-plans', false);
+            $this->render('user-plans', false);
+        }
     }
 
     public function selectedPlanAction(): bool
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
+
             $postData = [
                 'uuid' => $this->userPlansModel->NewUUID(),
                 'user_uuid' => $_SESSION['COD'],
@@ -359,7 +369,7 @@ class PlansController extends ActionController implements CrudInterface
 
     public function cancelPlanAction(): bool
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->userPlansModel->getTable());
             $transaction = $crud->update([
@@ -393,7 +403,7 @@ class PlansController extends ActionController implements CrudInterface
 
     public function usersPlansAction(): void
     {
-        if (!empty($_POST['uuid'])) {   
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {   
             $data = $this->userPlansModel->getAllUsersPlans($_POST['uuid']);
             $this->view->data = $data;
 
@@ -405,7 +415,7 @@ class PlansController extends ActionController implements CrudInterface
 
     public function deleteUserplanAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->userPlansModel->getTable());
             $transaction = $crud->delete($_POST['uuid'], 'uuid');
@@ -436,7 +446,7 @@ class PlansController extends ActionController implements CrudInterface
 
     public function deletePaymentfileAction(): bool
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $crud = new Crud();
             $crud->setTable($this->userPlansModel->getTable());
             $transaction = $crud->update([
@@ -471,7 +481,7 @@ class PlansController extends ActionController implements CrudInterface
 
     public function updateUserplanAction(): void
     {
-        if (!empty($_POST['uuid'])) {
+        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             $plans = $this->model->getAll();
             $this->view->plans = $plans;
             
@@ -483,7 +493,7 @@ class PlansController extends ActionController implements CrudInterface
 
     public function processUserplanAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
             if (!empty($_POST['message'])) {
                 $entity = $this->userPlansModel->getOne($_POST['uuid']);
                 $url = baseUrl;
@@ -539,14 +549,17 @@ class PlansController extends ActionController implements CrudInterface
 
     public function requestAlterAction(): void
     {
-        $plans = $this->model->getAllActives();
-        $this->view->plans = $plans;
-        $this->render('request-alter', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $plans = $this->model->getAllActives();
+            $this->view->plans = $plans;
+            $this->render('request-alter', false);
+        }
     }
 
     public function sendRequestAction(): bool
     {   
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
             $config = $this->getSiteConfig();
 
             $message = "<p>Pedido para alteração de plano:</p>

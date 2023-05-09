@@ -18,14 +18,18 @@ class SmtpController extends ActionController
 
     public function indexAction(): void
     {
-        $entity = $this->model->getEntity();
-        $this->view->entity = $entity;
-        $this->render('index', false);
+        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            $entity = $this->model->getEntity();
+            $this->view->entity = $entity;
+            $this->render('index', false);
+        }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+            unset($_POST['target']);
+            
             if (empty($_POST['mail_password'])) {
                 unset($_POST['mail_password']);
             }
