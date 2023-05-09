@@ -3,6 +3,10 @@ $entity = $this->view->entity;
 $role = $_SESSION['ROLE'];
 ?>
 <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('schedules'))): ?>
+    <?php
+    $canCreateCustomer = $_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('customers'));
+    $canCreateService = $_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('services'));
+    ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
@@ -49,10 +53,12 @@ $role = $_SESSION['ROLE'];
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="service_uuid">Atribuir Serviço*</label>
-                                            <a onclick="newService();" class="text-success" 
-                                                style="cursor: pointer; float: right" title="Adicionar Serviço">
-                                                <span class="fa fa-plus-circle"></span>
-                                            </a> 
+                                            <?php if ($canCreateService): ?>
+                                                <a onclick="newService();" class="text-success" 
+                                                    style="cursor: pointer; float: right" title="Adicionar Serviço">
+                                                    <span class="fa fa-plus-circle"></span>
+                                                </a> 
+                                            <?php endif; ?>
                                             <select name="service_uuid" id="service_uuid" class="form-control" required
                                                 onchange="getServiceDescription();">
                                                 <option value="">Selecione</option>
@@ -69,10 +75,12 @@ $role = $_SESSION['ROLE'];
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="customer_uuid">Atribuir Cliente</label>
-                                            <a onclick="newCustomer();" class="text-success" 
-                                                style="cursor: pointer; float: right" title="Adicionar Serviço">
-                                                <span class="fa fa-plus-circle"></span>
-                                            </a> 
+                                            <?php if ($canCreateCustomer): ?>
+                                                <a onclick="newCustomer();" class="text-success" 
+                                                    style="cursor: pointer; float: right" title="Adicionar Cliente">
+                                                    <span class="fa fa-plus-circle"></span>
+                                                </a> 
+                                            <?php endif; ?>
                                             <select name="customer_uuid" id="customer_uuid" class="form-control">
                                                 <option value="">Selecione</option>
                                                 <?php foreach ($this->view->customers as $customer): ?>
@@ -278,52 +286,6 @@ $role = $_SESSION['ROLE'];
             }
         }
 
-        function newService() {
-            $("#modalGreenLargeResult").empty();
-            $("#modalGreenLarge").modal('hide');
-            $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Serviço');
-            $("#modalGreenLargeLoader").show();
-            $("#modalGreenLarge").modal('show');
-
-            $.ajax({
-                type: 'post',
-                url: "<?php echo baseUrl; ?>agendamentos/cadastrar-servico",
-                data: {
-                    target: '<?php echo $this->getTarget(); ?>'
-                },
-                async: true
-            }).done(function(data) {
-                $("#modalGreenLargeResult").html(data);
-                $("#modalGreenLargeLoader").hide();
-            }).fail(function() {
-                showInternalErrorAlert();
-                $("#modalGreenLargeLoader").hide();
-            });
-        }
-
-        function newCustomer() {
-            $("#modalGreenLargeResult").empty();
-            $("#modalGreenLarge").modal('hide');
-            $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Cliente');
-            $("#modalGreenLargeLoader").show();
-            $("#modalGreenLarge").modal('show');
-
-            $.ajax({
-                type: 'post',
-                url: "<?php echo baseUrl; ?>agendamentos/cadastrar-cliente",
-                data: {
-                    target: '<?php echo $this->getTarget(); ?>'
-                },
-                async: true
-            }).done(function(data) {
-                $("#modalGreenLargeResult").html(data);
-                $("#modalGreenLargeLoader").hide();
-            }).fail(function() {
-                showInternalErrorAlert();
-                $("#modalGreenLargeLoader").hide();
-            });
-        }
-
         function deleteFile(uuid) {
             $("#box_" + uuid).fadeOut(999);
 
@@ -338,4 +300,56 @@ $role = $_SESSION['ROLE'];
             });
         }
     </script>
+    <?php if ($canCreateService): ?>
+        <script>
+            function newService() {
+                $("#modalGreenLargeResult").empty();
+                $("#modalGreenLarge").modal('hide');
+                $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Serviço');
+                $("#modalGreenLargeLoader").show();
+                $("#modalGreenLarge").modal('show');
+
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>agendamentos/cadastrar-servico",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#modalGreenLargeResult").html(data);
+                    $("#modalGreenLargeLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalGreenLargeLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canCreateCustomer): ?>
+        <script>
+            function newCustomer() {
+                $("#modalGreenLargeResult").empty();
+                $("#modalGreenLarge").modal('hide');
+                $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Cliente');
+                $("#modalGreenLargeLoader").show();
+                $("#modalGreenLarge").modal('show');
+
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>agendamentos/cadastrar-cliente",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#modalGreenLargeResult").html(data);
+                    $("#modalGreenLargeLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalGreenLargeLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
 <?php endif; ?>

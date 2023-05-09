@@ -1,4 +1,7 @@
 <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('revenues'))): ?>
+    <?php
+    $canCreateCustomer = $_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('customers'));
+    ?>
     <section class="content-header mt-5">
         <div class="container-fluid mt-2">
             <div class="row">
@@ -84,10 +87,12 @@
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label for="customer_uuid">Atribuir Cliente</label>
-                                            <a onclick="newCustomer();" class="text-success" 
-                                                style="cursor: pointer; float: right" title="Adicionar Serviço">
-                                                <span class="fa fa-plus-circle"></span>
-                                            </a> 
+                                            <?php if ($canCreateCustomer): ?>
+                                                <a onclick="newCustomer();" class="text-success" 
+                                                    style="cursor: pointer; float: right" title="Adicionar Cliente">
+                                                    <span class="fa fa-plus-circle"></span>
+                                                </a> 
+                                            <?php endif; ?>
                                             <select name="customer_uuid" id="customer_uuid" class="form-control">
                                                 <option value="">Selecione</option>
                                                 <?php foreach ($this->view->customers as $customer): ?>
@@ -190,29 +195,30 @@
             });
         });
     </script>
+    <?php if ($canCreateCustomer): ?>
+        <script>
+            function newCustomer() {
+                $("#modalGreenLargeResult").empty();
+                $("#modalGreenLarge").modal('hide');
+                $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Cliente');
+                $("#modalGreenLargeLoader").show();
+                $("#modalGreenLarge").modal('show');
 
-    <script>
-        function newCustomer() {
-            $("#modalGreenLargeResult").empty();
-            $("#modalGreenLarge").modal('hide');
-            $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Cliente');
-            $("#modalGreenLargeLoader").show();
-            $("#modalGreenLarge").modal('show');
-
-            $.ajax({
-                type: 'post',
-                url: "<?php echo baseUrl; ?>receitas/cadastrar-cliente",
-                data: {
-                    target: '<?php echo $this->getTarget(); ?>'
-                },
-                async: true
-            }).done(function(data) {
-                $("#modalGreenLargeResult").html(data);
-                $("#modalGreenLargeLoader").hide();
-            }).fail(function() {
-                showInternalErrorAlert();
-                $("#modalGreenLargeLoader").hide();
-            });
-        }
-    </script>
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>receitas/cadastrar-cliente",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#modalGreenLargeResult").html(data);
+                    $("#modalGreenLargeLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalGreenLargeLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
 <?php endif; ?>
