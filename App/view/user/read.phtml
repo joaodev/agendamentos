@@ -47,22 +47,19 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                             <div class="row" id="printable">
                                 <div class="col-md-6">
                                     <?php if ($entity['status'] == '1'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Usuário ativo no sistema
+                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Ativo no sistema
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '0'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Usuário inativo no sistema
+                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Inativo no sistema
                                     <?php endif; ?>
                                 </div>
-                                <?php if ($_SESSION['ROLE_ADM'] == '0'): ?>
-                                    <div class="col-md-6">
+                                <div class="col-md-6">
+                                    <?php if ($_SESSION['ROLE_ADM'] == '0'): ?>
                                         <div class="form-group">
                                             <label for="role">Nível de Acesso</label>:
                                             <span><?php echo $entity['role'] ? $entity['role'] : 'Não Informado'; ?></span>
                                         </div>
-                                    </div>
-                                <?php endif; ?>
-                                <div class="col-md-12">
-                                    <hr>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="col-md-12" style="border-radius: 5px;">
                                     <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>

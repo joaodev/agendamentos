@@ -37,8 +37,8 @@ $role = $_SESSION['ROLE'];
                                         <div class="form-group">
                                             <label for="name">Situação*</label>
                                             <select name="status" id="status_1" class="form-control">
-                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Plano ativo no sistema</option>
-                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>Plano inativo no sistema</option>
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Ativo no sistema</option>
+                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>Inativo no sistema</option>
                                             </select>
                                         </div>
                                     </div>
@@ -95,7 +95,7 @@ $role = $_SESSION['ROLE'];
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="total_revenues">Qtd. Receitas*</label>
+                                            <label for="total_revenues">Qtd. Recebimentos*</label>
                                             <input type="number" class="form-control" name="total_revenues" id="total_revenues" min="1" placeholder="0" required
                                                 value="<?php echo $entity['total_revenues']; ?>">
                                         </div>
@@ -180,7 +180,7 @@ $role = $_SESSION['ROLE'];
                     }).done(function(data) {
                         showAlert(data.type, data.title, data.msg, data.pos);
                         if (data.type === 'success') {
-                            updatePlan('<?php echo $entity['uuid']; ?>');
+                            openDetails('<?php echo $entity['uuid']; ?>');
                         } else {
                             $("#baseLoader").hide();
                             $("#btnSubmit").attr('disabled', false);

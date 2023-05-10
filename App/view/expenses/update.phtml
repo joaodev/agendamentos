@@ -42,8 +42,8 @@ $role = $_SESSION['ROLE'];
                                             <label for="title">Situação*</label>
                                             <select name="status" id="status_1" class="form-control">
                                                 <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Pagamento pendente</option>
-                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Pagamento concluída</option>
-                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Pagamento cancelada</option>
+                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Pagamento concluído</option>
+                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Pagamento cancelado</option>
                                             </select>
                                         </div>
                                     </div>
@@ -173,7 +173,7 @@ $role = $_SESSION['ROLE'];
                                         </div>
                                     </div>
                                     <div class="col-md-8 mt-3 mb-2">
-                                        <?php if ($entity['status'] == '1'): ?>
+                                        <?php if ($entity['status'] == '1' || $this->parentUUID == $_SESSION['COD']): ?>
                                             <input type="hidden" name="uuid" id="id_despesa" value="<?php echo $entity['uuid']; ?>">
                                             <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Despesa">
                                                 <i class="fa fa-save pr-1"></i> Salvar

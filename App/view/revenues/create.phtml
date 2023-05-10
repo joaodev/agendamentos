@@ -8,14 +8,14 @@
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-plus-square pr-1"></i>
-                        Receita
+                        Recebimento
                     </h1>
                 </div>
                 <div class="col-1">
                     <ol class="breadcrumb float-right">
                         <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary" title="Voltar para Receitas"
-                                onclick="openModule('receitas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
+                            <button type="button" class="btn btn-outline-primary" title="Voltar para Recebimentos"
+                                onclick="openModule('recebimentos?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
                         </li>
@@ -37,18 +37,18 @@
                                         <div class="form-group">
                                             <label for="title">Situação*</label>
                                             <select name="status" id="status_1" class="form-control" required>
-                                                <option value="1">Pendente</option>
-                                                <option value="2">Concluída</option>
-                                                <option value="3">Cancelada</option>
+                                                <option value="1">Pagamento pendente</option>
+                                                <option value="2">Pagamento concluído</option>
+                                                <option value="3">Pagamento cancelado</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-12">
                                         <hr>
                                         <div class="form-group">
-                                            <label for="title">Título da Receita*</label>
+                                            <label for="title">Título do Recebimento*</label>
                                             <input type="text" class="form-control" name="title" id="title" required maxlength="100"
-                                                placeholder="Nome da Receita a ser paga">
+                                                placeholder="Nome do Recebimento a ser paga">
                                         </div>
                                     </div>   
                                     <div class="col-12">
@@ -132,13 +132,13 @@
                                         </div>
                                     </div>
                                     <div class="col-md-8 mt-3 mb-2">
-                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Receita">
+                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Recebimento">
                                             <i class="fa fa-save pr-1"></i> Salvar
                                         </button>
                                     </div>
                                     <div class="col-md-4 mt-3 mb-2">
                                         <button type="button" class="btn btn-outline-primary w-100"
-                                                onclick="openModule('receitas?m=<?php echo $_POST['month']; ?>');" title="Voltar para Receitas">
+                                                onclick="openModule('recebimentos?m=<?php echo $_POST['month']; ?>');" title="Voltar para Recebimentos">
                                             <i class="fas fa-arrow-left pr-1"></i> Voltar
                                         </button>
                                     </div>
@@ -187,7 +187,7 @@
 
                     $.ajax({
                         type: "POST",
-                        url: "<?php echo baseUrl; ?>receitas/processa-cadastro",
+                        url: "<?php echo baseUrl; ?>recebimentos/processa-cadastro",
                         cache: false,
                         contentType: false,
                         processData: false,
@@ -221,7 +221,7 @@
 
                 $.ajax({
                     type: 'post',
-                    url: "<?php echo baseUrl; ?>receitas/cadastrar-cliente",
+                    url: "<?php echo baseUrl; ?>recebimentos/cadastrar-cliente",
                     data: {
                         target: '<?php echo $this->getTarget(); ?>'
                     },

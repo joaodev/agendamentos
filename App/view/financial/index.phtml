@@ -39,7 +39,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                         <div class="col-md-4 text-center">
                             <div class="card bg-success">
                                 <div class="card-body">
-                                    <span style="font-size: 1em"><i class="fa fa-plus-circle pr-1"></i> Receitas</span> 
+                                    <span style="font-size: 1em"><i class="fa fa-plus-circle pr-1"></i> Recebimentos</span> 
                                     <h3>R$ <?php echo number_format(($this->view->total_schedules + $this->view->total_revenues), 2, ",","."); ?></h3>
                                 </div>
                             </div>
@@ -85,7 +85,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                                     <?php echo $this->formatDate($entity['schedule_date']); ?>
                                                 </td>
                                                 <td style="font-size: 15px">
-                                                    Receita - Agendamento
+                                                    Recebimento - Agendamento
                                                 </td>
                                                 <td style="font-size: 15px; width: 60%;">
                                                     <?php echo $entity['serviceName']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
@@ -119,7 +119,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                                                     <?php echo $this->formatDate($entity['revenue_date']); ?>
                                                 </td>
                                                 <td style="font-size: 15px">
-                                                    Receita
+                                                    Recebimento
                                                 </td>
                                                 <td style="font-size: 15px; width: 60%;">
                                                     <?php echo $entity['title']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
@@ -212,13 +212,13 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
             let modalUrl = '';
 
             if (mod == 'schedules') {
-                modalTitle = 'Receita - Agendamento';
+                modalTitle = 'Recebimento - Agendamento';
                 modalUrl = 'agendamentos/detalhes';
             }
 
             if (mod == 'revenues') {
-                modalTitle = 'Receita';
-                modalUrl = 'receitas/detalhes';
+                modalTitle = 'Recebimento';
+                modalUrl = 'recebimentos/detalhes';
             }
 
             if (mod == 'expenses') {
@@ -226,7 +226,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
                 modalUrl = 'despesas/detalhes';
             }
 
-            $("#modalFinancialDetailsTitle").html('<i class="fa fa-info-circle pr-2"></i> Detalhes da ' + modalTitle);
+            $("#modalFinancialDetailsTitle").html('<i class="fa fa-info-circle pr-2"></i> Detalhes -  ' + modalTitle);
             $("#modalFinancialDetailsLoader").show();
             $("#modalFinancialDetails").modal('show');     
 

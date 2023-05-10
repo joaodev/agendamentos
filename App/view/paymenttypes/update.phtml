@@ -38,9 +38,9 @@ $role = $_SESSION['ROLE'];
                                             <label for="name">Situação*</label>
                                             <select name="status" id="status_1" class="form-control">
                                                 <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>
-                                                    Forma ativa no sistema</option>
+                                                    Ativa no sistema</option>
                                                 <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>
-                                                    Forma inativa no Sistema</option>
+                                                    Inativa no Sistema</option>
                                             </select>
                                         </div>
                                     </div>
@@ -119,7 +119,7 @@ $role = $_SESSION['ROLE'];
                     }).done(function (data) {
                         showAlert(data.type, data.title, data.msg, data.pos);
                         if (data.type === 'success') {
-                            updateTable('<?php echo $entity['uuid']; ?>');
+                            openDetails('<?php echo $entity['uuid']; ?>');
                         } else {
                             $("#baseLoader").hide();
                             $("#btnSubmit").attr('disabled', false);

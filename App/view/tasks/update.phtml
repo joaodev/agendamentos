@@ -132,7 +132,7 @@ $role = $_SESSION['ROLE'];
                                         </div>
                                     </div>
                                     <div class="col-md-8 mt-3 mb-2">
-                                        <?php if ($entity['status'] == '1'): ?>
+                                        <?php if ($entity['status'] == '1' || $this->parentUUID == $_SESSION['COD']): ?>
                                             <input type="hidden" name="uuid" id="uuid" value="<?php echo $entity['uuid']; ?>">
                                             <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Tarefa">
                                                 <i class="fa fa-save pr-1"></i> Salvar

@@ -18,7 +18,7 @@ $isParent = $this->isUserParent();
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-file-invoice-dollar pr-1"></i>
-                        Receitas
+                        Recebimentos
                     </h1>
                 </div>
                 <div class="col-1">
@@ -26,7 +26,7 @@ $isParent = $this->isUserParent();
                         <ol class="breadcrumb float-right">
                             <li class="breadcrumb-item">
                                 <?php if (!$this->view->reached_limit): ?>
-                                    <button type="button" class="btn btn-outline-success" title="Adcionar Receita"
+                                    <button type="button" class="btn btn-outline-success" title="Adcionar Recebimento"
                                         onclick="createRevenue();" style="width: 100%;">
                                         <i class="fas fa-plus"></i> 
                                     </button>
@@ -109,11 +109,11 @@ $isParent = $this->isUserParent();
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table_receitas" style="width: 100%;">
+                                <table class="table table-bordered table-hover" id="table_recebimentos" style="width: 100%;">
                                     <thead>
                                         <tr class="text-center" style="height: 30px;">
                                             <th style="font-size: 14px;">Data</th>
-                                            <th style="font-size: 14px;">Receita</th>
+                                            <th style="font-size: 14px;">Recebimento</th>
                                             <th style="font-size: 14px;">Valor</th>
                                             <th style="font-size: 14px;">Situação</th>
                                             <th style="display: none;">Situação</th>
@@ -185,13 +185,13 @@ $isParent = $this->isUserParent();
                 }
             };	
 
-            $('#table_receitas').DataTable({
+            $('#table_recebimentos').DataTable({
                 "sDom": 'flBtip',
                 searching: true,
                 buttons: [
                     $.extend( true, {}, buttonCommon, {
                         extend: 'excel',
-                        title: 'Receitas',
+                        title: 'Recebimentos',
                         exportOptions: {columns: [0,1,2,4]}
                     })
                 ],
@@ -237,7 +237,7 @@ $isParent = $this->isUserParent();
             $("#baseLoader").show();
             $.ajax({
                 type: 'post',
-                url: "<?php echo baseUrl; ?>receitas/detalhes",
+                url: "<?php echo baseUrl; ?>recebimentos/detalhes",
                 data: {
                     uuid:uuid,
                     month: $("#f_month").val(),
@@ -262,7 +262,7 @@ $isParent = $this->isUserParent();
         function selectMonth() {
             let month = $("#f_month").val();
             $("#modalMonthLoader").show();
-            openModule('receitas?m=' + month);
+            openModule('recebimentos?m=' + month);
             $("#modalMonthLoader").hide();
             $("#modalMonth").modal('hide');    
         }
@@ -273,7 +273,7 @@ $isParent = $this->isUserParent();
                 $("#baseLoader").show();
                 $.ajax({
                     type: 'post',
-                    url: "<?php echo baseUrl; ?>receitas/cadastrar",
+                    url: "<?php echo baseUrl; ?>recebimentos/cadastrar",
                     data: {
                         month: $("#f_month").val(),
                         target: '<?php echo $this->getTarget(); ?>'
@@ -295,7 +295,7 @@ $isParent = $this->isUserParent();
                 $("#baseLoader").show();
                 $.ajax({
                     type: 'post',
-                    url: "<?php echo baseUrl; ?>receitas/editar",
+                    url: "<?php echo baseUrl; ?>recebimentos/editar",
                     data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                     async: true
                 }).done(function(data) {
@@ -312,7 +312,7 @@ $isParent = $this->isUserParent();
         <script>
             function deleteRevenue(uuid) {
                 $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Receita');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Recebimento');
                 $("#modalDeleteLoader").hide();
                 $("#modalDelete").modal('show');
                 $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
@@ -325,7 +325,7 @@ $isParent = $this->isUserParent();
 
                     $.ajax({
                         type: "POST",
-                        url: "<?php echo baseUrl; ?>receitas/excluir",
+                        url: "<?php echo baseUrl; ?>recebimentos/excluir",
                         data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
                         dataType: 'json',
                         async: true
@@ -333,7 +333,7 @@ $isParent = $this->isUserParent();
                         showAlert(data.type, data.title, data.msg, data.pos);
                         $("#modalDelete").modal('hide');
                         $("#modalXL").modal('hide');
-                        openModule('receitas?m=' + month);
+                        openModule('recebimentos?m=' + month);
                     }).fail(function() {
                         showInternalErrorAlert();
                         $("#modalDeleteLoader").hide();

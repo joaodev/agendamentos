@@ -29,6 +29,16 @@
                         <div class="card-body">
                             <form method="post" name="formCreatePlan" id="formCreatePlan">
                                 <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="name">Situação*</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1">Ativo no sistema</option>
+                                                <option value="0">Inativo no sistema</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-md-8">
                                         <div class="form-group">
                                             <label for="name">Nome do Plano*</label>
@@ -76,7 +86,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="total_revenues">Qtd. Receitas*</label>
+                                            <label for="total_revenues">Qtd. Recebimentos*</label>
                                             <input type="number" class="form-control" name="total_revenues" id="total_revenues" min="1" placeholder="0" required>
                                         </div>
                                     </div>

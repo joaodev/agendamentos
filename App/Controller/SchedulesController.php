@@ -139,12 +139,19 @@ class SchedulesController extends ActionController implements CrudInterface
                     
                     $scheduledTo = $this->formatDate($_POST['schedule_date']);
                     $scheduledTime = substr($_POST['schedule_time'], 0, 5);
+
+                    $scheduleStatus = "Pendente";
+                    if ($_POST['status'] == 1) $scheduleStatus = "Agendandado";
+                    if ($_POST['status'] == 2) $scheduleStatus = "Finalizado";
+                    if ($_POST['status'] == 3) $scheduleStatus = "Cancelado";
+                    
                     if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
                         $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
-                        $message = "<p>Novo agendamento para: $scheduledTo às $scheduledTime.</p>";
+                        $message = "<p>Novo agendamento para: $scheduledTo às $scheduledTime.</p>
+                                    <p>Situação: <b>$scheduleStatus</b></p>";
 
                         $this->sendMail([
-                            'title' => 'Novo agendamento',
+                            'title' => 'Agendamento - ' . $scheduleStatus,
                             'message' => $message,
                             'name' => $customer['name'],
                             'toAddress' => $customer['email']
@@ -153,10 +160,11 @@ class SchedulesController extends ActionController implements CrudInterface
 
                     if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
                         $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
-                        $message = "<p>Você foi atribuído como responsável em um agendamento para: $scheduledTo às $scheduledTime.</p>";
+                        $message = "<p>Você foi atribuído como responsável em um agendamento para: $scheduledTo às $scheduledTime.</p>
+                                    <p>Situação: <b>$scheduleStatus</b></p>";
 
                         $this->sendMail([
-                            'title' => 'Novo agendamento atribuído',
+                            'title' => 'Agendamento - ' . $scheduleStatus,
                             'message' => $message,
                             'name' => $user['name'],
                             'toAddress' => $user['email']
@@ -247,12 +255,19 @@ class SchedulesController extends ActionController implements CrudInterface
 
                 $scheduledTo = $this->formatDate($_POST['schedule_date']);
                 $scheduledTime = substr($_POST['schedule_time'], 0, 5);
+
+                $scheduleStatus = "Pendente";
+                if ($_POST['status'] == 1) $scheduleStatus = "Pendente";
+                if ($_POST['status'] == 2) $scheduleStatus = "Finalizado";
+                if ($_POST['status'] == 3) $scheduleStatus = "Cancelado";
+                
                 if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
                     $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
-                    $message = "<p>Novo agendamento para: $scheduledTo às $scheduledTime.</p>";
+                    $message = "<p>Novo agendamento para: $scheduledTo às $scheduledTime.</p>
+                                <p>Situação: <b>$scheduleStatus</b></p>";
 
                     $this->sendMail([
-                        'title' => 'Novo agendamento',
+                        'title' => 'Agendamento - ' . $scheduleStatus,
                         'message' => $message,
                         'name' => $customer['name'],
                         'toAddress' => $customer['email']
@@ -261,10 +276,11 @@ class SchedulesController extends ActionController implements CrudInterface
 
                 if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
                     $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
-                    $message = "<p>Você foi atribuído como responsável em um agendamento para: $scheduledTo às $scheduledTime.</p>";
+                    $message = "<p>Você foi atribuído como responsável em um agendamento para: $scheduledTo às $scheduledTime.</p>
+                                <p>Situação: <b>$scheduleStatus</b></p>";
 
                     $this->sendMail([
-                        'title' => 'Novo agendamento atribuído',
+                        'title' => 'Agendamento - ' . $scheduleStatus,
                         'message' => $message,
                         'name' => $user['name'],
                         'toAddress' => $user['email']

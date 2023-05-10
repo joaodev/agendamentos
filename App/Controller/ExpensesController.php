@@ -126,12 +126,18 @@ class ExpensesController extends ActionController implements CrudInterface
                     }
 
                     $expenseTo = $this->formatDate($_POST['expense_date']);
+                    $expenseStatus = "Pagamento pendente";
+                    if ($_POST['status'] == 1) $expenseStatus = "Pagamento pendente";
+                    if ($_POST['status'] == 2) $expenseStatus = "Pagamento concluído";
+                    if ($_POST['status'] == 3) $expenseStatus = "Pagamento cancelado";
+
                     if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
                         $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
-                        $message = "<p>Nova despesa para: $expenseTo.</p>";
+                        $message = "<p>Nova despesa para: $expenseTo.</p>
+                                    <p>Situação: <b>$expenseStatus</b></p>";
 
                         $this->sendMail([
-                            'title' => 'Nova despesa',
+                            'title' => 'Despesa - ' . $expenseStatus,
                             'message' => $message,
                             'name' => $customer['name'],
                             'toAddress' => $customer['email']
@@ -140,10 +146,11 @@ class ExpensesController extends ActionController implements CrudInterface
 
                     if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
                         $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
-                        $message = "<p>Nova despesa para: $expenseTo.</p>";
+                        $message = "<p>Nova despesa para: $expenseTo.</p>
+                                    <p>Situação: <b>$expenseStatus</b></p>";
 
                         $this->sendMail([
-                            'title' => 'Nova despesa atribuída',
+                            'title' => 'Despesa - ' . $expenseStatus,
                             'message' => $message,
                             'name' => $user['name'],
                             'toAddress' => $user['email']
@@ -230,12 +237,18 @@ class ExpensesController extends ActionController implements CrudInterface
                 }
 
                 $expenseTo = $this->formatDate($_POST['expense_date']);
+                $expenseStatus = "Pagamento pendente";
+                if ($_POST['status'] == 1) $expenseStatus = "Pagamento pendente";
+                if ($_POST['status'] == 2) $expenseStatus = "Pagamento concluído";
+                if ($_POST['status'] == 3) $expenseStatus = "Pagamento cancelado";
+
                 if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
                     $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
-                    $message = "<p>Nova despesa para: $expenseTo.</p>";
+                    $message = "<p>Nova despesa para: $expenseTo.</p>
+                                <p>Situação: <b>$expenseStatus</b></p>";
 
                     $this->sendMail([
-                        'title' => 'Nova despesa',
+                        'title' => 'Despesa - ' . $expenseStatus,
                         'message' => $message,
                         'name' => $customer['name'],
                         'toAddress' => $customer['email']
@@ -244,10 +257,11 @@ class ExpensesController extends ActionController implements CrudInterface
 
                 if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
                     $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
-                    $message = "<p>Nova despesa para: $expenseTo.</p>";
+                    $message = "<p>Nova despesa para: $expenseTo.</p>
+                                <p>Situação: <b>$expenseStatus</b></p>";
 
                     $this->sendMail([
-                        'title' => 'Nova despesa atribuída',
+                        'title' => 'Despesa - ' . $expenseStatus,
                         'message' => $message,
                         'name' => $user['name'],
                         'toAddress' => $user['email']

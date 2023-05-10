@@ -30,6 +30,17 @@
                             <form method="post" name="formCreateTask" id="formCreateTask"
                                 enctype="multipart/form-data">
                                 <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="name">Situação*</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1">Tarefa pendente</option>
+                                                <option value="2">Tarefa conclúida</option>
+                                                <option value="3">Tarefa cancelada</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="title">Título*</label>
@@ -115,6 +126,7 @@
                     form_data.append('task_date', $("#task_date").val());    
                     form_data.append('user_uuid', $("#user_uuid").val());    
                     form_data.append('task_time', $("#task_time").val());    
+                    form_data.append('status', $("#status_1").val());    
 
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');
                     

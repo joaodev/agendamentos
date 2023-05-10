@@ -103,12 +103,18 @@ class TasksController extends ActionController implements CrudInterface
                     }
 
                     if (!empty($_POST['user_uuid']) && $sendEmail == 1) {
+                        $taskStatus = "Pendente";
+                        if ($_POST['status'] == 1) $taskStatus = "Pendente";
+                        if ($_POST['status'] == 2) $taskStatus = "Finalizada";
+                        if ($_POST['status'] == 3) $taskStatus = "Cancelada";
+                        
                         $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
                         $message = "<p>Você foi atribuído como responsável pela tarefa:</p>
-                                    <p><b>{$_POST['title']}</b></p>";
+                                    <p><b>{$_POST['title']}</b></p>
+                                    <p>Situação: <b>$taskStatus</b></p>";
 
                         $this->sendMail([
-                            'title' => 'Nova tarefa atribuída',
+                            'title' => 'Tarefa relacianada - ' . $taskStatus,
                             'message' => $message,
                             'name' => $user['name'],
                             'toAddress' => $user['email']
@@ -179,12 +185,18 @@ class TasksController extends ActionController implements CrudInterface
                 }
 
                 if (!empty($_POST['user_uuid']) && $sendEmail == 1) {
+                    $taskStatus = "Pendente";
+                    if ($_POST['status'] == 1) $taskStatus = "Pendente";
+                    if ($_POST['status'] == 2) $taskStatus = "Finalizada";
+                    if ($_POST['status'] == 3) $taskStatus = "Cancelada";
+                    
                     $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
                     $message = "<p>Você foi atribuído como responsável pela tarefa:</p>
-                                <p><b>{$_POST['title']}</b></p>";
+                                <p><b>{$_POST['title']}</b></p>
+                                <p>Situação: <b>$taskStatus</b></p>";
 
                     $this->sendMail([
-                        'title' => 'Nova tarefa atribuída',
+                        'title' => 'Tarefa relacianada - ' . $taskStatus,
                         'message' => $message,
                         'name' => $user['name'],
                         'toAddress' => $user['email']

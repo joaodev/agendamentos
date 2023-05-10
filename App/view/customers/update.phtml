@@ -235,6 +235,10 @@ $role = $_SESSION['ROLE'];
                         showAlert(data.type, data.title, data.msg, data.pos);
                         $("#baseLoader").hide();
                         $("#btnSubmit").attr('disabled', false);
+
+                        if (data.type == 'success') {
+                            openDetails('<?php echo $entity['uuid']; ?>');
+                        }
                     }).fail(function() {
                         showInternalErrorAlert(); 
                         $("#baseLoader").hide(); 

@@ -30,6 +30,16 @@
                             <form method="post" name="formCreateTable" id="formCreateTable"
                                 enctype="multipart/form-data">
                                 <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="name">Situação*</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1">Ativa no sistema</option>
+                                                <option value="0">Inativa no Sistema</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label for="name">Nome*</label>
@@ -79,6 +89,7 @@
                     let form_data = new FormData();
 
                     form_data.append('name', $("#name").val());    
+                    form_data.append('status', $("#status_1").val());    
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');
                     
                     $("#baseLoader").show();

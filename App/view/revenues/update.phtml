@@ -12,7 +12,7 @@ $role = $_SESSION['ROLE'];
                 <div class="col-11" >
                     <h1 style="position: relative; top: 5px; font-size: 25px;">
                         <i class="fas fa-pen-square pr-1"></i>
-                        Receita
+                        Recebimento
                     </h1>
                 </div>
                 <div class="col-1">
@@ -42,17 +42,17 @@ $role = $_SESSION['ROLE'];
                                             <label for="title">Situação*</label>
                                             <select name="status" id="status_1" class="form-control">
                                                 <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Pagamento pendente</option>
-                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Pagamento concluída</option>
-                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Pagamento cancelada</option>
+                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>Pagamento concluído</option>
+                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>Pagamento cancelado</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-12">
                                         <hr>
                                         <div class="form-group">
-                                            <label for="title">Título da Receita*</label>
+                                            <label for="title">Título do Recebimento*</label>
                                             <input type="text" class="form-control" name="title" id="title" required maxlength="100"
-                                                value="<?php echo $entity['title']; ?>" placeholder="Nome da Receita a ser paga">
+                                                value="<?php echo $entity['title']; ?>" placeholder="Nome do Recebimento a ser paga">
                                         </div>
                                     </div>   
                                     <div class="col-12">
@@ -173,9 +173,9 @@ $role = $_SESSION['ROLE'];
                                         </div>
                                     </div>
                                     <div class="col-md-8 mt-3 mb-2">
-                                        <?php if ($entity['status'] == '1'): ?>
-                                            <input type="hidden" name="uuid" id="id_receita" value="<?php echo $entity['uuid']; ?>">
-                                            <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Receita">
+                                        <?php if ($entity['status'] == '1' || $this->parentUUID == $_SESSION['COD']): ?>
+                                            <input type="hidden" name="uuid" id="id_recebimento" value="<?php echo $entity['uuid']; ?>">
+                                            <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Recebimento">
                                                 <i class="fa fa-save pr-1"></i> Salvar
                                             </button>
                                         <?php endif; ?>
@@ -214,7 +214,7 @@ $role = $_SESSION['ROLE'];
                     form_data.append('payment_type_uuid', $("#payment_type_uuid").val());    
                     form_data.append('user_uuid', $("#user_uuid").val());    
                     form_data.append('status', $("#status_1").val());
-                    form_data.append('uuid', $("#id_receita").val());    
+                    form_data.append('uuid', $("#id_recebimento").val());    
 
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');
 
@@ -231,7 +231,7 @@ $role = $_SESSION['ROLE'];
 
                     $.ajax({
                         type: "POST",
-                        url: "<?php echo baseUrl; ?>receitas/processa-edicao",
+                        url: "<?php echo baseUrl; ?>recebimentos/processa-edicao",
                         cache: false,
                         contentType: false,
                         processData: false,
@@ -241,7 +241,7 @@ $role = $_SESSION['ROLE'];
                     }).done(function(data) {
                         showAlert(data.type, data.title, data.msg, data.pos);
                         if (data.type === 'success') {
-                            updateRevenue('<?php echo $entity['uuid']; ?>');
+                            openDetails('<?php echo $entity['uuid']; ?>');
                         } else {
                             $("#baseLoader").hide();
                             $("#btnSubmit").attr('disabled', false);
@@ -262,7 +262,7 @@ $role = $_SESSION['ROLE'];
 
             $.ajax({
                 type: "POST",
-                url: "<?php echo baseUrl; ?>receitas/remove-arquivo",
+                url: "<?php echo baseUrl; ?>recebimentos/remove-arquivo",
                 data: {
                     uuid: uuid,
                     target: '<?php echo $this->getTarget(); ?>'
@@ -282,7 +282,7 @@ $role = $_SESSION['ROLE'];
 
                 $.ajax({
                     type: 'post',
-                    url: "<?php echo baseUrl; ?>receitas/cadastrar-cliente",
+                    url: "<?php echo baseUrl; ?>recebimentos/cadastrar-cliente",
                     data: {
                         target: '<?php echo $this->getTarget(); ?>'
                     },

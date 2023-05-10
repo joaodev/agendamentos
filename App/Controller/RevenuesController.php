@@ -123,12 +123,18 @@ class RevenuesController extends ActionController implements CrudInterface
                     }
 
                     $revenueTo = $this->formatDate($_POST['expense_date']);
+                    $revenueStatus = "Pagamento pendente";
+                    if ($_POST['status'] == 1) $revenueStatus = "Pagamento pendente";
+                    if ($_POST['status'] == 2) $revenueStatus = "Pagamento concluído";
+                    if ($_POST['status'] == 3) $revenueStatus = "Pagamento cancelado";
+
                     if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
                         $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
-                        $message = "<p>Novo recebimento para: $revenueTo.</p>";
+                        $message = "<p>Novo recebimento para: $revenueTo.</p>
+                                    <p>Situação: <b>$revenueStatus</b></p>";
 
                         $this->sendMail([
-                            'title' => 'Novo recebimento',
+                            'title' => 'Recebimento - ' . $revenueStatus,
                             'message' => $message,
                             'name' => $customer['name'],
                             'toAddress' => $customer['email']
@@ -137,27 +143,28 @@ class RevenuesController extends ActionController implements CrudInterface
 
                     if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
                         $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
-                        $message = "<p>Novo recebimento para: $revenueTo.</p>";
+                        $message = "<p>Novo recebimento para: $revenueTo.</p>
+                                    <p>Situação: <b>$revenueStatus</b></p>";
 
                         $this->sendMail([
-                            'title' => 'Novo recebimento atribuído',
+                            'title' => 'Recebimento - ' . $revenueStatus,
                             'message' => $message,
                             'name' => $user['name'],
                             'toAddress' => $user['email']
                         ]);
                     }
                     
-                    $this->toLog("Cadastrou a receita $uuid");
+                    $this->toLog("Cadastrou o recebimento $uuid");
                     $data  = [
                         'title' => 'Sucesso!', 
-                        'msg'   => 'Receita cadastrada.',
+                        'msg'   => 'Recebimento cadastrado.',
                         'type'  => 'success',
                         'pos'   => 'top-right'
                     ];
                 } else {
                     $data  = [
                         'title' => 'Erro!', 
-                        'msg' => 'A receita não foi cadastrada.',
+                        'msg' => 'O recebimento não foi cadastrado.',
                         'type' => 'error',
                         'pos'   => 'top-center'
                     ];
@@ -227,12 +234,18 @@ class RevenuesController extends ActionController implements CrudInterface
                 }
 
                 $revenueTo = $this->formatDate($_POST['revenue_date']);
+                $revenueStatus = "Pagamento pendente";
+                if ($_POST['status'] == 1) $revenueStatus = "Pagamento pendente";
+                if ($_POST['status'] == 2) $revenueStatus = "Pagamento concluído";
+                if ($_POST['status'] == 3) $revenueStatus = "Pagamento cancelado";
+                
                 if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
                     $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
-                    $message = "<p>Novo recebimento para: $revenueTo.</p>";
+                    $message = "<p>Novo recebimento para: $revenueTo.</p>
+                                <p>Situação: <b>$revenueStatus</b></p>";
 
                     $this->sendMail([
-                        'title' => 'Novo recebimento',
+                        'title' => 'Recebimento - ' . $revenueStatus,
                         'message' => $message,
                         'name' => $customer['name'],
                         'toAddress' => $customer['email']
@@ -241,27 +254,28 @@ class RevenuesController extends ActionController implements CrudInterface
 
                 if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
                     $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
-                    $message = "<p>Novo recebimento para: $revenueTo.</p>";
+                    $message = "<p>Novo recebimento para: $revenueTo.</p>
+                                <p>Situação: <b>$revenueStatus</b></p>";
 
                     $this->sendMail([
-                        'title' => 'Novo recebimento atribuído',
+                        'title' => 'Recebimento - ' . $revenueStatus,
                         'message' => $message,
                         'name' => $user['name'],
                         'toAddress' => $user['email']
                     ]);
                 }
 
-                $this->toLog("Atualizou a receita {$_POST['uuid']}");
+                $this->toLog("Atualizou o recebimento {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
-                    'msg'   => 'Receita atualizada.',
+                    'msg'   => 'Recebimento atualizado.',
                     'type'  => 'success',
                     'pos'   => 'top-right'
                 ];
             } else {
                 $data  = [
                     'title' => 'Erro!', 
-                    'msg' => 'A receita não foi atualizada.',
+                    'msg' => 'O recebimento não foi atualizado.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
@@ -298,17 +312,17 @@ class RevenuesController extends ActionController implements CrudInterface
             ],$_POST['uuid'], 'uuid');
 
             if ($transaction) {
-                $this->toLog("Removeu a receita {$_POST['uuid']}");
+                $this->toLog("Removeu o recebimento {$_POST['uuid']}");
                 $data  = [
                     'title' => 'Sucesso!', 
-                    'msg'   => 'Receita removida.',
+                    'msg'   => 'Recebimento removido.',
                     'type'  => 'success',
                     'pos'   => 'top-right'
                 ];
             } else {
                 $data  = [
                     'title' => 'Erro!', 
-                    'msg' => 'A receita não foi removida.',
+                    'msg' => 'O recebimento não foi removido.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];

@@ -43,7 +43,7 @@
                                         <i class="fa fa-circle pr-1" style="color: green;"></i> Pagamento concluído
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '3'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Pagamento cancelada
+                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Pagamento cancelado
                                     <?php endif; ?>
                                     <hr>
                                 </div>
@@ -129,7 +129,7 @@
                             </div>
                             <div class="row">
                                 <?php if(empty($_POST['modal'])): ?>
-                                    <?php if ($entity['status'] == '1'): ?>
+                                    <?php if ($entity['status'] == '1' || $this->parentUUID == $_SESSION['COD']): ?>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('expenses'))): ?>
                                                 <button type="button" class="btn btn-outline-danger"  title="Excluir Despesa"

@@ -48,8 +48,8 @@ $canViewUsers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                 <?php endif; ?>
                 <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewRevenues) && $this->view->revenuesForToday > 0): ?>
                     <div class="btn btn-outline-info text-center w-100 mb-3" role="alert">
-                        Receitas para hoje: <?php echo $this->view->revenuesForToday; ?>    
-                        <a onclick="openModule('receitas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                        Recebimentos para hoje: <?php echo $this->view->revenuesForToday; ?>    
+                        <a onclick="openModule('recebimentos');" class="alert-link ml-1 text-white" style="cursor: pointer;">
                             <i class="fa fa-external-link-alt pr-1"></i> Acessar
                         </a>
                     </div>
@@ -80,8 +80,8 @@ $canViewUsers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $thi
                 <?php endif; ?>
                 <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewRevenues) && $this->view->revenuesDelayed > 0): ?>
                     <div class="btn btn-outline-danger text-center w-100 mb-3" role="alert">
-                        Receitas atrasadas: <?php echo $this->view->revenuesDelayed; ?>    
-                        <a onclick="openModule('receitas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
+                        Recebimentos atrasadas: <?php echo $this->view->revenuesDelayed; ?>    
+                        <a onclick="openModule('recebimentos');" class="alert-link ml-1 text-white" style="cursor: pointer;">
                             <i class="fa fa-external-link-alt pr-1"></i> Acessar
                         </a>
                     </div>

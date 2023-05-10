@@ -61,10 +61,10 @@ class ReportsController extends ActionController
                     $modalTitle = 'Despesa';
                     break;
                 case 4:
-                    $module = 'receitas';
+                    $module = 'recebimentos';
                     $moduleModel = $this->revenuesModel;
-                    $moduleTitle = 'Receitas';
-                    $modalTitle = 'Receita';
+                    $moduleTitle = 'Recebimentos';
+                    $modalTitle = 'Recebimento';
                     break;
                 case 5:
                     $module = 'servicos';

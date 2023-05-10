@@ -150,7 +150,7 @@
                             </div>
                             <div class="row">
                                 <?php if(empty($_POST['modal'])): ?>
-                                    <?php if ($entity['status'] == '1'): ?>
+                                    <?php if ($entity['status'] == '1' || $this->parentUUID == $_SESSION['COD']): ?>
                                         <div class="col-md-6 col-lg-4 mt-2 mb-2">
                                             <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('schedules'))): ?>
                                                 <button type="button" class="btn btn-outline-danger"  title="Excluir Agendamento"

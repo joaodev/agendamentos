@@ -38,8 +38,8 @@ $role = $_SESSION['ROLE'];
                                         <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
                                         <hr>
                                     </div>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '0'): ?>
-                                        <div class="col-md-6">
+                                    <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
+                                        <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="name">Nível de Acesso</label>
                                                 <select class="form-control" name="role_uuid" required>
@@ -58,8 +58,8 @@ $role = $_SESSION['ROLE'];
                                         <div class="form-group">
                                             <label for="name">Situação*</label>
                                             <select name="status" id="status_1" class="form-control">
-                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Usuário ativo no sistema</option>
-                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>Usuário inativo no sistema</option>
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Ativo no sistema</option>
+                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>Inativo no sistema</option>
                                             </select>
                                         </div>
                                     </div>
@@ -258,6 +258,10 @@ $role = $_SESSION['ROLE'];
                         showAlert(data.type, data.title, data.msg, data.pos);
                         $("#baseLoader").hide();
                         $("#btnSubmit").attr('disabled', false);
+
+                        if (data.type == 'success') {
+                            openDetails('<?php echo $entity['uuid']; ?>');
+                        }
                     }).fail(function() {
                         showInternalErrorAlert(); 
                         $("#baseLoader").hide(); 

@@ -35,10 +35,10 @@
                             <div class="row" id="printable">
                                 <div class="col-md-12">
                                     <?php if ($entity['status'] == '1'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Plano ativo no sistema
+                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Ativo no sistema
                                     <?php endif; ?>
                                     <?php if ($entity['status'] == '0'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Plano inativo no sistema
+                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Inativo no sistema
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-12">
@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="total_revenues">Qtd. Receitas</label>
+                                        <label for="total_revenues">Qtd. Recebimentos</label>
                                         <p><?php echo $entity['total_revenues']; ?></p>
                                     </div>
                                 </div>
