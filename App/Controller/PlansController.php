@@ -197,7 +197,7 @@ class PlansController extends ActionController implements CrudInterface
 
             $postData = [
                 'uuid' => $this->userPlansModel->NewUUID(),
-                'user_uuid' => $_SESSION['COD'],
+                'parent_uuid' => $_SESSION['COD'],
                 'plan_uuid' => $_POST['uuid']
             ];
 

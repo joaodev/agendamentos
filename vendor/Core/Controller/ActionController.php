@@ -419,13 +419,13 @@ class ActionController
             ];
         } else {
             return [
-                'total_customers' => 10,
+                'total_customers' => 5,
                 'total_services' => 10,
-                'total_schedules' => 10,
+                'total_schedules' => 30,
                 'total_tasks' => 10,
                 'total_revenues' => 10,
                 'total_expenses' => 10,
-                'total_users' => 3
+                'total_users' => 1
             ];
         }
     }
