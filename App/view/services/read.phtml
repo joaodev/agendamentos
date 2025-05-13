@@ -1,135 +1,231 @@
-<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'))): ?>
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canUpdate = $aclData['canUpdate'];
+$canDelete = $aclData['canDelete'];
+
+if ($canView): ?>
     <?php $entity = $this->view->entity; ?>
-    <?php if(empty($_POST['modal'])): ?>
-        <section class="content-header mt-5">
-            <div class="container-fluid mt-2">
-                <div class="row">
-                    <div class="col-9" >
-                        <h1 style="position: relative; top: 5px; font-size: 25px;">
-                            <i class="fas fa-info-circle pr-1"></i>
-                            Serviço
-                        </h1>
-                    </div>
-                    <div class="col-3">
-                        <ol class="breadcrumb float-right">
-                            <li class="breadcrumb-item">
-                                <button type="button" class="btn btn-outline-info mr-1" title="Imprimir"
-                                    onclick="window.print();">
-                                    <i class="fas fa-print"></i> 
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" title="Voltar para Serviços"
-                                    onclick="openModule('servicos');">
-                                    <i class="fas fa-arrow-left"></i> 
-                                </button>
-                            </li>
-                        </ol>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-tools pr-1"></i>
+                                Serviço <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-info mr-1 btnRadius" 
+                                title="Imprimir"
+                                onclick="window.print();">
+                                <i class="fas fa-print"></i> 
+                            </button>
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Serviços"
+                                onclick="openModule('servicos');">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
-        <section class="content" style="margin-left: 9px; margin-right: 9px;">
-            <div class="container-fluid">
-                <div class="row">
+            <div class="row">
+                <?php if ($entity['deleted'] == 1): ?>
                     <div class="col-md-12">
-                    <?php endif; ?>
+                        <div class="alert alert-danger">
+                            <i class="fa fa-info-circle pr-1"></i> 
+                            Serviço removido em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="row" id="printable">
-                                <div class="col-md-12">
-                                    <?php if ($entity['status'] == '1'): ?>
-                                            <i class="fa fa-circle pr-1" style="color: green;"></i> Ativo no sistema
-                                    <?php endif; ?>
-                                    <?php if ($entity['status'] == '0'): ?>
-                                            <i class="fa fa-circle pr-1" style="color: red;"></i> Inativo no sistema
-                                    <?php endif; ?>
-                                    <hr>
+                        <div class="card-body cardWrapperDetails">
+                            <div class="row w-100 pt-3" id="printable" style="margin: 0 !important;">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Código</b>
+                                        <p>
+                                            <?php echo $entity['id']; ?>
+                                        </p>
+                                    </div>
                                 </div>
-                                <div class="col-md-8">
-                                    <b>Título</b>
-                                    <p><?php echo $entity['title']; ?></p>
-                                </div>
-                                <div class="col-md-4">
-                                    <b>Valor</b>
+                                <div class="col-6">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Situação</b>
                                     <p>
-                                        R$ <?php echo number_format($entity['price'], 2, ",", "."); ?>
+                                        <?php if ($entity['status'] == '1'): ?>
+                                            <i class="fa fa-circle pr-1 text-success"></i> Ativo
+                                        <?php endif; ?>
+                                        <?php if ($entity['status'] == '0'): ?>
+                                            <i class="fa fa-circle pr-1 text-danger"></i> Inativo
+                                        <?php endif; ?>
                                     </p>
                                 </div>
                                 <div class="col-md-12">
-                                    <b>Descrição</b>
-                                    <p><?php echo $entity['description']; ?></p>
+                                    <hr class="cardLine">
                                 </div>
-                                <div class="col-md-12"><hr></div>
-                                <div class="col-6 text-left">
+                                <div class="col-md-12">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Título</b>
+                                    <p>
+                                        <?php echo $entity['title']; ?>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="fa fa-dollar-sign pr-1"></span>
+                                    <b>Valor</b>
+                                    <p>
+                                        R$
+                                        <?php echo number_format($entity['price'], 2, ",", "."); ?>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="fa fa-dollar-sign pr-1"></span>
+                                    <b>Tipo de Cobrança</b>
+                                    <p>
+                                        <?php echo ($entity['service_type'] == '1') ? 'Total' : 'Por Hora'; ?>
+                                    </p>
+                                </div>
+                                <div class="col-md-12">
+                                    <hr class="cardLine">
+                                </div>
+                                <div class="col-6">
                                     <span class="fa fa-calendar pr-1"></span>
-                                    <span>Cadastrado em</span> <br>
-                                    <b>
+                                    <b>Cadastro</b> <br>
+                                    <p>
                                         <?php echo $this->formatDateTime($entity['created_at']); ?>
-                                    </b>
+                                    </p>
                                 </div>
-                                <div class="col-6 text-right">
+                                <div class="col-6">
                                     <?php if (!empty($entity['updated_at'])): ?>
                                         <span class="fa fa-calendar pr-1"></span>
-                                        <span>Atualizado em</span> <br>
-                                        <b>
+                                        <b>Última Atualização</b> <br>
+                                        <p>
                                             <?php echo $this->formatDateTime($entity['updated_at']); ?>
-                                        </b>
+                                        </p>
                                     <?php endif; ?>
                                 </div>
-                                <div class="col-md-12"><hr></div>
                             </div>
-                            <?php if(empty($_POST['modal'])): ?>
-                                <div class="row">
-                                    <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                        <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('services'))): ?>
-                                            <button type="button" class="btn btn-outline-danger" title="Excluir Serviço"
-                                                onclick="deleteService('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                <i class="fa fa-trash"></i> Excluir
-                                            </button>
+                            <div class="row mb-1">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <?php if ($canDelete && $entity['deleted'] == 0): ?>
+                                            <div class="col-md-6 mb-2">
+                                                <button type="button" class="btn btn-danger btnRadius" title="Remover Serviço"
+                                                    onclick="deleteService('<?php echo $entity['id']; ?>');"
+                                                    style="width: 100%;">
+                                                    <i class="fa fa-trash"></i> Remover
+                                                </button>
+                                            </div>
                                         <?php endif; ?>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                        <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('services'))): ?>
-                                            <button type="button" class="btn btn-outline-success" title="Editar Serviço"
-                                                onclick="updateService('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                <i class="fa fa-pen pr-1"></i> Editar
-                                            </button>
+                                        <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+                                            <div class="col-md-6 mb-2">
+                                                <button type="button" class="btn btn-success btnRadius" title="Editar Serviço"
+                                                    onclick="updateService('<?php echo $entity['id']; ?>');"
+                                                    style="width: 100%;">
+                                                    <i class="fa fa-pen pr-1"></i> Editar
+                                                </button>
+                                            </div>
                                         <?php endif; ?>
-                                    </div>
-                                    <div class="col-md-12 col-lg-4 mt-2 mb-2">
-                                        <button type="button" class="btn btn-outline-primary" title="Voltar para Serviços"
-                                                onclick="openModule('servicos');" style="width: 100%;">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
                                     </div>
                                 </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <?php if (!empty($_POST['modal']) && $_POST['modal'] == true): ?>
-                        <div class="row mt-md-4">
-                            <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-success w-100 mb-3" 
-                                    onclick="openModDetails('<?php echo $entity['uuid']; ?>', 'servicos');">
-                                    <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                                </button>
-                            </div>
-                            <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-primary w-100 mb-3" title="Imprimir"
-                                    onclick="window.print();">
-                                    <i class="fas fa-print pr-1"></i> Imprimir
-                                </button>
-                            </div>
-                            <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-danger w-100" data-dismiss="modal">
-                                    <i class="fa fa-window-close pr-1"></i> Fechar
-                                </button>
                             </div>
                         </div>
-                    <?php endif; ?>
-                    <?php if(empty($_POST['modal'])): ?>
                     </div>
                 </div>
             </div>
-        </section>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openModule('servicos');"
+                        title="Voltar para Serviços">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        async function openServiceDetails(id) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>servicos/detalhes",
+                data: { 
+                    id: id,
+                    target: '<?php echo $this->getTarget(); ?>' 
+                },
+                async: true
+            }).done(function (data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").fadeOut();
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+    </script>
+    <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+        <script>
+            async function updateService(id) {
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>servicos/editar",
+                    data: { 
+                        id: id,
+                        target: '<?php echo $this->getTarget(); ?>' 
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canDelete && $entity['deleted'] == 0): ?>
+        <script>
+            function deleteService(id) {
+                $("#modalXL").modal('hide');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Serviço');
+                $("#modalDeleteLoader").hide();
+                $("#modalDelete").modal('show');
+                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger btnRadius" title="Confirmar Exclusão" onclick="runDelete(\'' + id + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }
+
+            async function runDelete(id) {
+                if (id !== null) {
+                    $("#modalDeleteLoader").show();
+
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>servicos/excluir",
+                        data: { 
+                            id: id,
+                            target: '<?php echo $this->getTarget(); ?>' 
+                        },
+                        dataType: 'json',
+                        async: true
+                    }).done(async function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#modalDelete").modal('hide');
+                        $("#modalXL").modal('hide');
+                        await openModule('servicos');
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#modalDeleteLoader").hide();
+                    });
+                }
+            }
+        </script>
     <?php endif; ?>
 <?php endif; ?>

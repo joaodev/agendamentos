@@ -1,0 +1,323 @@
+<?php
+$data = $this->view->data;
+$isAdmin = $this->view->isAdmin;
+$aclData = $this->view->acl;
+
+$canView = $aclData['canViewTimeSheets'];
+$canCreate = $aclData['canCreateTimeSheets'];
+$canUpdate = $aclData['canUpdateTimeSheets'];
+$canDelete = $aclData['canDeleteTimeSheets'];
+?>
+<?php if ($canView): ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-calendar-check pr-1"></i>
+                                Folha de Ponto
+                                <small style="color: #666">
+                                    <?php echo ' #' . $this->view->user['id']; ?>
+                                </small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <?php if ($canCreate && $this->view->user['deleted'] == 0): ?>
+                                    <button type="button" class="btn btn-success btnRadius" 
+                                        title="Adicionar Subcategoria"
+                                        onclick="createUserTimeSheetModal();">
+                                        <i class="fas fa-plus pr-1"></i> Carga Horária
+                                    </button>
+                            <?php endif; ?>
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Usuário"
+                                onclick="openUserDetails('<?php echo $_POST['id']; ?>');">
+                                <i class="fas fa-arrow-left "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12 col-md-4 offset-md-4 mb-3 text-center">
+                            <a onclick="changeMonth();" style="width: 100%; cursor: pointer;" title="Alterar Mês">
+                                <i class="fas fa-sync  pr-1"></i> Mês Atual:
+                                <?php echo $this->view->month; ?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body cardWrapperList">
+                            <?php if (!$data): ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table_pt" style="width: 100%;">
+                                        <thead>
+                                            <tr class="text-center" style="height: 30px;">
+                                                <th style="font-size: 14px;">Código</th>
+                                                <th style="font-size: 14px;">Data</th>
+                                                <th style="font-size: 14px;">Usuário</th>
+                                                <th style="font-size: 14px;">Início</th>
+                                                <th style="font-size: 14px;">Almoço</th>
+                                                <th style="font-size: 14px;">Fim</th>
+                                                <th style="font-size: 14px;">Horas</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($data as $entity): ?>
+                                                <tr class="text-center" style="cursor: pointer;"
+                                                    onclick="openUserTimeSheetModalDetails('<?php echo $entity['id']; ?>');">
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['id']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $this->formatDate($entity['work_date']); ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['userName']; ?>
+                                                    </td>
+
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $this->formatTime($entity['start_time']); ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $this->formatTime($entity['lunch_start_time']); ?> -
+                                                        <?php echo $this->formatTime($entity['lunch_end_time']); ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $this->formatTime($entity['end_time']); ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php
+                                                        $timeTotal = $this->getHours(
+                                                            $entity['work_date'],
+                                                            $entity['start_time'],
+                                                            $entity['lunch_start_time'],
+                                                            $entity['lunch_end_time'],
+                                                            $entity['end_time']
+                                                        );
+
+                                                        echo $timeTotal;
+                                                        ?>
+                                                    </td>
+                                                </tr>
+                                            <?php
+                                            endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php if ($data): ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                let buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function (data) {
+                                return data;
+                            }
+                        }
+                    }
+                };
+
+                $('#table_pt').DataTable({
+                    "sDom": 'flBtip',
+                    searching: true,
+                    buttons: [
+                        $.extend(true, {}, buttonCommon, {
+                            extend: 'excel',
+                            title: 'Folha de Ponto',
+                        })
+                    ],
+                    order: [[1, "desc"]],
+                    columnDefs: [{ orderable: false, targets: [3, 4, 5, 6] },
+                    { type: 'date-eu', targets: [1] },
+                    ],
+                    responsive: true,
+                    info: true,
+                    processing: true,
+                    scrollCollapse: true,
+                    paging: true,
+                    "pageLength": 25,
+                    "language": {
+                        "sEmptyTable": "Nenhum registro encontrado",
+                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sInfoThousands": ".",
+                        "sLengthMenu": "_MENU_ &nbsp;",
+                        "sLoadingRecords": "Carregando...",
+                        "sProcessing": "Processando...",
+                        "sZeroRecords": "Nenhum registro encontrado",
+                        "sSearch": "Filtrar",
+                        "oPaginate": {
+                            "sNext": "Próximo",
+                            "sPrevious": "Anterior",
+                            "sFirst": "Primeiro",
+                            "sLast": "Último"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ordenar colunas de forma ascendente",
+                            "sSortDescending": ": Ordenar colunas de forma descendente"
+                        }
+                    }
+                });
+            });
+        </script>
+    <?php endif; ?>
+    <script>
+        async function openUserTimeSheetModalDetails(id) {
+            $("#modalLargeTitle").html('<i class="fa fa-calendar-check pr-1"></i> Detalhes da Carga Horária');
+            $("#modalLargeLoader").show();
+            $("#modalLargeResult").html('Carregando informações...');
+            $("#modalLarge").modal('show');
+
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>usuarios/folha-ponto/detalhes",
+                data: { 
+                    id: id,
+                    user_id: '<?php echo $this->view->user['id']; ?>',
+                    target: '<?php echo $this->getTarget(); ?>',
+                    month: $("#f_month").val(), 
+                },
+                async: true
+            }).done(function (data) {
+                $("#modalLargeResult").html(data);
+                $("#modalLargeLoader").hide();
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#modalLargeLoader").hide();
+            });
+        }
+
+        async function changeMonth() {
+            $("#modalMonthTitle").html('<i class="fa fa-info-circle pr-2"></i> Alterar Mês');
+            $("#modalMonthLoader").hide();
+            $("#modalMonth").modal('show');
+        }
+
+        function selectMonth() {
+            let month = $("#f_month").val();
+            $("#modalMonthLoader").show();
+            timeSheetUser('<?php echo $this->view->user['id']; ?>', month);
+            $("#modalMonthLoader").hide();
+            $("#modalMonth").modal('hide');
+        }
+    </script>
+    <?php if ($canCreate &&  $this->view->user['deleted'] == 0): ?>
+        <script>
+            async function createUserTimeSheetModal() {
+                $("#modalLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Carga Horária');
+                $("#modalLargeLoader").show();
+                $("#modalLargeResult").html('Carregando informações...');
+                $("#modalLarge").modal('show');
+                
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>usuarios/folha-ponto/cadastrar",
+                    data: { 
+                        user_id: '<?php echo $this->view->user['id']; ?>',
+                        target: '<?php echo $this->getTarget(); ?>',
+                        month: $("#f_month").val() 
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#modalLargeResult").html(data);
+                    $("#modalLargeLoader").hide();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#modalLargeLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canUpdate && $this->view->user['deleted'] == 0): ?>
+        <script>
+            async function updateUserTimeSheetModal(id) {
+                $("#modalLargeTitle").html('<i class="fa fa-pen-square pr-1"></i> Carga Horária');
+                $("#modalLargeLoader").show();
+                $("#modalLargeResult").html('Carregando informações...');
+                $("#modalLarge").modal('show');
+
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>usuarios/folha-ponto/editar",
+                    data: { 
+                        id: id,
+                        user_id: '<?php echo $this->view->user['id']; ?>',
+                        target: '<?php echo $this->getTarget(); ?>',
+                        month: $("#f_month").val()  
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#modalLargeResult").html(data);
+                    $("#modalLargeLoader").hide();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#modalLargeLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canDelete && $this->view->user['deleted'] == 0): ?>
+        <script>
+            function deleteUserTimeSheetModal(id) {
+                $("#modalDeleteTimeSheetTitle").html('<i class="fa fa-trash pr-2"></i> Remover Carga Horária');
+                $("#modalDeleteTimeSheetLoader").hide();
+                $("#modalDeleteTimeSheet").modal('show');
+                $("#modalDeleteTimeSheetResult").html('<button type="button" class="btn btn-danger btnRadius" title="Confirmar Exclusão" onclick="runUserTimeSheetDelete(\'' + id + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }
+
+            async function runUserTimeSheetDelete(id) {
+                if (id !== null) {
+                    $("#modalDeleteTimeSheetLoader").show();
+
+                    let status_mail = null;
+                    if ($('#time_sheet_delete_notification').is(':checked')) {
+                        status_mail = $("#time_sheet_delete_notification").val();
+                    } 
+              
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>folha-ponto/excluir",
+                        data: { 
+                            id: id,
+                            target: '<?php echo $this->getTarget(); ?>',
+                            month: $("#f_month").val(),
+                            send_mail: status_mail
+                        },
+                        dataType: 'json',
+                        async: true
+                    }).done(async function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#modalDeleteTimeSheet").modal('hide');
+                        $("#modalLarge").modal('hide');
+                        await timeSheetUser('<?php echo $this->view->user['id']; ?>', $("#f_month").val());
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#modalDeleteTimeSheetLoader").hide();
+                    });
+                }
+            }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

@@ -1,0 +1,179 @@
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canCreate = $aclData['canCreate'];
+
+if ($canView): ?>
+    <?php $data = $this->view->data; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-filter pr-1"></i> 
+                                Categorias
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <?php if ($canCreate): ?>
+                                <button type="button" class="btn btn-success btnRadius" title="Nova Categoria"
+                                    onclick="createCategory();">
+                                    <i class="fas fa-plus"></i> 
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body cardWrapperList">
+                            <?php if (!$data): ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table_sv" style="width: 100%;">
+                                        <thead>
+                                            <tr class="text-center" style="height: 30px;">
+                                                <th style="font-size: 14px;">Código</th>
+                                                <th style="font-size: 14px;">Categoria</th>
+                                                <th style="font-size: 14px;">Situação</th>
+                                                <th style="display: none;">Situação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($data as $entity): ?>
+                                                <tr class="text-center" style="cursor: pointer;"
+                                                    onclick="openCategoryDetails('<?php echo $entity['id']; ?>');">
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['id']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['title']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px;">
+                                                        <?php if ($entity['status'] == '1'): ?>
+                                                            <span class="text-success">Ativa</span>
+                                                        <?php else: ?>
+                                                            <span class="text-danger">Inativa</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td style="display: none;">
+                                                        <?php echo ($entity['status'] == '1') ? 'Ativa' : 'Inativa'; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php if ($data): ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                let buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function (data) {
+                                return data;
+                            }
+                        }
+                    }
+                };
+
+                $('#table_sv').DataTable({
+                    "sDom": 'flBtip',
+                    searching: true,
+                    buttons: [
+                        $.extend(true, {}, buttonCommon, {
+                            extend: 'excel',
+                            title: 'Categorias',
+                            exportOptions: { columns: [0, 1, 3] }
+                        })
+                    ],
+                    order: [[0, "asc"]],
+                    responsive: true,
+                    info: true,
+                    processing: true,
+                    scrollCollapse: true,
+                    paging: true,
+                    "pageLength": 25,
+                    "language": {
+                        "sEmptyCategory": "Nenhum registro encontrado",
+                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sInfoThousands": ".",
+                        "sLengthMenu": "_MENU_ &nbsp;",
+                        "sLoadingRecords": "Carregando...",
+                        "sProcessing": "Processando...",
+                        "sZeroRecords": "Nenhum registro encontrado",
+                        "sSearch": "Filtrar",
+                        "oPaginate": {
+                            "sNext": "Próximo",
+                            "sPrevious": "Anterior",
+                            "sFirst": "Primeiro",
+                            "sLast": "Último"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ordenar colunas de forma ascendente",
+                            "sSortDescending": ": Ordenar colunas de forma descendente"
+                        }
+                    }
+                });
+            });
+        </script>
+    <?php endif; ?>
+    <?php if ($canCreate): ?>
+        <script>
+            async function createCategory() {
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>categorias/cadastrar",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <script>
+        async function openCategoryDetails(id) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>categorias/detalhes",
+                data: { 
+                    id: id,
+                    target: '<?php echo $this->getTarget(); ?>' 
+                },
+                async: true
+            }).done(function (data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").fadeOut();
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+    </script>
+<?php endif; ?>

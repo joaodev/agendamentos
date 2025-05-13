@@ -1,0 +1,128 @@
+<?php if (!$this->view->data): ?>
+    <div class="alert alert-info mt-3" role="alert">
+        <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+    </div>
+<?php else: ?>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover" id="table_responsibles" style="border-bottom: 1px solid #ccc">
+            <thead>
+                <tr class="text-center bg-primary">
+                    <th style="font-size: 14px; color: white;"><i class="fa fa-image"></i></th>
+                    <th style="font-size: 14px; color: white;">Responsável</th>
+                    <th style="font-size: 14px; color: white;">Cargo</th>
+                    <th style="font-size: 14px; color: white;">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->view->data as $responsible): ?>
+                    <tr style="text-align: center;">
+                        <td style="border-left: 1px solid #ccc; width: 35px; text-align: center;">
+                            <?php if (!empty($responsible['userAvatar']) && $this->isImage($responsible['userAvatar'], 'users')): ?>
+                                <a href="<?php echo baseUrl . 'public/uploads/users/' . $responsible['userAvatar']; ?>" 
+                                    data-lightbox="image-1"
+                                    data-title="<?php echo $responsible['userAvatar']; ?>">
+                                    <img src="<?php echo baseUrl . 'public/uploads/users/'
+                                        . $responsible['userAvatar']; ?>" style="width: 30px; height: 30px;" 
+                                        alt="<?php echo $responsible['userName']; ?>"
+                                        class="img-circle">
+                                </a>
+                            <?php else: ?>
+                                <img src="<?php echo baseUrl . 'public/uploads/semfoto.png'; ?>" 
+                                    style="width: 30px; height: 30px;" alt="<?php echo $responsible['userName']; ?> - SEM FOTO"
+                                    title="Responsável sem foto" class="img-circle">
+                            <?php endif; ?>
+                        </td>
+                        <td style="font-size: 15px" class="pt-2">
+                            <?php echo $responsible['userCod']; ?> - <?php echo $responsible['userName']; ?>
+                        </td>
+                        <td style="font-size: 15px" class="pt-2">
+                            <?php echo $responsible['userRole']; ?>
+                        </td>
+                        <td style="border-right: 1px solid #ccc; width: 45px;" class="pt-1">
+                            <button type="button" class="btn btn-danger btn-sm btnRadius"
+                                onclick="deleteResponsible('<?php echo $responsible['id']; ?>');">
+                                <span class="fa fa-trash"></span>
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-12 text-center mt-2">
+        <div id="sendMailUser" class="">
+            <input type="checkbox" name="send_email_user" id="send_email_user" value="1" class="mr-1"> 
+            <small style="position: relative; top: -2px;">Enviar notificação sobre a operação.</small>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#table_responsibles').DataTable({
+                "sDom": '',
+                searching: true,
+                order: [ [1, "asc"] ],
+                columnDefs: [{orderable: false, targets: [0,3]}],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+
+        function deleteResponsible(id) {
+            $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Responsável do Orçamento');
+            $("#modalDeleteLoader").hide();
+            $("#modalDelete").modal('show');
+            $("#modalDeleteResult").html('<button type="button" class="btn btn-danger btn-lg btnRadiusLg" style="width: 100%;" onclick="runDeleteResponsible(\''+id+'\');">EXCLUIR</button>');
+        }   
+
+        async function runDeleteResponsible(id) {
+            if (id !== null) {
+                $("#modalDeleteLoader").show();
+            
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>chamados/excluir-responsavel",
+                    data: {
+                        id: id,
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    dataType: 'json',
+                    async: true
+                }).done(async function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    $("#modalDelete").modal('hide');
+                    await loadModulesTable('responsibles');
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalDeleteLoader").hide();
+                });
+            }
+        }
+    </script>
+<?php endif; ?>

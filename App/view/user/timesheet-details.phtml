@@ -1,0 +1,139 @@
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canViewTimeSheets'];
+$canUpdate = $aclData['canUpdateTimeSheets'];
+$canDelete = $aclData['canDeleteTimeSheets'];
+?>
+<?php if ($canView): ?>
+    <?php $entity = $this->view->entity; ?>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <span class="fa fa-calendar pr-1"></span>
+                <label for="name">Data</label>
+                <p>
+                    <?php echo $this->formatDate($entity['work_date']); ?>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                <span class="fa fa-user pr-1"></span>
+                <label for="userName">Usuário</label>
+                <p>
+                    <?php echo $entity['userName']; ?>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <hr class="cardLine">
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <span class="fa fa-clock pr-1"></span>
+                <label for="start_time">Início</label>
+                <p>
+                    <?php echo $this->formatTime($entity['start_time']); ?>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <span class="fa fa-clock pr-1"></span>
+                <label for="lunch_start_time">Almoço</label>
+                <p>
+                    <?php echo $this->formatTime($entity['lunch_start_time']); ?> -
+                    <?php echo $this->formatTime($entity['lunch_end_time']); ?>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <span class="fa fa-clock pr-1"></span>
+                <label for="end_time">Fim</label>
+                <p>
+                    <?php echo $this->formatTime($entity['end_time']); ?>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <span class="fa fa-clock pr-1"></span>
+                <label for="timeTotal">Total</label>
+                <p>
+                    <?php
+                    $timeTotal = $this->getHours(
+                        $entity['work_date'],
+                        $entity['start_time'],
+                        $entity['lunch_start_time'],
+                        $entity['lunch_end_time'],
+                        $entity['end_time']
+                    );
+
+                    echo $timeTotal;
+                    ?>
+                </p>
+            </div>
+        </div>
+        <?php if ($entity['description']): ?>
+            <div class="col-md-12">
+                <hr class="cardLine">
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <span class="fa fa-info-circle pr-1"></span>
+                    <label for="description">Informações adicionais</label>
+                    <p>
+                        <?php echo $entity['description']; ?>
+                    </p>
+                </div>
+            </div>
+        <?php endif; ?>
+        <div class="col-md-12">
+            <hr class="cardLine">
+        </div>
+        <div class="col-6 text-left">
+            <span class="fa fa-calendar pr-1"></span>
+            <b>Cadastro</b> <br>
+            <p>
+                <?php echo $this->formatDateTime($entity['created_at']); ?>
+            </p>
+        </div>
+        <div class="col-6 text-right">
+            <?php if (!empty($entity['updated_at'])): ?>
+                <span class="fa fa-calendar pr-1"></span>
+                <b>Última Atualização</b> <br>
+                <p>
+                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                </p>
+            <?php endif; ?>
+        </div>
+        <div class="col-md-12">
+            <hr class="cardLine">
+        </div>
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <?php if ($canDelete && $this->view->user['deleted'] == 0): ?>
+                        <button type="button" class="btn btn-danger btnRadius"
+                            title="Remover Carga Horária"
+                            onclick="deleteUserTimeSheetModal('<?php echo $entity['id']; ?>');"
+                            style="width: 100%;">
+                            <i class="fa fa-trash"></i> Remover
+                        </button>
+                    <?php endif; ?>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <?php if ($canUpdate && $this->view->user['deleted'] == 0): ?>
+                        <button type="button" class="btn btn-success btnRadius"
+                            title="Editar Carga Horária"
+                            onclick="updateUserTimeSheetModal('<?php echo $entity['id']; ?>');"
+                            style="width: 100%;">
+                            <i class="fa fa-pen pr-1"></i> Editar
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>

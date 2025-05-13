@@ -6,13 +6,12 @@ use Exception;
 
 class Logs extends InitDb
 {
-    public function toLog($msg): bool|string
+    public function toLog(string $msg): bool|string
     {
         try {
             $model = new Model();
             $dataPost = [
-                'uuid' => $model->NewUUID(),
-                'log_user_uuid' => (!empty($_SESSION['COD']) ? $_SESSION['COD'] : ''),
+                'log_user_id' => (!empty($_SESSION['COD']) ? $_SESSION['COD'] : ''),
                 'log_action' => $msg,
                 'log_date' => date('Y-m-d H:i:s'),
                 'log_ip' => self::getUserIp(),
@@ -20,7 +19,7 @@ class Logs extends InitDb
                 'log_status' => http_response_code()
             ];
 
-            $crud = New Crud();
+            $crud = new Crud();
             $crud->setTable('logs');
 
             return $crud->create($dataPost);

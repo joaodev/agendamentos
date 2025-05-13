@@ -9,4 +9,5 @@ return array(
     'PHPMailer' => $vendorDir . '/phpmailer/class.phpmailer.php',
     'SMTP' => $vendorDir . '/phpmailer/class.smtp.php',
     'XLSXWriter' => $vendorDir . '/PHP_XLSXWriter/xlsxwriter.class.php',
+    'XLSXReader' => $vendorDir . '/PHP_XLSXReader/XLSXReader.php',
 );

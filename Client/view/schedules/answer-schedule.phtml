@@ -1,0 +1,68 @@
+<form method="post" name="formAnswerScheduleModal" id="formAnswerScheduleModal" enctype="multipart/form-data">
+    <div class="col-md-12">
+        <div class="form-group">
+            <label for="status">Resposta*</label>
+            <select name="status" id="status" class="form-control" required>
+                <option value="">Selecione</option>
+                <option value="2">Confirmar</option>
+                <option value="1">Reagendar</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="form-group">
+            <label for="description">Informações adicionais</label>
+            <textarea name="description" id="description" class="form-control" rows="2"
+                placeholder="Informe a descrição adicional caso necessário"></textarea>
+        </div>
+    </div>
+    <div class="col-md-12 mt-3 mb-2">
+        <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmitModal" title="Salvar Informações">
+            <i class="fa fa-save pr-1"></i> Salvar
+        </button>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        $('#formAnswerScheduleModal').validate({
+            submitHandler: async function () {
+                let form_data = new FormData();         
+                    
+                form_data.append('status', $("#status").val()); 
+                form_data.append('description', $("#description").val()); 
+
+                form_data.append('id', '<?php echo $_POST['id']; ?>');    
+                form_data.append('target', '<?php echo $this->getClientTarget(); ?>');
+
+                $("#modalGreenMidLoader").show();
+                $("#btnSubmitModal").attr('disabled', true);
+
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>cliente/agendamentos/processa-resposta",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    dataType: 'json',
+                    async: true
+                }).done(async function (data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    if (data.type === 'success') {
+                        await openScheduleDetails(data.id);
+                        $("#modalGreenMid").modal('hide');
+                    } else {
+                        $("#modalGreenMidLoader").hide();
+                        $("#btnSubmitModal").attr('disabled', false);
+                    }
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#modalGreenMidLoader").hide();
+                    $("#btnSubmitModal").attr('disabled', false);
+                });
+
+                return false;
+            }
+        });
+    });
+</script>

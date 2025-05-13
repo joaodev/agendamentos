@@ -1,146 +1,158 @@
-<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('expenses'))): ?>
-    <?php
-    $canCreateCustomer = $_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('customers'));
-    ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-plus-square pr-1"></i>
-                        Despesa
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary" title="Voltar para Despesas"
-                                onclick="openModule('despesas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
-                                <i class="fas fa-arrow-left"></i> 
+<?php if ($this->view->acl['canCreate']): ?>
+    <style>
+        .select2-selection {
+            height: 38px !important;
+        }
+    </style>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-plus-square pr-1"></i>
+                                Conta
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Contas"
+                                onclick="openModule('contas?m=<?php echo $_POST['month']; ?>');">
+                                <i class="fas fa-arrow-left"></i>
                             </button>
-                        </li>
-                    </ol>
+                        </div>
+                    </div>  
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body cardWrapperBody">
                             <form method="post" name="formCreateExpense" id="formCreateExpense"
                                 enctype="multipart/form-data">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-12  col-md-8">
                                         <div class="form-group">
-                                            <label for="title">Situação*</label>
-                                            <select name="status" id="status_1" class="form-control" required>
-                                                <option value="1">Pagamento pendente</option>
-                                                <option value="2">Pagamento concluído</option>
-                                                <option value="3">Pagamento cancelado</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <hr>
-                                        <div class="form-group">
-                                            <label for="title">Título da Despesa*</label>
-                                            <input type="text" class="form-control" name="title" id="title" required maxlength="100"
-                                                placeholder="Nome da Despesa a ser paga">
-                                        </div>
-                                    </div>   
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label for="description">Descrição completa</label>
-                                            <textarea name="description" id="description" class="form-control" rows="3"
-                                                placeholder="Informe a descrição completo caso necessário"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <div class="form-group">
-                                            <label for="amount">Valor*</label>
-                                            <input type="text" class="form-control" name="amount" id="amount" required placeholder="0,00">
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <div class="form-group">
-                                            <label for="payment_type_uuid">Forma de Pagamento*</label>
-                                            <select name="payment_type_uuid" id="payment_type_uuid" class="form-control" required>
-                                                <option value="">Selecione</option>
-                                                <?php foreach ($this->view->paymentTypes as $paymentType): ?>    
-                                                    <option value="<?php echo $paymentType['uuid']; ?>">
-                                                        <?php echo $paymentType['name']; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
+                                            <label for="title">Título da Conta*</label>
+                                            <input type="text" class="form-control" name="title" id="title" required
+                                                maxlength="100" placeholder="Informe o Título da Conta">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-4">
                                         <div class="form-group">
                                             <label for="expense_date">Data*</label>
-                                            <input type="date" class="form-control" name="expense_date" id="expense_date" required>
+                                            <input type="date" class="form-control" name="expense_date" id="expense_date"
+                                                required value="<?php echo date('Y-m-d'); ?>">
                                         </div>
                                     </div>
-                                    <div class="col-12"><hr></div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="form-group">
+                                            <label for="expense_type">Tipo de Conta*</label>
+                                            <select name="expense_type" id="expense_type" class="form-control" required>
+                                                <option value="1">1 - Pagamento</option>
+                                                <option value="2">2 - Recebimento</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="form-group">
+                                            <label for="amount">Valor*</label>
+                                            <input type="text" class="form-control" name="amount" id="amount" required
+                                                placeholder="0,00">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="form-group">
+                                            <label for="payment_type_id">Forma de Pagamento</label>
+                                            <select name="payment_type_id" id="payment_type_id" class="form-control">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->paymentTypes as $paymentType): ?>
+                                                    <option value="<?php echo $paymentType['id']; ?>">
+                                                        <?php echo $paymentType['id'] . ' - ' . $paymentType['name']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-12">
                                         <div class="form-group">
-                                            <label for="customer_uuid">Atribuir Cliente</label>
-                                            <?php if ($canCreateCustomer): ?>
-                                                <a onclick="newCustomer();" class="text-success" 
+                                            <label for="customer_id">Atribuir Cliente</label>
+                                            <?php if ($this->view->isAdmin || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('customers'))): ?>
+                                                <a onclick="newCustomer();" class="text-success"
                                                     style="cursor: pointer; float: right" title="Adicionar Cliente">
                                                     <span class="fa fa-plus-circle"></span>
-                                                </a> 
+                                                </a>
                                             <?php endif; ?>
-                                            <select name="customer_uuid" id="customer_uuid" class="form-control">
-                                                <option value="">Selecione</option>
-                                                <?php foreach ($this->view->customers as $customer): ?>
-                                                    <option value="<?php echo $customer['uuid']; ?>">
-                                                        <?php echo $customer['name']; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
+                                            <select name="customer_id" id="customer_id" class="form-control" style="width: 100%;">
+                                                <option value="">Clique para Pesquisar</option>
                                             </select>
                                         </div>
+                                        <div id="sendMailCustomer" style="display: none;" class="mb-3">
+                                            <input type="checkbox" name="send_email_customer" id="send_email_customer" value="1" class="mr-1"> 
+                                            <small style="position: relative; top: -2px;">Enviar notificação sobre a operação.</small>
+                                        </div>
                                     </div>
-                                    <div class="col-12">
-                                        <input type="checkbox" name="send_email_customer" id="send_email_customer" value="1" class="mr-1"> Enviar email de notificação para o cliente.</small>
-                                    </div>
-                                    <div class="col-12"><hr></div>
                                     <div class="col-12">
                                         <div class="form-group">
-                                            <label for="title">Atribuir Usuário</label>
-                                            <select name="user_uuid" id="user_uuid" class="form-control">
-                                                <option value="">Selecione</option>
-                                                <?php foreach ($this->view->users as $user): ?>
-                                                    <option value="<?php echo $user['uuid']; ?>">
-                                                        <?php echo $user['name'] . ' (' . $user['email'] . ')'; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
+                                            <label for="provider_id">Atribuir Fornecedor</label>
+                                            <?php if ($this->view->isAdmin || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('providers'))): ?>
+                                                <a onclick="newProvider();" class="text-success"
+                                                    style="cursor: pointer; float: right" title="Adicionar Fornecedor">
+                                                    <span class="fa fa-plus-circle"></span>
+                                                </a>
+                                            <?php endif; ?>
+                                            <select name="provider_id" id="provider_id" class="form-control" style="width: 100%;">
+                                                <option value="">Clique para Pesquisar</option>
                                             </select>
                                         </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <input type="checkbox" name="send_email_user" id="send_email_user" value="1" class="mr-1"> Enviar email de notificação para o usuário.</small>
-                                    </div>
-                                    <div class="col-12"><hr></div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label for="description">Anexar Arquivos</label>
-                                            <input type="file" class="form-control" name="file[]" multiple id="file"
-                                                accept="jpg,jpeg,png,pdf">
+                                        <div id="sendMailProvider" style="display: none;" class="mb-3">
+                                            <input type="checkbox" name="send_email_provider" id="send_email_provider" value="1" class="mr-1"> 
+                                            <small style="position: relative; top: -2px;">Enviar notificação sobre a operação.</small>
                                         </div>
                                     </div>
-                                    <div class="col-md-8 mt-3 mb-2">
-                                        <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Despesa">
-                                            <i class="fa fa-save pr-1"></i> Salvar
-                                        </button>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="user_id">Atribuir Usuário</label>
+                                            <select name="user_id" id="user_id" class="form-control" style="width: 100%;">
+                                                <option value="">Clique para Pesquisar</option>
+                                            </select>
+                                        </div>
+                                        <div id="sendMailUser" style="display: none;" class="mb-3">
+                                            <input type="checkbox" name="send_email_user" id="send_email_user" value="1" class="mr-1"> 
+                                            <small style="position: relative; top: -2px;">Enviar notificação sobre a operação.</small>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4 mt-3 mb-2">
-                                        <button type="button" class="btn btn-outline-primary w-100"
-                                                onclick="openModule('despesas?m=<?php echo $_POST['month']; ?>');" title="Voltar para Despesas">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="description">Informações adicionais</label>
+                                            <textarea name="description" id="description" class="form-control" rows="2"
+                                                placeholder="Informe a descrição adicional caso necessário"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 offset-md-3 mt-2 mb-3">
+                                        <div class="bg-info text-center p-3 btnRadius">
+                                            <span style="font-size: 20px; color: #fff; ">
+                                                <i class="fa fa-file-upload pr-1"></i> <b>Enviar Arquivos</b>
+                                            </span>
+                                            <div class="form-group text-center">
+                                                <label for="file"><small style="color: #fff;">
+                                                    <i>(jpg, jpeg, png, gif, pdf)</i></small>
+                                                </label>
+                                                <input type="file" class="form-control inputUpload" name="file[]" multiple id="file"
+                                                    accept=".png,.jpg,.jpeg,.gif,.pdf">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-1">
+                                        <div class="row">
+                                            <div class="col-md-6 offset-md-3 mb-2">
+                                                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit"
+                                                    title="Salvar Conta">
+                                                    <i class="fa fa-save pr-1"></i> Salvar
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -148,88 +160,188 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openModule('contas?m=<?php echo $_POST['month']; ?>');" 
+                        title="Voltar para Contas">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
     <script>
-        $(document).ready(function(){
-            $("input[id=amount]").maskMoney({allowNegative: false, thousands:'.', decimal:',', affixesStay: true});
+        $(document).ready(function () {
+            $('#customer_id').select2({
+                ajax: {
+                    type: 'POST',
+                    url: '<?php echo baseUrl; ?>clientes/busca-cliente',
+                    dataType: 'json',
+                    processResults: function (data) {
+                        if(data[0]) {
+                            if (data[0].id) {
+                                $("#sendMailCustomer").removeAttr("style");
+                            }
+                        }
+
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+
+            $('#provider_id').select2({
+                ajax: {
+                    type: 'POST',
+                    url: '<?php echo baseUrl; ?>fornecedores/busca-fornecedor',
+                    dataType: 'json',
+                    processResults: function (data) {
+                        if(data[0]) {
+                            if (data[0].id) {
+                                $("#sendMailProvider").removeAttr("style");
+                            }
+                        }
+
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+
+            $('#user_id').select2({
+                ajax: {
+                    type: 'POST',
+                    url: '<?php echo baseUrl; ?>usuarios/busca-responsavel',
+                    dataType: 'json',
+                    processResults: function (data) {
+                        if(data[0]) {
+                            if (data[0].id) {
+                                $("#sendMailUser").removeAttr("style");
+                            }
+                        } 
+
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+            
+            $("input[id=amount]").maskMoney({ allowNegative: false, thousands: '.', decimal: ',', affixesStay: true });
 
             $('#formCreateExpense').validate({
-               
-                submitHandler: function() {
-                    let form_data = new FormData();         
-                    
+
+                submitHandler: async function () {
+                    let form_data = new FormData();
+
                     $.each($("input[type='file']")[0].files, function (i, file) {
                         form_data.append('file_' + i, file);
                     });
 
-                    form_data.append('title', $("#title").val());    
-                    form_data.append('description', $("#description").val());    
-                    form_data.append('amount', $("#amount").val());    
-                    form_data.append('payment_type_uuid', $("#payment_type_uuid").val());    
-                    form_data.append('expense_date', $("#expense_date").val());    
-                    form_data.append('customer_uuid', $("#customer_uuid").val());    
-                    form_data.append('user_uuid', $("#user_uuid").val());    
-                    form_data.append('status', $("#status_1").val());
-
-                    form_data.append('target', '<?php echo $this->getTarget(); ?>');
+                    form_data.append('title', $("#title").val());
+                    form_data.append('description', $("#description").val());
+                    form_data.append('amount', $("#amount").val());
+                    form_data.append('payment_type_id', $("#payment_type_id").val());
+                    form_data.append('expense_date', $("#expense_date").val());
+                    form_data.append('customer_id', $("#customer_id").val());
+                    form_data.append('user_id', $("#user_id").val());
+                    form_data.append('provider_id', $("#provider_id").val());
+                    form_data.append('expense_type', $("#expense_type").val());
 
                     if ($('#send_email_customer').is(':checked')) {
                         form_data.append('send_email_customer', $("#send_email_customer").val());    
+                    }
+
+                    if ($('#send_email_provider').is(':checked')) {
+                        form_data.append('send_email_provider', $("#send_email_provider").val());    
                     }
 
                     if ($('#send_email_user').is(':checked')) {
                         form_data.append('send_email_user', $("#send_email_user").val());    
                     }
 
+                    form_data.append('target', '<?php echo $this->getTarget(); ?>');
+
                     $("#baseLoader").show();
                     $("#btnSubmit").attr('disabled', true);
 
-                    $.ajax({
+                    await $.ajax({
                         type: "POST",
-                        url: "<?php echo baseUrl; ?>despesas/processa-cadastro",
+                        url: "<?php echo baseUrl; ?>contas/processa-cadastro",
                         cache: false,
                         contentType: false,
                         processData: false,
                         data: form_data,
                         dataType: 'json',
                         async: true
-                    }).done(function(data) {
+                    }).done(async function (data) {
                         showAlert(data.type, data.title, data.msg, data.pos);
-                        $("#baseLoader").hide();
+                        if (data.type === 'success') {
+                            await openExpenseDetails(data.id);
+                        } else {
+                            $("#baseLoader").fadeOut();
+                            $("#btnSubmit").attr('disabled', false);
+                        }
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#baseLoader").fadeOut();
                         $("#btnSubmit").attr('disabled', false);
-                        $('#formCreateExpense').trigger("reset");
-                    }).fail(function() {
-                        showInternalErrorAlert(); 
-                        $("#baseLoader").hide();   
-                        $("#btnSubmit").attr('disabled', false);
-                    }); 
+                    });
 
                     return false;
                 }
             });
         });
     </script>
-    <?php if ($canCreateCustomer): ?>
+    <?php if ($this->view->isAdmin || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('customers'))): ?>
         <script>
-            function newCustomer() {
+            async function newCustomer() {
                 $("#modalGreenLargeResult").empty();
                 $("#modalGreenLarge").modal('hide');
                 $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Cliente');
                 $("#modalGreenLargeLoader").show();
                 $("#modalGreenLarge").modal('show');
 
-                $.ajax({
+                await $.ajax({
                     type: 'post',
-                    url: "<?php echo baseUrl; ?>despesas/cadastrar-cliente",
+                    url: "<?php echo baseUrl; ?>contas/cadastrar-cliente",
                     data: {
                         target: '<?php echo $this->getTarget(); ?>'
                     },
                     async: true
-                }).done(function(data) {
+                }).done(function (data) {
                     $("#modalGreenLargeResult").html(data);
                     $("#modalGreenLargeLoader").hide();
-                }).fail(function() {
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#modalGreenLargeLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($this->view->isAdmin || $this->acl($_SESSION['ROLE'], $this->resourceCodes('create'), $this->moduleCodes('providers'))): ?>
+        <script>
+            async function newProvider() {
+                $("#modalGreenLargeResult").empty();
+                $("#modalGreenLarge").modal('hide');
+                $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Fornecedor');
+                $("#modalGreenLargeLoader").show();
+                $("#modalGreenLarge").modal('show');
+
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>contas/cadastrar-fornecedor",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#modalGreenLargeResult").html(data);
+                    $("#modalGreenLargeLoader").hide();
+                }).fail(function () {
                     showInternalErrorAlert();
                     $("#modalGreenLargeLoader").hide();
                 });

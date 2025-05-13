@@ -7,18 +7,14 @@
                 <th style="font-size: 14px;">Valor</th>
             </tr>
         </thead>
-        <tbody >
-            <tr>
-                <td style="font-size: 15px">Referência</td>
-                <td style="font-size: 15px"><?php echo $entity['uuid']; ?></td>
-            </tr>
+        <tbody>
             <tr>
                 <td style="font-size: 15px">Data</td>
                 <td style="font-size: 15px"><?php echo $this->formatDateTime($entity['log_date']); ?></td>
             </tr>
             <tr>
-                <td style="font-size: 15px">Colaborador</td>
-                <td style="font-size: 15px"><?php echo $entity['username']; ?></td>
+                <td style="font-size: 15px">Usuário</td>
+                <td style="font-size: 15px"><?php echo $entity['username'] . ' #' . $entity['log_user_id']; ?></td>
             </tr>
             <tr>
                 <td style="font-size: 15px">Ação</td>
@@ -42,7 +38,7 @@
                 <td style="font-size: 15px"><?php echo $entity['log_user_agent']; ?></td>
             </tr>
             <tr>
-                <td style="font-size: 15px">Situação</td>
+                <td style="font-size: 15px">Status da Requisiçao</td>
                 <td style="font-size: 15px"><?php echo $entity['log_status']; ?></td>
             </tr>
         </tbody>
@@ -76,7 +72,7 @@
             processing: true,
             scrollCollapse: true,
             paging: true,
-            "pageLength": 10,
+            "pageLength": 25,
             "language": {
                 "sEmptyTable": "Nenhum registro encontrado",
                 "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",

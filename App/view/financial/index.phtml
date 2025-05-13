@@ -1,258 +1,266 @@
-<?php 
-$isAdmin = $_SESSION['ROLE_ADM'] == '0';
-$role    = $_SESSION['ROLE'];
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
 
-$canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('financial'));
-?>
-<?php if ($canView): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-8" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-cash-register pr-1"></i>
-                        Fluxo de Caixa
-                    </h1>
-                </div>
-                <div class="col-4">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary"
-                                onclick="changeMonth();" style="width: 100%;" title="Alterar Mês">
-                                <i class="fas fa-sync pr-1"></i> <?php echo $this->view->month; ?>
-                            </button>
-                        </li>
-                    </ol>
+if ($canView): ?>
+    <?php $data = $this->view->data; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-dollar-sign pr-1"></i>
+                                Fluxo de Caixa
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <a href="<?php echo baseUrl; ?>"  
+                                class="btn btn-primary btnRadius" 
+                                title="Página Inicial">
+                                <i class="fas fa-home"></i> 
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 mt-3">
+                <div class="col-12">
                     <div class="row">
-                        <div class="col-md-4 text-center">
-                            <div class="card bg-danger">
-                                <div class="card-body">
-                                    <span style="font-size: 1em"><i class="fa fa-minus-circle pr-1"></i> Despesas</span> 
-                                    <h3>R$ <?php echo number_format($this->view->total_expenses, 2, ",","."); ?></h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-md-6 text-center">
                             <div class="card bg-success">
-                                <div class="card-body">
-                                    <span style="font-size: 1em"><i class="fa fa-plus-circle pr-1"></i> Recebimentos</span> 
-                                    <h3>R$ <?php echo number_format(($this->view->total_schedules + $this->view->total_revenues), 2, ",","."); ?></h3>
+                                <div class="card-body cardBox">
+                                    <span style="font-size: 1em"><i class="fa fa-plus-circle pr-1"></i> Entradas</span>
+                                    <h3>R$
+                                        <?php echo number_format($this->getTotalFinancialByMonth('1', $this->view->month), 2, ",", "."); ?>
+                                    </h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
-                            <div class="card bg-info">
-                                <div class="card-body">
-                                    <span style="font-size: 1em"><i class="fa fa-cash-register pr-1"></i> Caixa</span> 
-                                    <h3>R$ <?php echo number_format((($this->view->total_schedules + $this->view->total_revenues) - $this->view->total_expenses), 2, ",","."); ?></h3>
+                        <div class="col-md-6 text-center">
+                            <div class="card bg-danger">
+                                <div class="card-body cardBox">
+                                    <span style="font-size: 1em"><i class="fa fa-minus-circle pr-1"></i> Saídas</span>
+                                    <h3>R$
+                                        <?php echo number_format($this->getTotalFinancialByMonth('2', $this->view->month), 2, ",", "."); ?>
+                                    </h3>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-12 col-md-4 offset-md-4 mb-3 text-center">
+                            <a onclick="changeMonth();" style="width: 100%; cursor: pointer;" title="Alterar Mês">
+                                <i class="fas fa-sync  pr-1"></i> Mês Atual:
+                                <?php echo $this->view->month; ?>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
-                        <div class="alert alert-info" role="alert">
-                            <span class="fa fa-users pr-1"></span> 
-                            Você está utilizando o Plano Gratuito. 
-                            <a onclick="openModule('planos-usuario');" 
-                                class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para alterar e liberar todos os recursos do sistema.
-                        </div>
-                    <?php endif; ?>
                     <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table_fn" style="width: 100%;">
-                                    <thead>
-                                        <tr class="text-center" style="height: 30px;">
-                                            <th style="font-size: 14px;">Data</th>
-                                            <th style="font-size: 14px;">Tipo</th>
-                                            <th style="font-size: 14px;">Descrição</th>
-                                            <th style="font-size: 14px;">Valor</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($this->view->schedules as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;"
-                                                onclick="viewModal('schedules', '<?php echo $entity['uuid']; ?>');">
-                                                <td style="font-size: 15px">
-                                                    <?php echo $this->formatDate($entity['schedule_date']); ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    Recebimento - Agendamento
-                                                </td>
-                                                <td style="font-size: 15px; width: 60%;">
-                                                    <?php echo $entity['serviceName']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
-                                                </td> 
-                                                <td style="font-size: 15px; color: green;">
-                                                    <?php echo number_format($entity['amount'], 2, ",","."); ?>
-                                                </td> 
+                        <div class="card-body cardWrapperList">
+                            <?php if (!$data): ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table_sv" style="width: 100%;">
+                                        <thead>
+                                            <tr class="text-center" style="height: 30px;">
+                                                <th style="font-size: 14px;">#</th>
+                                                <th style="font-size: 14px;">Data</th>
+                                                <th style="font-size: 14px;">Título</th>
+                                                <th style="font-size: 14px;">Valor</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                        <?php foreach ($this->view->expenses as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;"
-                                                onclick="viewModal('expenses', '<?php echo $entity['uuid']; ?>');">
-                                                <td style="font-size: 15px">
-                                                    <?php echo $this->formatDate($entity['expense_date']); ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    Despesa
-                                                </td>
-                                                <td style="font-size: 15px; width: 60%;">
-                                                    <?php echo $entity['title']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
-                                                </td> 
-                                                <td style="font-size: 15px; color: green;">
-                                                    <?php echo number_format($entity['amount'], 2, ",","."); ?>
-                                                </td> 
-                                            </tr>
-                                        <?php endforeach; ?>
-                                        <?php foreach ($this->view->revenues as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;"
-                                                onclick="viewModal('revenues', '<?php echo $entity['uuid']; ?>');">
-                                                <td style="font-size: 15px">
-                                                    <?php echo $this->formatDate($entity['revenue_date']); ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    Recebimento
-                                                </td>
-                                                <td style="font-size: 15px; width: 60%;">
-                                                    <?php echo $entity['title']; ?><?php echo !empty($entity['customerName']) ? ' para ' . $entity['customerName'] : ''; ?><?php echo !empty($entity['description']) ? ' - ' . $entity['description'] : ''; ?> 
-                                                </td> 
-                                                <td style="font-size: 15px; color: red;">
-                                                    <?php echo number_format($entity['amount'], 2, ",","."); ?>
-                                                </td> 
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($data as $entity): ?>
+                                                <?php 
+                                                $className = ($entity['mov_type'] == '1' ? 'text-green' : 'text-red'); 
+
+                                                switch ($entity['parent_type']) {
+                                                    case 'expenses-up':
+                                                        $parentId = $entity['expense_id'];
+                                                        break;
+                                                    case 'expenses-down':
+                                                        $parentId = $entity['expense_id'];
+                                                        break;
+                                                    case 'sales':
+                                                        $parentId = $entity['sale_id'];
+                                                        break;
+                                                    case 'purchases':
+                                                        $parentId = $entity['purchase_id'];
+                                                        break;
+                                                    default: 
+                                                        $parentId = null;
+                                                        break;
+                                                }
+                                                ?>
+                                                <tr class="text-center" style="cursor: pointer;"
+                                                    onclick="openModuleDetails('<?php echo $entity['parent_type']; ?>', '<?php echo $parentId; ?>');">
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['id']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $this->formatDateTime($entity['created_at'], false); ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['title']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px" class="<?php echo $className; ?>">
+                                                        <?php echo number_format($entity['amount'], 2, ",", "."); ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <?php if (empty($_GET['m'])): ?>
-        <script>
-            $(document).ready(function() {
-                $("#f_month").val('<?php echo date('Y-m'); ?>');
-            });
-        </script>
-    <?php endif; ?>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            let buttonCommon = {
-                exportOptions: {
-                    format: {
-                        body: function ( data, row, column ) {
-                            return  column === 3  ?
-                                parseFloat(data.replace(/[.]/g, '' ).replace( ',', '.' )).toLocaleString('en-IN',
-                                {minimumFractionDigits: 2 , maximumFractionDigits: 2}) : data;
-                        }
-                    }
-                }
-            };	
-
-            $('#table_fn').DataTable({
-                "sDom": 'flBtip',
-                searching: true,
-                buttons: [
-                    $.extend( true, {}, buttonCommon, {
-                        extend: 'excel',
-                        title: 'Fluxo de Caixa do Mês <?php echo $this->view->month; ?>',
-                        exportOptions: {columns: [0,1,2,3]}
-                    })
-                ],
-                order: [ [0, "desc"] ],
-                columnDefs: [
-                    {type: 'date-eu', targets: [0]},
-                    {type: 'valoresemreais', targets: [3]},
-                ],
-                responsive: true,
-                info: true,
-                processing: true,
-                scrollCollapse: true,
-                paging: true,
-                "pageLength": 10,
-                "language": {
-                    "sEmptyTable": "Nenhum registro encontrado",
-                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
-                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
-                    "sInfoPostFix": "",
-                    "sInfoThousands": ".",
-                    "sLengthMenu": "_MENU_ &nbsp;",
-                    "sLoadingRecords": "Carregando...",
-                    "sProcessing": "Processando...",
-                    "sZeroRecords": "Nenhum registro encontrado",
-                    "sSearch": "Filtrar",
-                    "oPaginate": {
-                        "sNext": "Próximo",
-                        "sPrevious": "Anterior",
-                        "sFirst": "Primeiro",
-                        "sLast": "Último"
-                    },
-                    "oAria": {
-                        "sSortAscending": ": Ordenar colunas de forma ascendente",
-                        "sSortDescending": ": Ordenar colunas de forma descendente"
-                    }
-                }
-            });
+    <script>
+        $(document).ready(function () {
+            $("#f_month").val('<?php echo $this->view->month_not_formatted ?>');
         });
     </script>
-    <script>
-        function viewModal(mod, uuid) {
-            let modalTitle = '';
-            let modalUrl = '';
+    <?php if ($data): ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                let buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function (data, row, column) {
+                                return column === 3 ?
+                                    parseFloat(data.replace(/[.]/g, '').replace(',', '.')).toLocaleString('en-IN',
+                                        { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : data;
+                            }
+                        }
+                    }
+                };
 
-            if (mod == 'schedules') {
-                modalTitle = 'Recebimento - Agendamento';
-                modalUrl = 'agendamentos/detalhes';
-            }
-
-            if (mod == 'revenues') {
-                modalTitle = 'Recebimento';
-                modalUrl = 'recebimentos/detalhes';
-            }
-
-            if (mod == 'expenses') {
-                modalTitle = 'Despesa';
-                modalUrl = 'despesas/detalhes';
-            }
-
-            $("#modalFinancialDetailsTitle").html('<i class="fa fa-info-circle pr-2"></i> Detalhes -  ' + modalTitle);
-            $("#modalFinancialDetailsLoader").show();
-            $("#modalFinancialDetails").modal('show');     
-
-            $.ajax({
-                type: 'post',
-                url: "<?php echo baseUrl; ?>"+modalUrl,
-                data: {
-                    uuid:uuid,
-                    month: $("#f_month").val(),
-                    modal: true,
-                    target: '<?php echo $this->getTarget(); ?>'
-                },
-                async: true
-            }).done(function(data) {
-                $("#modalFinancialDetailsResult").html(data);
-                $("#modalFinancialDetailsLoader").hide();
-            }).fail(function() {
-                showInternalErrorAlert();
-                $("#modalFinancialDetailsLoader").hide();
+                $('#table_sv').DataTable({
+                    "sDom": 'flBtip',
+                    searching: true,
+                    buttons: [
+                        $.extend(true, {}, buttonCommon, {
+                            extend: 'excel',
+                            title: 'Fluxo de Caixa'
+                        })
+                    ],
+                    order: [[0, "desc"]],
+                    columnDefs: [
+                        { type: 'date-eu', targets: [1] },
+                        { type: 'valoresemreais', targets: [3] },
+                    ],
+                    responsive: true,
+                    info: true,
+                    processing: true,
+                    scrollCollapse: true,
+                    paging: true,
+                    "pageLength": 25,
+                    "language": {
+                        "sEmptyService": "Nenhum registro encontrado",
+                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sInfoThousands": ".",
+                        "sLengthMenu": "_MENU_ &nbsp;",
+                        "sLoadingRecords": "Carregando...",
+                        "sProcessing": "Processando...",
+                        "sZeroRecords": "Nenhum registro encontrado",
+                        "sSearch": "Filtrar",
+                        "oPaginate": {
+                            "sNext": "Próximo",
+                            "sPrevious": "Anterior",
+                            "sFirst": "Primeiro",
+                            "sLast": "Último"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ordenar colunas de forma ascendente",
+                            "sSortDescending": ": Ordenar colunas de forma descendente"
+                        }
+                    }
+                });
             });
-        }
 
-        function changeMonth() {
+            async function openModuleDetails(type, id) {
+                let moduleUrl;
+                
+                if (type === 'expenses-down' || type === 'expenses-up') {
+                    moduleUrl = 'contas' ;
+                    $("#modalReportDetailsTitle").html('<i class="fa fa-info-circle pr-2"></i> Detalhes da Conta');
+                }
+
+                if (type === 'sales') {
+                    moduleUrl = 'vendas' ;
+                    $("#modalReportDetailsTitle").html('<i class="fa fa-info-circle pr-2"></i> Detalhes da Venda');
+                }
+
+                if (type === 'purchases') {
+                    moduleUrl = 'compras' ;
+                    $("#modalReportDetailsTitle").html('<i class="fa fa-info-circle pr-2"></i> Detalhes da Compra');
+                }
+
+                $("#modalReportDetailsLoader").show();
+                $("#modalReportDetails").modal('show');     
+                
+
+                await $.ajax({
+                    type: 'post',
+                    url: `<?php echo baseUrl; ?>${moduleUrl}/detalhes`,
+                    data: { 
+                        id: id,
+                        target: '<?php echo $this->getTarget(); ?>',
+                        month: $("#f_month").val(),
+                        modal: true 
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#modalReportDetailsResult").html(data);
+                    $("#modalReportDetailsLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalReportDetailsLoader").hide();
+                });
+            }
+
+            async function openModDetails(id, mod, month = null) {
+                $("#modalReportDetailsLoader").show();
+                
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>"+mod+"/detalhes",
+                    data: {
+                        id:id,
+                        month: month,
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").fadeOut();
+                    $("#modalReportDetails").modal('hide');  
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <script>
+        async function changeMonth() {
             $("#modalMonthTitle").html('<i class="fa fa-info-circle pr-2"></i> Alterar Mês');
             $("#modalMonthLoader").hide();
-            $("#modalMonth").modal('show');           
+            $("#modalMonth").modal('show');
         }
 
         function selectMonth() {
@@ -260,30 +268,7 @@ $canView = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->mo
             $("#modalMonthLoader").show();
             openModule('financeiro?m=' + month);
             $("#modalMonthLoader").hide();
-            $("#modalMonth").modal('hide');    
-        }
-        
-        function openModDetails(uuid, mod) {
-            $("#modalFinancialDetailsLoader").show();
-            
-            $("#baseLoader").show();
-            $.ajax({
-                type: 'post',
-                url: "<?php echo baseUrl; ?>"+mod+"/detalhes",
-                data: {
-                    uuid:uuid,
-                    month: $("#f_month").val(),
-                    target: '<?php echo $this->getTarget(); ?>'
-                },
-                async: true
-            }).done(function(data) {
-                $("#sis_content").html(data);
-                $("#baseLoader").hide();
-                $("#modalFinancialDetails").modal('hide');  
-            }).fail(function() {
-                showInternalErrorAlert();
-                $("#baseLoader").hide();
-            });
+            $("#modalMonth").modal('hide');
         }
     </script>
 <?php endif; ?>

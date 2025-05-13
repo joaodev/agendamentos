@@ -1,0 +1,111 @@
+<?php if ($this->view->acl['canUpdate']): ?>
+    <?php $entity = $this->view->entity; ?>
+    <form method="post" name="formCreateChangeStatusModal" id="formCreateChangeStatusModal"
+        enctype="multipart/form-data">
+        <div class="col-md-12">
+            <span class="fa fa-info-circle pr-1"></span>
+            <label for="status">Situação Atual</label>
+            <p>
+                <?php if ($entity['status'] == '1'): ?>
+                    <i class="fa fa-circle pr-1 text-info"></i> Aberto
+                <?php endif; ?>
+                <?php if ($entity['status'] == '2'): ?>
+                    <i class="fa fa-circle pr-1 text-purple"></i> Em Atendimento
+                <?php endif; ?>
+                <?php if ($entity['status'] == '3'): ?>
+                    <i class="fa fa-circle pr-1 text-success"></i> Finalizado
+                <?php endif; ?>
+                <?php if ($entity['status'] == '4'): ?>
+                    <i class="fa fa-circle pr-1 text-danger"></i> Fechado
+                <?php endif; ?>
+            </p>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="status">Escolha a nova Situação*</label>
+                <select name="status" id="status_1" class="form-control" required>
+                    <option value="">Selecione</option>
+                    <?php if ($entity['status'] != 1): ?><option value="1">1 - Aberto</option><?php endif; ?>
+                    <?php if ($entity['status'] != 2): ?><option value="2">2 - Em Atendimento</option><?php endif; ?>
+                    <?php if ($entity['status'] != 3): ?><option value="3">3 - Finalizado</option><?php endif; ?>
+                    <?php if ($entity['status'] != 4): ?><option value="4">4 - Fechado</option><?php endif; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="call_answer">Resposta ao chamado</label>
+                <textarea name="call_answer" id="call_answer" class="form-control" rows="5" 
+                    placeholder="Descreva a resposta para o chamado"><?php echo $entity['call_answer']; ?></textarea>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label for="file">Anexar Arquivos <small style="color: red; margin-left: 5px;"><i>(jpg, jpeg, png, gif, pdf)</i></small></label>
+                <input type="file" class="form-control inputUpload" name="file[]" accept=".png,.jpg,.jpeg,.gif,.pdf" multiple id="file">
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="send_email_status">Notificação</label><br>
+                <input type="checkbox" name="send_email_status" id="send_email_status" value="1" class="mr-1"> 
+                <small style="position: relative; top: -2px;">Enviar notificação sobre o operação.</small>
+            </div>
+        </div>
+        <div class="col-md-12 mt-3 mb-2">
+            <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmitModalChangeStatus" title="Aplicar nova situação">
+                <i class="fa fa-check pr-1"></i> Aplicar
+            </button>
+        </div>
+    </form>
+    <script>
+        $(document).ready(function () {
+            $('#formCreateChangeStatusModal').validate({
+                submitHandler: async function () {
+                    let form_data = new FormData();        
+                    
+                    $.each($("input[type='file']")[0].files, function (i, file) {
+                        form_data.append('file_' + i, file);
+                    });
+                        
+                    form_data.append('status', $("#status_1").val());
+                    form_data.append('call_answer', $("#call_answer").val());
+                    form_data.append('id', '<?php echo $_POST['id']; ?>');    
+                    form_data.append('target', '<?php echo $this->getTarget(); ?>');
+
+                    if ($('#send_email_status').is(':checked')) {
+                        form_data.append('send_email_status', $("#send_email_status").val());    
+                    }
+
+                    $("#modalMidLoader").show();
+                    $("#btnSubmitModalChangeStatus").attr('disabled', true);
+
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>chamados/processa-situacao",
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: form_data,
+                        dataType: 'json',
+                        async: true
+                    }).done(async function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        if (data.type === 'success') {
+                            await openSupportDetails(data.id);
+                            $("#modalMid").modal('hide');
+                        } else {
+                            $("#btnSubmitModalChangeStatus").attr('disabled', false);
+                        }
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#modalMidLoader").hide();
+                        $("#btnSubmitModalChangeStatus").attr('disabled', false);
+                    });
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

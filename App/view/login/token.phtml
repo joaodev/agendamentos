@@ -1,5 +1,7 @@
 <?php
 $config = $this->getSiteConfig();
+$config['logo'] = $this->isImage($config['logo'], 'logo') ? $config['logo'] : 'jaconsultoriati.png';
+$config['logo_icon'] = $this->isImage($config['logo_icon'], 'logo') ? $config['logo_icon'] : 'jaconsultoriati.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,6 +27,14 @@ $config = $this->getSiteConfig();
 
         .btn-primary:hover {
             background: <?php echo $config['secondary_color']; ?> !important;
+        }
+
+        .btnRadius {
+            border-radius: 20px !important;
+        }
+
+        .btnRadiusLg {
+            border-radius: 30px !important;
         }
     </style>
 </head>
@@ -53,10 +63,10 @@ $config = $this->getSiteConfig();
                 </div>
                 <div class="row">
                     <div class="col-12 mt-1">
-                        <button type="submit" class="btn btn-primary btn-block" id="btnSubmitToken">Validar</button>
+                        <button type="submit" class="btn btn-primary btn-block btnRadius" id="btnSubmitToken" title="Validar token de acesso">Validar</button>
                     </div>
                     <div class="col-12 text-center mt-3">
-                        <a href="<?php echo baseUrl; ?>cancelar-token" style=" color: #000;">
+                        <a href="<?php echo baseUrl; ?>cancelar-token" style=" color: #000;" title="Cancelar autenticação">
                             Cancelar
                         </a>
                     </div>
@@ -75,11 +85,9 @@ $config = $this->getSiteConfig();
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body text-center">
-                <div style="font-size: 20px; color: <?php echo $config['secondary_color'] ?>">
-                    <span class="fa fa-clock"></span> Aguarde...
+                <div style="color: <?php echo $config['secondary_color'] ?>" class="pt-2">
+                    <h2><span class="fa fa-clock"></span> Aguarde...</h2>
                 </div>
-                <hr>
-                <h2>Autenticando Informações</h2>
             </div>
         </div>
     </div>

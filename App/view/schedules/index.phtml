@@ -1,105 +1,70 @@
-<?php 
-$data = $this->view->data; 
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canCreate = $aclData['canCreate'];
 
-$isAdmin = $_SESSION['ROLE_ADM'] == '0';
-$role    = $_SESSION['ROLE'];
-
-$canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('schedules'));
-$canCreate  = $isAdmin || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('schedules'));
-$canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('schedules'));
-$canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('schedules'));
-
-$isParent = $this->isUserParent();
-?>
-<?php if ($canView): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-file-invoice-dollar pr-1"></i>
-                        Agendamentos
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <?php if ($canCreate): ?>
-                        <ol class="breadcrumb float-right">
-                            <li class="breadcrumb-item">
-                                <?php if (!$this->view->reached_limit): ?>
-                                    <button type="button" class="btn btn-outline-success"
-                                        onclick="createSchedule();" style="width: 100%;" title="Adcionar Agendamento">
-                                        <i class="fas fa-plus"></i> 
-                                    </button>
-                                <?php else: ?>
-                                    <?php if ($isParent): ?>
-                                        <button type="button" class="btn btn-outline-primary" title="Limite de cadastros atingido, altere seu plano para aumentar o limite atual."
-                                            onclick="openModule('planos-usuario');" style="width: 100%;">
-                                            <i class="fas fa-sync"></i> 
-                                        </button>
-                                    <?php endif; ?>
-                                <?php endif; ?>
-                            </li>
-                        </ol>
-                    <?php endif; ?>
+if ($canView): ?>
+    <?php 
+    $data = $this->view->data; 
+    $totalSchedules = $this->getTotalSchedules();
+    ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-calendar pr-1"></i>
+                                Agendamentos
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <?php if ($canCreate): ?>
+                                <button type="button" class="btn btn-success btnRadius" 
+                                    title="Adicionar Agendamento"
+                                    onclick="createSchedule();">
+                                    <i class="fas fa-plus"></i> 
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 mt-3">
-                    <?php if ($this->view->reached_limit): ?>
-                        <?php if ($isParent): ?>
-                            <div class="alert bg-red" role="alert">
-                                <span class="fa fa-info-circle pr-1"></span>
-                                Limite de cadastros atingido! 
-                                <a onclick="openModule('planos-usuario');" 
-                                    class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para aumentar o limite atual.
-                            </div>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
-                            <?php if ($isParent): ?>
-                                <div class="alert alert-info" role="alert">
-                                    <span class="fa fa-users pr-1"></span> 
-                                    Você está utilizando o Plano Gratuito. 
-                                    <a onclick="openModule('planos-usuario');" 
-                                        class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para alterar e liberar todos os recursos do sistema.
-                                </div>
-                            <?php endif; ?>
-                        <?php else: ?>
-                            <div class="alert alert-info" role="alert">
-                                <span class="fa fa-info-circle pr-1"></span> 
-                                Cadastros disponíveis: <b><?php echo $this->view->total_free; ?></b> 
-                            </div>
-                        <?php endif; ?>
-                    <?php endif; ?>
+                <div class="col-12">
                     <div class="row">
-                        <div class="col-md-4 text-center">
-                            <div class="card bg-info">
-                                <div class="card-body">
-                                    <span style="font-size: 1em"><i class="fa fa-calendar pr-1"></i> Agendados</span> 
-                                    <h3><?php echo $this->getTotalSchedulesByMonth('1', $this->view->month); ?></h3>
+                        <div class="col-md-3 text-center">
+                            <div class="card bg-orange">
+                                <div class="card-body cardBox">
+                                    <span style="font-size: 1em"><i class="fa fa-list pr-1"></i> Pendentes</span> 
+                                    <h3><?php echo $totalSchedules['totalByStatus_1']; ?></h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-md-3 text-center">
+                            <div class="card bg-purple">
+                                <div class="card-body cardBox">
+                                    <span style="font-size: 1em"><i class="fa fa-calendar-check pr-1"></i> Confirmados</span> 
+                                    <h3><?php echo $totalSchedules['totalByStatus_2']; ?></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
                             <div class="card bg-success">
-                                <div class="card-body">
+                                <div class="card-body cardBox">
                                     <span style="font-size: 1em"><i class="fa fa-calendar-check pr-1"></i> Concluídos</span> 
-                                    <h3><?php echo $this->getTotalSchedulesByMonth('2', $this->view->month); ?></h3>
+                                    <h3><?php echo $totalSchedules['totalByStatus_3']; ?></h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-md-3 text-center">
                             <div class="card bg-danger">
-                                <div class="card-body">
-                                    <span style="font-size: 1em"><i class="fa fa-calendar-minus pr-1"></i> Cancelados</span> 
-                                    <h3><?php echo $this->getTotalSchedulesByMonth('3', $this->view->month); ?></h3>
+                                <div class="card-body cardBox">
+                                    <span style="font-size: 1em"><i class="fa fa-calendar-minus pr-1"></i> Atrasados</span> 
+                                    <h3><?php echo $totalSchedules['totalDelayed']; ?></h3>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-12 col-md-4 offset-md-4 mb-3 text-center">
-                            <a onclick="changeMonth();" style="width: 100%; cursor: pointer;" title="Alterar Mês">
-                                <i class="fas fa-sync  pr-1"></i> Mês Atual: <?php echo $this->view->month; ?>
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -107,248 +72,193 @@ $isParent = $this->isUserParent();
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table_agendamentos" style="width: 100%">
-                                    <thead>
-                                        <tr class="text-center" style="height: 30px;">
-                                            <th style="font-size: 14px;">Data</th>
-                                            <th style="font-size: 14px;">Horário</th>
-                                            <th style="font-size: 14px;">Serviço</th>
-                                            <th style="font-size: 14px;">Cliente</th>
-                                            <th style="font-size: 14px;">Responsável</th>
-                                            <th style="font-size: 14px;">Situação</th>
-                                            <th style="display: none;">Situação</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($data as $entity): ?>
-                                            <?php 
-                                            $today = strtotime(date('Y-m-d'));
-                                            $entityDate = strtotime($entity['schedule_date']);
-                                            $isLateClass = ($entityDate < $today && $entity['status'] == 1) ? 'alert alert-danger' : '';
-                                            ?>
-                                            <tr class="text-center <?php echo $isLateClass; ?>" style="cursor: pointer;" 
-                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
-                                                <td style="font-size: 15px">
-                                                    <?php echo $this->formatDate($entity['schedule_date']); ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <?php echo substr($entity['schedule_time'], 0, 5); ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <?php echo $entity['serviceName']; ?>
-                                                </td> 
-                                                <td style="font-size: 15px">
-                                                    <?php echo $entity['customerName'] ?? 'Não informado'; ?>
-                                                </td> 
-                                                <td style="font-size: 15px">
-                                                    <?php echo $entity['userName'] ?? 'Não informado'; ?>
-                                                </td> 
-                                                <td style="width: 80px;">
-                                                    <?php if ($entity['status'] == '1'): ?>
-                                                        <i class="fa fa-circle" style="color: orange;"></i>
-                                                    <?php endif; ?>
-                                                    <?php if ($entity['status'] == '2'): ?>
-                                                        <i class="fa fa-circle" style="color: green;"></i>
-                                                    <?php endif; ?>
-                                                    <?php if ($entity['status'] == '3'): ?>
-                                                        <i class="fa fa-circle" style="color: red;"></i>
-                                                    <?php endif; ?>
-                                                </td>  
-                                                <td style="display: none;">
-                                                    <?php echo ($entity['status'] == '1') ? 'Agendado' : ''; ?>
-                                                    <?php echo ($entity['status'] == '2') ? 'Concluído' : ''; ?>
-                                                    <?php echo ($entity['status'] == '3') ? 'Cancelado' : ''; ?>
-                                                </td> 
+                        <div class="card-body cardWrapperList">
+                            <?php if (!$data): ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table_sv" style="width: 100%;">
+                                        <thead>
+                                            <tr class="text-center" style="height: 30px;">
+                                                <th style="font-size: 14px;">Código</th>
+                                                <th style="font-size: 14px;">Data</th>
+                                                <th style="font-size: 14px;">Horário</th>
+                                                <th style="font-size: 14px;">Agendamento</th>
+                                                <th style="font-size: 14px;">Responsável</th>
+                                                <th style="font-size: 14px;">Situação</th>
+                                                <th style="display: none;">Situação</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($data as $entity): ?>
+                                                <?php 
+                                                $today = strtotime(date('Y-m-d'));
+                                                $entityDate = strtotime($entity['schedule_date']);
+
+                                                $textColor = "";
+                                                if ($entityDate == $today && ($entity['status'] == 1 || $entity['status'] == 2)):
+                                                    $textColor = "color: blue !important";
+                                                elseif ($entityDate < $today && ($entity['status'] == 1 || $entity['status'] == 2)):
+                                                    $textColor = "color: red !important;";
+                                                endif;
+                                                ?>
+                                                <tr class="text-center" style="cursor: pointer;" 
+                                                    onclick="openScheduleDetails('<?php echo $entity['id']; ?>');">
+                                                    <td style="font-size: 15px; <?php echo $textColor; ?>">
+                                                        <?php echo $entity['id']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px; <?php echo $textColor; ?>">
+                                                        <?php echo $this->formatDate($entity['schedule_date']); ?>
+                                                    </td>
+                                                    <td style="font-size: 15px; <?php echo $textColor; ?>">
+                                                        <?php echo substr($entity['schedule_time'], 0, 5); ?>
+                                                    </td>
+                                                    <td style="font-size: 15px; <?php echo $textColor; ?>">
+                                                        <?php echo $entity['title']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px; <?php echo $textColor; ?>">
+                                                        <?php echo $entity['userName'] ? $entity['userCod'] . ' - ' . $entity['userName'] : 'Não atribuido'; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px;">
+                                                        <?php if ($entity['status'] == '1'): ?>
+                                                            <span class="text-info" style="<?php echo $textColor; ?>">Pendente</span>
+                                                        <?php endif; ?>
+                                                        <?php if ($entity['status'] == '2'): ?>
+                                                            <span class="text-purple" style="<?php echo $textColor; ?>">Confirmado</span>
+                                                        <?php endif; ?>
+                                                        <?php if ($entity['status'] == '3'): ?>
+                                                            <span class="text-success" style="<?php echo $textColor; ?>">Concluído</span>
+                                                        <?php endif; ?>
+                                                        <?php if ($entity['status'] == '4'): ?>
+                                                            <span class="text-danger" style="<?php echo $textColor; ?>">Cancelado</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td style="display: none;">
+                                                        <?php if ($entity['status'] == '1'): ?>
+                                                            Pendente
+                                                        <?php endif; ?>
+                                                        <?php if ($entity['status'] == '2'): ?>
+                                                            Confirmado
+                                                        <?php endif; ?>
+                                                        <?php if ($entity['status'] == '3'): ?>
+                                                            Concluído
+                                                        <?php endif; ?>
+                                                        <?php if ($entity['status'] == '4'): ?>
+                                                            Cancelado
+                                                        <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <?php if (empty($_GET['m'])): ?>
-        <script>
+    <?php if ($data): ?>
+        <script type="text/javascript">
             $(document).ready(function() {
-                $("#f_month").val('<?php echo date('Y-m'); ?>');
+                let buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function ( data ) {
+                                return data;
+                            }
+                        }
+                    }
+                };
+            
+                $('#table_sv').DataTable({
+                    "sDom": 'flBtip',
+                    searching: true,
+                    buttons: [
+                        $.extend( true, {}, buttonCommon, {
+                            extend: 'excel',
+                            title: 'Agendamentos',
+                            exportOptions: {columns: [0,1,2,3,4,6]}
+                        })
+                    ],
+                    order: [ [0, "desc"] ],
+                    columnDefs: [
+                        {type: 'date-eu', targets: [1]},
+                    ],
+                    responsive: true,
+                    info: true,
+                    processing: true,
+                    scrollCollapse: true,
+                    paging: true,
+                    "pageLength": 25,
+                    "language": {
+                        "sEmptySchedule": "Nenhum registro encontrado",
+                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sInfoThousands": ".",
+                        "sLengthMenu": "_MENU_ &nbsp;",
+                        "sLoadingRecords": "Carregando...",
+                        "sProcessing": "Processando...",
+                        "sZeroRecords": "Nenhum registro encontrado",
+                        "sSearch": "Filtrar",
+                        "oPaginate": {
+                            "sNext": "Próximo",
+                            "sPrevious": "Anterior",
+                            "sFirst": "Primeiro",
+                            "sLast": "Último"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ordenar colunas de forma ascendente",
+                            "sSortDescending": ": Ordenar colunas de forma descendente"
+                        }
+                    }
+                });
             });
         </script>
     <?php endif; ?>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            
-            let buttonCommon = {
-                exportOptions: {
-                    format: {
-                        body: function ( data, row, column ) {
-                            return data;
-                        }
-                    }
-                }
-            };	
-
-            $('#table_agendamentos').DataTable({
-                "sDom": 'flBtip',
-                searching: true,
-                buttons: [
-                    $.extend( true, {}, buttonCommon, {
-                        extend: 'excel',
-                        title: 'Agendamentos',
-                        exportOptions: {columns: [0,1,2,3,4,6]}
-                    })
-                ],
-                order: [ [0, "desc"] ],
-                columnDefs: [
-                    {type: 'date-eu', targets: [0]},
-                    {orderable: false, targets: [5]},
-                ],
-                responsive: true,
-                info: true,
-                processing: true,
-                scrollCollapse: true,
-                paging: true,
-                "pageLength": 10,
-                "language": {
-                    "sEmptyTable": "Nenhum registro encontrado",
-                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
-                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
-                    "sInfoPostFix": "",
-                    "sInfoThousands": ".",
-                    "sLengthMenu": "_MENU_ &nbsp;",
-                    "sLoadingRecords": "Carregando...",
-                    "sProcessing": "Processando...",
-                    "sZeroRecords": "Nenhum registro encontrado",
-                    "sSearch": "Filtrar",
-                    "oPaginate": {
-                        "sNext": "Próximo",
-                        "sPrevious": "Anterior",
-                        "sFirst": "Primeiro",
-                        "sLast": "Último"
-                    },
-                    "oAria": {
-                        "sSortAscending": ": Ordenar colunas de forma ascendente",
-                        "sSortDescending": ": Ordenar colunas de forma descendente"
-                    }
-                }
-            });
-        });
-    </script>
-
     <script>
-        function openDetails(uuid) {
+        async function openScheduleDetails(id) {
             $("#baseLoader").show();
-            $.ajax({
+            await $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>agendamentos/detalhes",
                 data: {
-                    uuid:uuid,
-                    month: $("#f_month").val(),
+                    id:id,
                     target: '<?php echo $this->getTarget(); ?>'
                 },
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
-                $("#baseLoader").hide();
+                $("#baseLoader").fadeOut();
             }).fail(function() {
                 showInternalErrorAlert();
-                $("#baseLoader").hide();
+                $("#baseLoader").fadeOut();
             });
-        }
-
-        function changeMonth() {
-            $("#modalMonthTitle").html('<i class="fa fa-info-circle pr-2"></i> Alterar Mês');
-            $("#modalMonthLoader").hide();
-            $("#modalMonth").modal('show');           
-        }
-
-        function selectMonth() {
-            let month = $("#f_month").val();
-            $("#modalMonthLoader").show();
-            openModule('agendamentos?m=' + month);
-            $("#modalMonthLoader").hide();
-            $("#modalMonth").modal('hide');    
         }
     </script>
     <?php if ($canCreate): ?>
         <script>
-            function createSchedule() {
+            async function createSchedule() {
                 $("#baseLoader").show();
-                $.ajax({
+                await $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>agendamentos/cadastrar",
                     data: {
-                        month: $("#f_month").val(),
                         target: '<?php echo $this->getTarget(); ?>'
                     },  
                     async: true
                 }).done(function(data) {
                     $("#sis_content").html(data);
-                    $("#baseLoader").hide();
+                    $("#baseLoader").fadeOut();
                 }).fail(function() {
                     showInternalErrorAlert();
-                    $("#baseLoader").hide();
+                    $("#baseLoader").fadeOut();
                 });
-            }
-        </script>
-    <?php endif; ?>
-    <?php if ($canUpdate): ?>
-        <script>
-            function updateSchedule(uuid) {
-                $("#baseLoader").show();
-                $.ajax({
-                    type: 'post',
-                    url: "<?php echo baseUrl; ?>agendamentos/editar",
-                    data: {
-                        uuid:uuid,
-                        target: '<?php echo $this->getTarget(); ?>'
-                    },
-                    async: true
-                }).done(function(data) {
-                    $("#sis_content").html(data);
-                    $("#baseLoader").hide();
-                }).fail(function() {
-                    showInternalErrorAlert();
-                    $("#baseLoader").hide();
-                });
-            }
-        </script>
-    <?php endif; ?>
-    <?php if ($canDelete): ?>
-        <script>
-            function deleteSchedule(uuid) {
-                $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Agendamento');
-                $("#modalDeleteLoader").hide();
-                $("#modalDelete").modal('show');
-                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
-            }   
-
-            function runDelete(uuid) {
-                if (uuid !== null) {
-                    $("#modalDeleteLoader").show();
-                    let month = $("#f_month").val();
-                    $.ajax({
-                        type: "POST",
-                        url: "<?php echo baseUrl; ?>agendamentos/excluir",
-                        data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
-                        dataType: 'json',
-                        async: true
-                    }).done(function(data) {
-                        showAlert(data.type, data.title, data.msg, data.pos);
-                        $("#modalDelete").modal('hide');
-                        $("#modalXL").modal('hide');
-                        openModule('agendamentos?m=' + month);
-                    }).fail(function() {
-                        showInternalErrorAlert();
-                        $("#modalDeleteLoader").hide();
-                    });
-                }
             }
         </script>
     <?php endif; ?>

@@ -1,7 +1,6 @@
 <h1>
-    Agendamentos
+    Sistema de Gestão
 </h1>
-<p>🚀 Sistema para Agendamentos.</p>
 
 ## Authors
 - [João Augusto Bonfante](https://github.com/joaodev)

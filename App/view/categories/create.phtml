@@ -1,0 +1,98 @@
+<?php if ($this->view->acl['canCreate']): ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-plus-square pr-1"></i> 
+                                Categoria
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-outline-primary btnRadius" 
+                                title="Voltar para Categorias"
+                                onclick="openModule('categorias');">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row"> 
+                <div class="col-md-12">
+                    <div class="card">  
+                        <div class="card-body cardWrapperBody">
+                            <form method="post" name="formCreateCategory" id="formCreateCategory">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="title">Título*</label>
+                                            <input type="text" class="form-control" name="title" id="title" required
+                                                maxlength="150" placeholder="Título da Categoria">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-1">
+                                        <div class="row">
+                                            <div class="col-md-6 offset-md-3 mb-2">
+                                                <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
+                                                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit"
+                                                    title="Salvar Categoria">
+                                                    <i class="fa fa-save pr-1"></i> Salvar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openModule('categorias');"
+                        title="Voltar para Categorias">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function () {
+            $('#formCreateCategory').validate({
+                submitHandler: async function (form) {
+                    let dados = $(form).serialize();
+
+                    $("#baseLoader").show();
+                    $("#btnSubmit").attr('disabled', true);
+
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>categorias/processa-cadastro",
+                        data: dados,
+                        dataType: 'json',
+                        async: true
+                    }).done(async function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        if (data.type === 'success') {
+                            await openCategoryDetails(data.id);
+                        } else {
+                            $("#baseLoader").fadeOut();
+                            $("#btnSubmit").attr('disabled', false);
+                        }
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#baseLoader").fadeOut();
+                        $("#btnSubmit").attr('disabled', false);
+                    });
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

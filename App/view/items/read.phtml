@@ -1,0 +1,330 @@
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canUpdate = $aclData['canUpdate'];
+$canDelete = $aclData['canDelete'];
+
+if ($canView): ?>
+    <?php $entity = $this->view->entity; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-cubes pr-1"></i>
+                                Produto <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-info mr-1 btnRadius" 
+                                title="Imprimir"
+                                onclick="window.print();">
+                                <i class="fas fa-print"></i> 
+                            </button>
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Produto"
+                                onclick="openModule('estoque');">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <div class="card bg-info">
+                        <div class="card-body cardBox">
+                            <span style="font-size: 1em"><i class="fa fa-cubes pr-1"></i>
+                                Estoque
+                            </span>
+                            <h3>
+                                <?php echo $entity['quantity']; ?>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="card bg-success">
+                        <div class="card-body cardBox">
+                            <span style="font-size: 1em"><i class="fa fa-arrow-up pr-1"></i>
+                                Entradas
+                            </span>
+                            <h3>
+                                <?php echo $this->view->total_movs_1; ?>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="card bg-danger">
+                        <div class="card-body cardBox">
+                            <span style="font-size: 1em"><i class="fa fa-arrow-down pr-1"></i>
+                                Saídas
+                            </span>
+                            <h3>
+                            <?php echo $this->view->total_movs_2; ?>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <?php if ($entity['deleted'] == 1): ?>
+                    <div class="col-md-12">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-info-circle pr-1"></i> 
+                            Produto removido em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body cardWrapperDetails">
+                            <div class="row w-100 pt-3" id="printable" style="margin: 0 !important;">
+                                <div class="col-6 col-md-4">
+                                    <div class="form-group">
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Código</b>
+                                        <p>
+                                            <?php echo $entity['id']; ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Situação</b>
+                                    <p>
+                                        <?php if ($entity['status'] == '1'): ?>
+                                            <i class="fa fa-circle pr-1 text-success"></i> Ativo
+                                        <?php endif; ?>
+                                        <?php if ($entity['status'] == '0'): ?>
+                                            <i class="fa fa-circle pr-1 text-danger"></i> Inativo
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Estoque</b>
+                                    <p>
+                                        <?php if ($entity['quantity'] == 0): ?>
+                                            <i class="fa fa-circle pr-1 text-danger"></i> Sem estoque
+                                        <?php elseif ($entity['quantity'] <= $entity['min_quantity'] && $entity['min_quantity'] > 0): ?>
+                                            <i class="fa fa-circle pr-1 text-info"></i> Atingiu quantidade mínima
+                                        <?php else: ?>
+                                            <i class="fa fa-circle pr-1 text-success"></i> Em estoque
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                                <div class="col-md-12">
+                                    <hr class="cardLine">
+                                </div>
+                                <div class="col-12 col-sm-2 col-md-1">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Foto</b>
+                                    <p>
+                                        <?php if (!empty($entity['file']) && $this->isImage($entity['file'], 'items')): ?>
+                                            <a href="<?php echo baseUrl . 'public/uploads/items/' . $entity['file']; ?>" 
+                                                data-lightbox="image-1"
+                                                data-title="<?php echo $entity['file']; ?>">
+                                                <img src="<?php echo baseUrl . 'public/uploads/items/'
+                                                    . $entity['file']; ?>" style="max-height: 40px; margin-top: 12px" alt="<?php echo $entity['name']; ?>">
+                                            </a>
+                                        <?php else: ?>
+                                            <img src="<?php echo baseUrl . 'public/uploads/semfoto.png'; ?>" 
+                                                style="max-height: 40px; margin-top: 12px" alt="<?php echo $entity['name']; ?> - SEM FOTO"
+                                                title="Produto sem foto">
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                                <div class="col-12 col-sm-10 col-md-11">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Nome</b>
+                                    <p>
+                                        <?php echo $entity['name']; ?>
+                                    </p>
+                                </div>
+                                <div class="col-12">
+                                    <hr class="cardLine">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <span class="fa fa-filter pr-1"></span>
+                                    <b>Categoria</b>
+                                    <p>
+                                        <?php echo $entity['categoryCod'] .' - ' . $entity['categoryTitle']; ?>
+                                    </p>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <span class="fa fa-filter pr-1"></span>
+                                    <b>Subcategoria</b>
+                                    <p>
+                                        <?php echo $entity['subcategoryTitle'] ? $entity['subcategoryCod'] .' - ' . $entity['subcategoryTitle'] : 'Não informada'; ?>
+                                    </p>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <span class="fa fa-dollar-sign pr-1"></span>
+                                    <b>Valor</b>
+                                    <p>R$
+                                        <?php echo number_format($entity['price'], 2, ",", "."); ?>
+                                    </p>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Qtd. Mínima</b>
+                                    <p>
+                                        <?php echo $entity['min_quantity']; ?>
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <span class="fa fa-truck pr-1"></span>
+                                    <b>Fornecedor</b>
+                                    <p>
+                                        <?php echo (!empty($entity['providerName']) ? $entity['providerId'] . ' - ' . $entity['providerName'] : 'Não informado'); ?>
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Informações adicionais do Produto</b>
+                                    <p>
+                                        <?php echo (!empty($entity['description']) ? $entity['description'] : 'Não informada'); ?>
+                                    </p>
+                                </div>
+                                <div class="col-md-12">
+                                    <hr class="cardLine">
+                                </div>
+                                <div class="col-6">
+                                    <span class="fa fa-calendar pr-1"></span>
+                                    <b>Cadastro</b> <br>
+                                    <p>
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <?php if (!empty($entity['updated_at'])): ?>
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <b>Última Atualização</b> <br>
+                                        <p>
+                                            <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <?php if ($canDelete && $entity['deleted'] == 0): ?>
+                                            <div class="col-md-6 mb-2">
+                                                <button type="button" class="btn btn-danger btnRadius" title="Remover Produto"
+                                                    onclick="deleteItem('<?php echo $entity['id']; ?>');"
+                                                    style="width: 100%;">
+                                                    <i class="fa fa-trash"></i> Remover
+                                                </button>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+                                            <div class="col-md-6 mb-2">
+                                                <button type="button" class="btn btn-success btnRadius" title="Editar Produto"
+                                                    onclick="updateItem('<?php echo $entity['id']; ?>');"
+                                                    style="width: 100%;">
+                                                    <i class="fa fa-pen pr-1"></i> Editar
+                                                </button>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openModule('estoque');"
+                        title="Voltar para Produtos">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        async function openItemDetails(id) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>estoque/detalhes",
+                data: { 
+                    id: id,
+                    target: '<?php echo $this->getTarget(); ?>' 
+                },
+                async: true
+            }).done(function (data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").fadeOut();
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+    </script>
+    <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+        <script>
+            async function updateItem(id) {
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>estoque/editar",
+                    data: { 
+                        id: id,
+                        target: '<?php echo $this->getTarget(); ?>' 
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canDelete && $entity['deleted'] == 0): ?>
+        <script>
+            function deleteItem(id) {
+                $("#modalXL").modal('hide');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Produto');
+                $("#modalDeleteLoader").hide();
+                $("#modalDelete").modal('show');
+                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger btnRadius" title="Confirmar Exclusão" onclick="runDelete(\'' + id + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }
+
+            async function runDelete(id) {
+                if (id !== null) {
+                    $("#modalDeleteLoader").show();
+
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>estoque/excluir",
+                        data: { 
+                            id: id,
+                            target: '<?php echo $this->getTarget(); ?>' 
+                        },
+                        dataType: 'json',
+                        async: true
+                    }).done(async function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#modalDelete").modal('hide');
+                        $("#modalXL").modal('hide');
+                        await openModule('estoque');
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#modalDeleteLoader").hide();
+                    });
+                }
+            }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

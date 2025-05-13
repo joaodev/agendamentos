@@ -1,162 +1,165 @@
-<?php 
-$data = $this->view->data; 
-?>
-<?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-pen-square pr-1"></i>
-                        <?php echo $this->view->role['name']; ?> - Permissões
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary"
-                                onclick="openDetails('<?php echo $this->view->role['uuid']; ?>');" style="width: 100%;">
+<?php if ($this->view->isAdmin): ?>
+    <?php $data = $this->view->data; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-pen-square pr-1"></i>
+                                <?php echo $this->view->role['name']; ?> - Permissões
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Controle de Acesso"
+                                onclick="openRoleDetails('<?php echo $this->view->role['id']; ?>');">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
-                        </li>
-                    </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table_role2" style="width: 100%;">
-                                    <thead>
-                                        <tr class="text-center" style="height: 30px;">
-                                        <th style="font-size: 14px;">Recurso</th>
-                                            <th style="font-size: 14px;">Módulo</th>
-                                            <th style="font-size: 14px;">Ativo</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($data as $entity): ?>
-                                            <tr class="text-center">
-                                                <td style="font-size: 15px">
-                                                    <?php echo $entity['resource']; ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <?php echo $entity['module']; ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <input type="checkbox" id="my-checkbox-<?php echo $entity['uuid']; ?>"
-                                                        data-bootstrap-switch data-off-color="danger" 
-                                                        data-on-color="success" onchange="getVal('<?php echo $entity['uuid']; ?>');"
-                                                        <?php echo ($entity['status'] == 1) ? 'checked' : ''; ?>>
-                                                </td>
+                        <div class="card-body cardWrapperList">
+                            <?php if (!$data): ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table_role2" style="width: 100%;">
+                                        <thead>
+                                            <tr class="text-center" style="height: 30px;">
+                                            <th style="font-size: 14px;">Recurso</th>
+                                                <th style="font-size: 14px;">Módulo</th>
+                                                <th style="font-size: 14px;">Ativo</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($data as $entity): ?>
+                                                <tr class="text-center">
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['resource']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['module']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <input type="checkbox" id="my-checkbox-<?php echo $entity['id']; ?>"
+                                                            data-bootstrap-switch data-off-color="danger" 
+                                                            data-on-color="success" onchange="getVal('<?php echo $entity['id']; ?>');"
+                                                            <?php echo ($entity['status'] == 1) ? 'checked' : ''; ?>>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $("input[data-bootstrap-switch]").each(function(){
-                $(this).bootstrapSwitch();
-            });
-       
-            let buttonCommon = {
-                exportOptions: {
-                    format: {
-                        body: function ( data ) {
-                            return data;
+    <?php if ($data): ?>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("input[data-bootstrap-switch]").each(function(){
+                    $(this).bootstrapSwitch();
+                });
+        
+                let buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function ( data ) {
+                                return data;
+                            }
                         }
                     }
-                }
-            };	
+                };	
 
-            $('#table_role2').DataTable({
-                "sDom": 'fltip',
-                searching: true,
-                buttons: [
-                    $.extend( true, {}, buttonCommon, {
-                        extend: 'excel',
-                        title: 'PRIVILÉGIOS DE ACESSO',
-                        exportOptions: {columns: [0,1]}
-                    }), 
-                    {extend: 'pdf', 
-                        title: 'PRIVILÉGIOS DE ACESSO',
-                        orientation: 'landscape',
-                        pageSize: 'LEGAL',
-                        exportOptions: {columns: [0,1]}
+                $('#table_role2').DataTable({
+                    "sDom": 'fltip',
+                    searching: true,
+                    buttons: [
+                        $.extend( true, {}, buttonCommon, {
+                            extend: 'excel',
+                            title: 'PRIVILÉGIOS DE ACESSO',
+                            exportOptions: {columns: [0,1]}
+                        }), 
+                        {extend: 'pdf', 
+                            title: 'PRIVILÉGIOS DE ACESSO',
+                            orientation: 'landscape',
+                            pageSize: 'LEGAL',
+                            exportOptions: {columns: [0,1]}
+                        }
+                    ],
+                    order: [ [1, "asc"] ],
+                    responsive: true,
+                    info: true,
+                    processing: true,
+                    scrollCollapse: true,
+                    paging: true,
+                    "pageLength": 25,
+                    "language": {
+                        "sEmptyTable": "Nenhum registro encontrado",
+                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sInfoThousands": ".",
+                        "sLengthMenu": "_MENU_ &nbsp;",
+                        "sLoadingRecords": "Carregando...",
+                        "sProcessing": "Processando...",
+                        "sZeroRecords": "Nenhum registro encontrado",
+                        "sSearch": "Filtrar",
+                        "oPaginate": {
+                            "sNext": "Próximo",
+                            "sPrevious": "Anterior",
+                            "sFirst": "Primeiro",
+                            "sLast": "Último"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ordenar colunas de forma ascendente",
+                            "sSortDescending": ": Ordenar colunas de forma descendente"
+                        }
                     }
-                ],
-                order: [ [1, "asc"] ],
-                responsive: true,
-                info: true,
-                processing: true,
-                scrollCollapse: true,
-                paging: true,
-                "pageLength": 10,
-                "language": {
-                    "sEmptyTable": "Nenhum registro encontrado",
-                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
-                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
-                    "sInfoPostFix": "",
-                    "sInfoThousands": ".",
-                    "sLengthMenu": "_MENU_ &nbsp;",
-                    "sLoadingRecords": "Carregando...",
-                    "sProcessing": "Processando...",
-                    "sZeroRecords": "Nenhum registro encontrado",
-                    "sSearch": "Filtrar",
-                    "oPaginate": {
-                        "sNext": "Próximo",
-                        "sPrevious": "Anterior",
-                        "sFirst": "Primeiro",
-                        "sLast": "Último"
-                    },
-                    "oAria": {
-                        "sSortAscending": ": Ordenar colunas de forma ascendente",
-                        "sSortDescending": ": Ordenar colunas de forma descendente"
-                    }
-                }
+                });
             });
-        });
 
-        function getVal(uuid) {
-            let status_acl;
-            if ($('#my-checkbox-' + uuid).is(":checked")) {
-                status_acl = 1;    
-            } else {
-                status_acl = 0;
-            }
+            async function getVal(id) {
+                let status_acl;
+                if ($('#my-checkbox-' + id).is(":checked")) {
+                    status_acl = 1;    
+                } else {
+                    status_acl = 0;
+                }
+                
+                $("#baseLoader").show();
             
-            $("#baseLoader").show();
-        
-            $.ajax({
-                type: "POST",
-                url: "<?php echo baseUrl; ?>controle-acesso/altera-permissao",
-                data: {
-                    uuid: uuid,
-                    status: status_acl,
-                    target: '<?php echo $this->getTarget(); ?>'
-                },
-                dataType: 'json',
-                async: true
-            }).done(function(data) {
-                showAlert(data.type, data.title, data.msg, data.pos);
-                $("#baseLoader").hide();
-            }).fail(function() {
-                showInternalErrorAlert(); 
-                $("#baseLoader").hide();   
-            }); 
-        }
-    </script>
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>controle-acesso/altera-permissao",
+                    data: {
+                        id: id,
+                        status: status_acl,
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    dataType: 'json',
+                    async: true
+                }).done(function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    $("#baseLoader").fadeOut();
+                }).fail(function() {
+                    showInternalErrorAlert(); 
+                    $("#baseLoader").fadeOut();   
+                }); 
+            }
+        </script>
+    <?php endif; ?>
 <?php endif; ?>

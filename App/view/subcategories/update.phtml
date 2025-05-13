@@ -1,0 +1,118 @@
+<?php if ($this->view->acl['canUpdate']): ?>
+    <?php $entity = $this->view->entity; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-pen-square pr-1"></i>
+                                Subcategoria <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-primary btnRadius" title="Voltar para Subcategoria"
+                                onclick="openSubcategoryDetailsSubcategory('<?php echo $_POST['id']; ?>');">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body cardWrapperBody">
+                            <form method="post" name="formUpdateSubcategory" id="formUpdateSubcategory">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>Código</label>
+                                            <input type="text" class="form-control" value="<?php echo $entity['id']; ?>" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label for="status">Situação</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>
+                                                    1 - Ativa</option>
+                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>
+                                                    2 - Inativa</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="title">Título</label>
+                                            <input type="text" class="form-control" name="title" id="title" required
+                                                value="<?php echo $entity['title']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-1">
+                                        <div class="row">
+                                            <div class="col-md-6 offset-md-3 mb-2">
+                                                <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
+                                                <input type="hidden" name="category_id"
+                                                    value="<?php echo $entity['category_id']; ?>">
+                                                <input type="hidden" name="id" value="<?php echo $entity['id']; ?>">
+                                                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit"
+                                                    title="Salvar Subcategoria">
+                                                    <i class="fa fa-save pr-1"></i> Salvar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openSubcategoryDetailsSubcategory('<?php echo $_POST['id']; ?>');"
+                        title="Voltar para Subcategoria">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function () {
+            $('#formUpdateSubcategory').validate({
+                submitHandler: async function (form) {
+                    let dados = $(form).serialize();
+
+                    $("#baseLoader").show();
+                    $("#btnSubmit").attr('disabled', true);
+
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>subcategorias/processa-edicao",
+                        data: dados,
+                        dataType: 'json',
+                        async: true
+                    }).done(async function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        if (data.type == 'success') {
+                            await openSubcategoryDetailsSubcategory('<?php echo $_POST['id']; ?>');
+                        } else {
+                            $("#baseLoader").fadeOut();
+                            $("#btnSubmit").attr('disabled', false);
+                        }
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#baseLoader").fadeOut();
+                        $("#btnSubmit").attr('disabled', false);
+                    });
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

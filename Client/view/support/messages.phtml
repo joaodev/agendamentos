@@ -1,0 +1,55 @@
+<?php foreach ($this->view->messages as $message): ?>
+    <?php if (!empty($message['customer_id'])): ?>
+        <div class="row mt-3">
+            <div class="col-12 p-2" style="border: 1px solid #ccc; text-align: left; border-radius: 5px;">
+                <div class="row">
+                    <div class="col-3 col-md-1 text-center">
+                        <?php if (!empty($message['customerAvatar']) && $this->isImage($message['customerAvatar'], 'customers')): ?>
+                            <img src="<?php echo baseUrl . 'public/uploads/customers/' . $message['customerAvatar']; ?>" 
+                                alt="avatar" class="img-circle" style="width: 60px; height: 60px;">
+                        <?php else: ?>
+                            <img src="<?php echo baseUrl; ?>public/app/dist/img/avatar5.png" 
+                                alt="avatar" class="img-circle" style="width: 60px; height: 60px;">
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-9 col-md-11">
+                        <b><?php echo $message['customername'] ?>:</b>
+                        <br>
+                        <?php echo $message['description'] ?>
+                        <br>
+                        <small style="color: #666"><?php echo $this->formatDateTime($message['created_at']); ?></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+    <?php if (!empty($message['user_id'])): ?>
+        <div class="row mt-3">
+            <div class="col-12 p-2" style="border: 1px solid #ccc; text-align: right; border-radius: 5px;">
+                <div class="row">
+                    <div class="col-9 col-md-11">
+                        <b><?php echo $message['username'] ?>:</b>
+                        <br>
+                        <?php echo $message['description'] ?>
+                        <br>
+                        <small style="color: #666"><?php echo $this->formatDateTime($message['created_at']); ?></small>
+                    </div>
+                    <div class="col-3 col-md-1 text-center">
+                        <?php if (!empty($message['userAvatar']) && $this->isImage($message['userAvatar'], 'users')): ?>
+                            <img src="<?php echo baseUrl . 'public/uploads/users/' . $message['userAvatar']; ?>" 
+                                alt="avatar" class="img-circle" style="width: 60px; height: 60px;">
+                        <?php else: ?>
+                            <img src="<?php echo baseUrl; ?>public/app/dist/img/avatar5.png" 
+                                alt="avatar" class="img-circle" style="width: 60px; height: 60px;">
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+<?php endforeach; ?>
+<?php if (empty($this->view->messages)): ?>
+    <div class="alert alert-info mt-4" role="alert">
+        Nenhuma mensagem enviada.
+    </div>
+<?php endif; ?>

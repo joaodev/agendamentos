@@ -1,0 +1,242 @@
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canCreate = $aclData['canCreate'];
+
+if ($canView): ?>
+    <?php $data = $this->view->data; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-cubes pr-1"></i>
+                                Produtos
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <?php if ($canCreate): ?>
+                                <button type="button" class="btn btn-success btnRadius"
+                                    title="Adcionar Produto"
+                                    onclick="createItem();">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body cardWrapperList">
+                            <?php if (!$data): ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table_estoque" style="width: 100%;">
+                                        <thead>
+                                            <tr class="text-center" style="height: 30px;">
+                                                <th style="font-size: 14px;"><i class="fa fa-image"></i></th>
+                                                <th style="font-size: 14px;">Código</th>
+                                                <th style="font-size: 14px;">Produto</th>
+                                                <th style="font-size: 14px;">Categoria</th>
+                                                <th style="font-size: 14px;">Estoque</th>
+                                                <th style="font-size: 14px;">Entradas</th>
+                                                <th style="font-size: 14px;">Saídas</th>
+                                                <th style="font-size: 14px;">Valor</th>
+                                                <th style="font-size: 14px;">Situação</th>
+                                                <th style="display: none;">Situação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($data as $entity): 
+                                                if ($entity['quantity'] == 0): 
+                                                    $color = "color: red !important";
+                                                elseif ($entity['quantity'] <= $entity['min_quantity'] && $entity['min_quantity'] > 0): 
+                                                    $color = "color: orange !important;";
+                                                else:
+                                                    $color = "color: green !important";
+                                                endif;
+                                                ?>
+                                                <tr class="text-center" style="cursor: pointer;"
+                                                    onclick="openItemDetails('<?php echo $entity['id']; ?>');">
+                                                    <td style="width: 35px; text-align: center;">
+                                                        <?php if (!empty($entity['file']) && $this->isImage($entity['file'], 'items')): ?>
+                                                            <a href="<?php echo baseUrl . 'public/uploads/items/' . $entity['file']; ?>" 
+                                                                data-lightbox="image-1"
+                                                                data-title="<?php echo $entity['file']; ?>">
+                                                                <img src="<?php echo baseUrl . 'public/uploads/items/'
+                                                                    . $entity['file']; ?>" style="max-height: 30px;" alt="<?php echo $entity['name']; ?>">
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <img src="<?php echo baseUrl . 'public/uploads/semfoto.png'; ?>" 
+                                                                style="max-height: 30px;" alt="<?php echo $entity['name']; ?> - SEM FOTO"
+                                                                title="Produto sem foto">
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['id']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['name']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['categoryCod'] .' - ' . $entity['categoryTitle']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px; <?php echo $color; ?>">
+                                                        <?php echo $entity['quantity']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['qtdEntradas']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['qtdSaidas']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo number_format($entity['price'], 2, ",", "."); ?>
+                                                    </td>
+                                                    <td style="font-size: 15px;">
+                                                        <?php if ($entity['status'] == '1'): ?>
+                                                            <span class="text-success">Ativo</span>
+                                                        <?php else: ?>
+                                                            <span class="text-danger">Inativo</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td style="display: none;">
+                                                        <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 mb-3">
+                    <div class="row">
+                        <div class="col-12 col-md-4 text-center">
+                            <i class="fa fa-circle pr-1 text-success"></i> Em estoque
+                        </div>
+                        <div class="col-12 col-md-4 text-center">
+                            <i class="fa fa-circle pr-1 text-info"></i> Atingiu quantidade mínima
+                        </div>
+                        <div class="col-12 col-md-4 text-center">
+                            <i class="fa fa-circle pr-1 text-danger"></i> Sem estoque
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php if ($data): ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                let buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function (data, row, column) {
+                                return column === 6 ?
+                                    parseFloat(data.replace(/[.]/g, '').replace(',', '.')).toLocaleString('en-IN',
+                                        { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : data;
+                            }
+                        }
+                    }
+                };
+
+                $('#table_estoque').DataTable({
+                    "sDom": 'flBtip',
+                    searching: true,
+                    buttons: [
+                        $.extend(true, {}, buttonCommon, {
+                            extend: 'excel',
+                            title: 'Produtos',
+                            exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 9] }
+                        })
+                    ],
+                    order: [[1, "asc"]],
+                    columnDefs: [
+                        { type: 'valoresemreais', targets: [7] },
+                        { orderable: false, targets: [0] },
+                    ],
+                    responsive: true,
+                    info: true,
+                    processing: true,
+                    scrollCollapse: true,
+                    paging: true,
+                    "pageLength": 25,
+                    "language": {
+                        "sEmptyTable": "Nenhum registro encontrado",
+                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sInfoThousands": ".",
+                        "sLengthMenu": "_MENU_ &nbsp;",
+                        "sLoadingRecords": "Carregando...",
+                        "sProcessing": "Processando...",
+                        "sZeroRecords": "Nenhum registro encontrado",
+                        "sSearch": "Filtrar",
+                        "oPaginate": {
+                            "sNext": "Próximo",
+                            "sPrevious": "Anterior",
+                            "sFirst": "Primeiro",
+                            "sLast": "Último"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ordenar colunas de forma ascendente",
+                            "sSortDescending": ": Ordenar colunas de forma descendente"
+                        }
+                    }
+                });
+            });
+        </script>
+    <?php endif; ?>
+    <?php if ($canCreate): ?>
+        <script>
+            async function createItem() {
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>estoque/cadastrar",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <script>
+        async function openItemDetails(id) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>estoque/detalhes",
+                data: { 
+                    id: id,
+                    target: '<?php echo $this->getTarget(); ?>' 
+                },
+                async: true
+            }).done(function (data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").fadeOut();
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+    </script>
+<?php endif; ?>

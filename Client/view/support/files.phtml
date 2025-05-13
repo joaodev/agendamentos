@@ -1,0 +1,82 @@
+<?php if (!empty($this->view->files)): ?>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover tableFiles w-100">
+            <thead class="bg-primary text-white">
+                <tr class="text-center">
+                    <th style="font-size: 14px; padding: 2px; color: white;">Arquivo</th>
+                    <th style="font-size: 14px; padding: 2px; color: white;">Data</th>
+                    <th style="display: none;">cod</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->view->files as $file): ?>
+                    <tr style="text-align: center;" id="row_file_<?php echo $file['id']; ?>">
+                        <td style="font-size: 15px;">
+                            <?php if ($this->isImage($file['file'])): ?>
+                                <a href="<?php echo baseUrl . 'public/uploads/support/' . $_POST['id'] . '/' . $file['file']; ?>" 
+                                    data-lightbox="image-1"
+                                    data-title="<?php echo $file['file']; ?>">
+                                    <span class="fa fa-image pr-1"></span> <?php echo $file['file']; ?>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?php echo baseUrl . 'public/uploads/support/' . $_POST['id'] . '/' . $file['file']; ?>" 
+                                    target="_blank">
+                                    <span class="fa fa-file-pdf pr-1"></span> <?php echo $file['file']; ?>
+                                </a>
+                            <?php endif; ?>
+                        </td>
+                        <td style="font-size: 15px;">
+                            <?php echo $this->formatDateTime($file['created_at']); ?>
+                        </td>
+                        <td style="display: none">
+                            <?php echo $file['id']; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('.tableFiles').DataTable({
+                "sDom": 'tip',
+                searching: true,
+                order: [ [2, "desc"] ],
+                columnDefs: [{orderable: false, targets: [0,1]}],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+    </script>
+<?php else: ?>
+    <div class="alert alert-info mt-3" role="alert">
+        Nenhum arquivo enviado.
+    </div>
+<?php endif; ?>

@@ -1,188 +1,55 @@
 <?php
-$canViewSchedules = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('schedules'));
-$canViewCustomers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('customers'));
-$canViewServices = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('services'));
 $canViewExpenses = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('expenses'));
-$canViewRevenues = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('revenues'));
-$canViewTasks = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('tasks'));
-$canViewUsers = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('user'));
+$canViewSchedules = $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('schedules'));
 ?>
 <section class="content mt-5 pt-4" style="margin-left: 9px; margin-right: 9px;">
     <div class="container-fluid mt-2">
-        <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-info" role="alert">
-                        Você está no plano Gratuito,
-                        <a onclick="openModule('planos-usuario');"
-                           class="alert-link text-white" style="cursor: pointer;">altere seu plano</a> para liberar todos os recursos do sistema.
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
         <div class="row">
-            <div class="col-lg-12">
-                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules) && $this->view->schedulesForToday > 0): ?>
-                    <div class="btn btn-outline-info text-center w-100 mb-3" role="alert">
-                        Agendamentos para hoje: <?php echo $this->view->schedulesForToday; ?>  
-                        <a onclick="openModule('agendamentos');" class="alert-link ml-1 text-white" style="cursor: pointer;">
-                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                        </a>
-                    </div>
-                <?php endif; ?>
-                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewTasks) && $this->view->tasksForToday > 0): ?>
-                    <div class="btn btn-outline-info text-center w-100 mb-3" role="alert">
-                        Tarefas para hoje: <?php echo $this->view->tasksForToday; ?>   
-                        <a onclick="openModule('tarefas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
-                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                        </a>
-                    </div>
-                <?php endif; ?>
-                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewExpenses) && $this->view->expensesForToday > 0): ?>
-                    <div class="btn btn-outline-info text-center w-100 mb-3" role="alert">
-                        Despesas para hoje: <?php echo $this->view->expensesForToday; ?>  
-                        <a onclick="openModule('despesas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
-                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                        </a>
-                    </div>
-                <?php endif; ?>
-                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewRevenues) && $this->view->revenuesForToday > 0): ?>
-                    <div class="btn btn-outline-info text-center w-100 mb-3" role="alert">
-                        Recebimentos para hoje: <?php echo $this->view->revenuesForToday; ?>    
-                        <a onclick="openModule('recebimentos');" class="alert-link ml-1 text-white" style="cursor: pointer;">
-                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                        </a>
-                    </div>
-                <?php endif; ?>
-                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules) && $this->view->schedulesDelayed > 0): ?>
-                    <div class="btn btn-outline-danger text-center w-100 mb-3" role="alert">
-                        Agendamentos atrasados: <?php echo $this->view->schedulesDelayed; ?>    
-                        <a onclick="openModule('agendamentos');" class="alert-link ml-1 text-white" style="cursor: pointer;">
-                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                        </a>
-                    </div>
-                <?php endif; ?>
-                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewTasks) && $this->view->tasksDelayed > 0): ?>
-                    <div class="btn btn-outline-danger text-center w-100 mb-3" role="alert">
-                        Tarefas atrasadas: <?php echo $this->view->tasksDelayed; ?>    
-                        <a onclick="openModule('tarefas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
-                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                        </a>
-                    </div>
-                <?php endif; ?>
-                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewExpenses) && $this->view->expensesDelayed > 0): ?>
-                    <div class="btn btn-outline-danger text-center w-100 mb-3" role="alert">
-                        Despesas atrasadas: <?php echo $this->view->expensesDelayed; ?>    
-                        <a onclick="openModule('despesas');" class="alert-link ml-1 text-white" style="cursor: pointer;">
-                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                        </a>
-                    </div>
-                <?php endif; ?>
-                <?php if (($_SESSION['ROLE_ADM'] == '0' || $canViewRevenues) && $this->view->revenuesDelayed > 0): ?>
-                    <div class="btn btn-outline-danger text-center w-100 mb-3" role="alert">
-                        Recebimentos atrasadas: <?php echo $this->view->revenuesDelayed; ?>    
-                        <a onclick="openModule('recebimentos');" class="alert-link ml-1 text-white" style="cursor: pointer;">
-                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                        </a>
-                    </div>
-                <?php endif; ?>
-            </div>
-            <div class="col-lg-12">
-                <div class="row">
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewRevenues): ?>
-                        <div class="col-12 col-xl-6">
-                            <div class="small-box bg-gradient-success py-4" onclick="openModule('financeiro')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Entradas do Mês</p>
-                                    <?php $total =  ($this->view->total_revenues + $this->view->total_schedules) ; ?>
-                                    <h3 style="font-size: 1.8em">R$ <?php echo number_format($total, 2, ",", "."); ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-money-bill-wave text-white"></i>
-                                </div>
-                            </div>
+            <?php if ($this->view->isAdmin || $canViewExpenses): ?>
+                <div class="col-6 col-md-4">
+                    <div class="small-box bg-purple" onclick="openModule('contas')" style="cursor: pointer;">
+                        <div class="inner text-white">
+                            <p>Contas <br>Pendentes</p>
+                            <h3>
+                                <?php echo $this->view->total_pending_expenses; ?>
+                            </h3>
                         </div>
-                    <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewExpenses): ?>
-                        <div class="col-12 col-xl-6">
-                            <div class="small-box bg-gradient-danger py-4" onclick="openModule('despesas')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Despesas do Mês</p>
-                                    <h3 style="font-size: 1.8em">R$ <?php echo number_format($this->view->total_expenses, 2, ",", "."); ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-file-invoice-dollar text-white"></i>
-                                </div>
-                            </div>
+                        <div class="icon">
+                            <i class="fas fa-file-invoice-dollar text-white"></i>
                         </div>
-                    <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewCustomers): ?>
-                        <div class="col-6 col-lg-4">
-                            <div class="small-box bg-gradient-dark" onclick="openModule('clientes')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Clientes <br>Cadastrados</p>
-                                    <h3><?php echo $this->view->total_customers; ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-building text-white"></i>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewServices): ?>
-                        <div class="col-6 col-lg-4">
-                            <div class="small-box bg-gradient-dark" onclick="openModule('servicos')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Serviços <br>Cadastrados</p>
-                                    <h3><?php echo $this->view->total_services; ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-cubes text-white"></i>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewUsers): ?>
-                        <div class="col-6 col-lg-4">
-                            <div class="small-box bg-gradient-dark" onclick="openModule('usuarios')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Usuários <br>Cadastrados</p>
-                                    <h3><?php echo $this->view->total_users; ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-users text-white"></i>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewSchedules): ?>
-                        <div class="col-6">
-                            <div class="small-box bg-gradient-dark" onclick="openModule('agendamentos')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Agendamentos <br>Pendentes</p>
-                                    <h3><?php echo $this->view->total_pending_schedules; ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-calendar text-white"></i>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if ($_SESSION['ROLE_ADM'] == '0' || $canViewTasks): ?>
-                        <div class="col-6">
-                            <div class="small-box bg-gradient-dark" onclick="openModule('tarefas')" style="cursor: pointer;">
-                                <div class="inner">
-                                    <p>Tarefas <br>Pendentes</p>
-                                    <h3><?php echo $this->view->total_pending_tasks ; ?></h3>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-tasks text-white"></i>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
+            <?php if ($this->view->isAdmin || $canViewSchedules): ?>
+                <div class="col-6 col-md-4">
+                    <div class="small-box bg-orange" onclick="openModule('agendamentos')" style="cursor: pointer;">
+                        <div class="inner text-white">
+                            <p>Agendamentos <br>Pendentes</p>
+                            <h3>
+                                <?php echo $this->view->total_pending_schedules; ?>
+                            </h3>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-calendar text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if ($this->view->isAdmin || $canViewSchedules): ?>
+                <div class="col-6 col-md-4">
+                    <div class="small-box bg-green" onclick="openModule('agendamentos')" style="cursor: pointer;">
+                        <div class="inner text-white">
+                            <p>Novos <br>Clientes</p>
+                            <h3>
+                                <?php echo $this->view->total_pending_schedules; ?>
+                            </h3>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-plus text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>

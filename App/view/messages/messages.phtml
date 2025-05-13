@@ -1,0 +1,129 @@
+<?php $unreadTotal = $this->userUnreadMessages(); ?>
+<a class="nav-link cPointer" data-toggle="dropdown">
+    <i class="far fa-comments"></i>
+    <span class="badge <?php echo ($unreadTotal > 0) ? 'badge-danger' : 'badge-primary'; ?> navbar-badge">
+        <?php echo $unreadTotal; ?>
+    </span>
+</a>
+<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+    <span class="dropdown-item dropdown-header cPointer" onclick="openModule('mensagens');">
+        <span id="unread_messages_2"><?php echo $unreadTotal; ?></span>
+        <?php if ($unreadTotal == 1): ?>
+            <span id="message_single">Mensagem</span>
+        <?php else: ?>
+            <span id="message_plural">Mensagens</span>
+        <?php endif; ?>
+    </span>
+    <?php foreach ($this->view->user_messages as $userMessage): ?>
+        <?php $userData = $this->getUserDataByMsg($userMessage); ?>
+        <a onclick="jumpToMessage(<?php echo $userMessage['id']; ?>, '<?php echo $userMessage['parent']; ?>');" 
+            class="dropdown-item cPointer">
+            <div class="media">
+                <?php if (!empty($userData['username']) && !empty($userData['userAvatar']) 
+                    && $this->isImage($userData['userAvatar'], 'users')): ?>
+                    <img src="<?php echo baseUrl . 'public/uploads/users/' . $userData['userAvatar']; ?>" 
+                        alt="avatar" class="img-size-50 mr-3 img-circle" style="height: 50px;">
+                <?php elseif (!empty($userData['customername']) && !empty($userData['customerAvatar']) 
+                    && $this->isImage($userData['customerAvatar'], 'customers')): ?>
+                    <img src="<?php echo baseUrl . 'public/uploads/customers/' . $userData['customerAvatar']; ?>" 
+                        alt="avatar" class="img-size-50 mr-3 img-circle" style="height: 50px;">
+                <?php else: ?>
+                    <img src="<?php echo baseUrl; ?>public/app/dist/img/avatar5.png" 
+                        alt="avatar" class="img-size-50 mr-3 img-circle" style="height: 50px;">
+                <?php endif; ?>
+                <div class="media-body">
+                    <h3 class="dropdown-item-title">
+                        <?php if (!empty($userData['username'])): ?>
+                            <?php echo $userData['username']; ?>
+                        <?php else: ?>
+                            <?php if (!empty($userData['customername'])): ?>
+                                <?php echo $userData['customername']; ?>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </h3>
+                    <p class="text-sm">
+                        <?php echo $userMessage['description']; ?>
+                    </p>
+                    <p class="text-sm text-muted">
+                        <i class="far fa-clock mr-1"></i> 
+                        <?php echo $this->formatDateTime($userMessage['created_at']); ?>
+                    </p>
+                </div>
+            </div>
+        </a>
+    <?php endforeach; ?>
+    <div class="dropdown-divider"></div>
+    <a onclick="openModule('mensagens');"
+        class="dropdown-item dropdown-footer bg-primary cPointer">
+        <i class="fa fa-arrow-right"></i> Todas as Mensagens
+    </a>
+</div>
+<script>
+    async function jumpToMessage(id, param) {
+        $("#baseLoader").show();
+        await $.ajax({
+            type: 'post',
+            url: '<?php echo baseUrl; ?>mensagens/valida-modulo',
+            data: {
+                id: id,
+                param: param,
+                target: '<?php echo $this->getTarget(); ?>'
+            },  
+            dataType: 'json',
+            async: true
+        }).done(async function (data) {
+            if (data.mod_id) {
+                await $.ajax({
+                    type: 'post',
+                    url: '<?php echo baseUrl; ?>mensagens/lidas',
+                    data: {
+                        id: id,
+                        target: '<?php echo $this->getTarget(); ?>',
+                    },  
+                    async: true
+                }).done(async function() {
+                    await $.ajax({
+                        type: 'post',
+                        url: "<?php echo baseUrl; ?>mensagens/checa-mensagens",
+                        data: {
+                            target: '<?php echo $this->getTarget(); ?>'
+                        },  
+                        async: true
+                    }).done(async function (dataMsg) {
+                        $("#messages_box").html(dataMsg);
+                    
+                        await $.ajax({
+                            type: 'post',
+                            url: `<?php echo baseUrl; ?>${data.mod_name}`,
+                            data: {
+                                id: data.mod_id,
+                                target: '<?php echo $this->getTarget(); ?>',
+                                month: $("#f_month").val(),
+                                viewMsgs: true
+                            },  
+                            async: true
+                        }).done(function (data) {
+                            $("#sis_content").html(data);
+                            $("#baseLoader").fadeOut();
+                        }).fail(function () {
+                            showInternalErrorAlert();
+                            $("#baseLoader").fadeOut();
+                        });
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#baseLoader").fadeOut();
+                    });
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            } else {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            }
+        }).fail(function () {
+            showInternalErrorAlert();
+            $("#baseLoader").fadeOut();
+        });
+    }
+</script>

@@ -1,294 +1,213 @@
-<?php 
-$data    = $this->view->data; 
-$isAdmin = $_SESSION['ROLE_ADM'] == '0';
-$role    = $_SESSION['ROLE'];
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canCreate = $aclData['canCreate'];
 
-$canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('user'));
-$canCreate  = $isAdmin || $this->acl($role, $this->resourceCodes('create'), $this->moduleCodes('user'));
-$canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('user'));
-$canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('user'));
-$canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('privileges'));
-
-$isParent = $this->isUserParent();
-?>
-<?php if ($canView): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-users pr-1"></i>
-                        Usuários
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <?php if ($canCreate): ?>
-                        <ol class="breadcrumb float-right">
-                            <li class="breadcrumb-item">
-                                <?php if (!$this->view->reached_limit): ?>
-                                    <button type="button" class="btn btn-outline-success" title="Adicionar Usuário"
-                                        onclick="createUser();" style="width: 100%;">
-                                        <i class="fas fa-plus"></i> 
-                                    </button>
-                                <?php else: ?>
-                                    <?php if ($canCreate): ?>
-                                        <button type="button" class="btn btn-outline-primary" title="Limite de cadastros atingido, altere seu plano para aumentar o limite atual."
-                                            onclick="openModule('planos-usuario');" style="width: 100%;">
-                                            <i class="fas fa-sync"></i> 
-                                        </button>
-                                    <?php endif; ?>
-                                <?php endif; ?>
-                            </li>
-                        </ol>
-                    <?php endif; ?>
+if ($canView): ?>
+    <?php $data = $this->view->data; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-user pr-1"></i>
+                                Usuários
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <?php if ($canCreate): ?>
+                                <button type="button" class="btn btn-success btnRadius"
+                                    title="Adicionar Usuário"
+                                    onclick="createUser();">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <?php if ($this->view->reached_limit): ?>
-                        <?php if ($canCreate): ?>
-                            <div class="alert bg-red" role="alert">
-                                <span class="fa fa-info-circle pr-1"></span>
-                                Limite de cadastros atingido! 
-                                <a onclick="openModule('planos-usuario');" 
-                                    class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para aumentar o limite atual.
-                            </div>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <?php if (empty($_SESSION['PLAN']) && !$_SESSION['ROLE_ADM']): ?>
-                            <?php if ($canCreate): ?>
-                                <div class="alert alert-info" role="alert">
-                                    <span class="fa fa-users pr-1"></span> 
-                                    Você está utilizando o Plano Gratuito. 
-                                    <a onclick="openModule('planos-usuario');" 
-                                        class="alert-link text-white" style="cursor: pointer;">Clique aqui</a> para alterar e liberar todos os recursos do sistema.
+                    <div class="card">
+                        <div class="card-body cardWrapperList">
+                            <?php if (!$data): ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table_user" style="width: 100%;">
+                                        <thead>
+                                            <tr class="text-center" style="height: 30px;">
+                                                <th style="font-size: 14px;"><i class="fa fa-image"></i></th>
+                                                <th style="font-size: 14px;">Código</th>
+                                                <th style="font-size: 14px;">Nome</th>
+                                                <th style="font-size: 14px;">Email</th>
+                                                <th style="font-size: 14px;">Celular</th>
+                                                <th style="font-size: 14px;">Cargo</th>
+                                                <th style="font-size: 14px;">Perfil</th>
+                                                <th style="font-size: 14px;">Situação</th>
+                                                <th style="display: none;">Situação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($data as $entity): ?>
+                                                <tr class="text-center" style="cursor: pointer;"
+                                                    onclick="openUserDetails('<?php echo $entity['id']; ?>');">
+                                                    <td style="width: 35px; text-align: center;">
+                                                        <?php if (!empty($entity['file']) && $this->isImage($entity['file'], 'users')): ?>
+                                                            <a href="<?php echo baseUrl . 'public/uploads/users/' . $entity['file']; ?>" 
+                                                                data-lightbox="image-1"
+                                                                data-title="<?php echo $entity['file']; ?>">
+                                                                <img src="<?php echo baseUrl . 'public/uploads/users/'
+                                                                    . $entity['file']; ?>" style="width: 30px; height: 30px;" 
+                                                                    alt="<?php echo $entity['name']; ?>"
+                                                                    class="img-circle">
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <img src="<?php echo baseUrl . 'public/uploads/semfoto.png'; ?>" 
+                                                                style="width: 30px; height: 30px;" alt="<?php echo $entity['name']; ?> - SEM FOTO"
+                                                                title="Sem foto"
+                                                                class="img-circle">
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['id']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px; ">
+                                                        <?php echo $entity['name']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['email']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['cellphone']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['job_role']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['role']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px;">
+                                                        <?php if ($entity['status'] == '1'): ?>
+                                                            <span class="text-success">Ativo</span>
+                                                        <?php else: ?>
+                                                            <span class="text-danger">Inativo</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td style="display: none;">
+                                                        <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             <?php endif; ?>
-                        <?php else: ?>
-                            <div class="alert alert-info" role="alert">
-                                <span class="fa fa-info-circle pr-1"></span> 
-                                Cadastros disponíveis: <b><?php echo $this->view->total_free; ?></b> 
-                            </div>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table_user" style="width: 100%;">
-                                    <thead>
-                                        <tr class="text-center" style="height: 30px;">
-                                            <th style="font-size: 14px;">Nome</th>
-                                            <th style="font-size: 14px;">Líder</th>
-                                            <th style="font-size: 14px;">Situação</th>
-                                            <th style="display: none;">Situação</th>
-                                            <th style="display: none;"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($data as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;" 
-                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
-                                                <td style="font-size: 15px; ">
-                                                    <?php echo $entity['name']; ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <?php echo ($entity['uuid'] == $entity['parent_uuid']) ? 'Sim' : 'Não'; ?>
-                                                </td>
-                                                <td style="width: 80px;">
-                                                    <?php if ($entity['status'] == '1'): ?>
-                                                        <i class="fa fa-circle" style="color: green;"></i>
-                                                    <?php else: ?>
-                                                        <i class="fa fa-circle" style="color: red;"></i>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <?php echo ($entity['status'] == '1') ? 'Ativo' : 'Inativo'; ?>
-                                                </td> 
-                                                <td style="display: none;">
-                                                    <?php echo $this->formatDateTime($entity['created_at'], false); ?>
-                                                </td> 
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            let buttonCommon = {
-                exportOptions: {
-                    format: {
-                        body: function ( data ) {
-                            return data;
+    <?php if ($data): ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                let buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function (data) {
+                                return data;
+                            }
                         }
                     }
-                }
-            };	
+                };
 
-            $('#table_user').DataTable({
-                "sDom": 'flBtip',
-                searching: true,
-                buttons: [
-                    $.extend( true, {}, buttonCommon, {
-                        extend: 'excel',
-                        title: 'USUÁRIOS',
-                        exportOptions: {columns: [0,1,3]}
-                    })
-                ],
-                order: [ [4, "desc"] ],
-                columnDefs: [{orderable: false, targets: [2]}],
-                responsive: true,
-                info: true,
-                processing: true,
-                scrollCollapse: true,
-                paging: true,
-                "pageLength": 10,
-                "language": {
-                    "sEmptyTable": "Nenhum registro encontrado",
-                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
-                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
-                    "sInfoPostFix": "",
-                    "sInfoThousands": ".",
-                    "sLengthMenu": "_MENU_ &nbsp;",
-                    "sLoadingRecords": "Carregando...",
-                    "sProcessing": "Processando...",
-                    "sZeroRecords": "Nenhum registro encontrado",
-                    "sSearch": "Filtrar",
-                    "oPaginate": {
-                        "sNext": "Próximo",
-                        "sPrevious": "Anterior",
-                        "sFirst": "Primeiro",
-                        "sLast": "Último"
-                    },
-                    "oAria": {
-                        "sSortAscending": ": Ordenar colunas de forma ascendente",
-                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                $('#table_user').DataTable({
+                    "sDom": 'flBtip',
+                    searching: true,
+                    buttons: [
+                        $.extend(true, {}, buttonCommon, {
+                            extend: 'excel',
+                            title: 'Usuários',
+                            exportOptions: { columns: [1, 2, 3, 4, 5, 6, 8] }
+                        })
+                    ],
+                    order: [[1, "asc"]],
+                    columnDefs: [
+                        { orderable: false, targets: [0] },
+                    ],
+                    paging: true,
+                    "pageLength": 25,
+                    "language": {
+                        "sEmptyTable": "Nenhum registro encontrado",
+                        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sInfoThousands": ".",
+                        "sLengthMenu": "_MENU_ &nbsp;",
+                        "sLoadingRecords": "Carregando...",
+                        "sProcessing": "Processando...",
+                        "sZeroRecords": "Nenhum registro encontrado",
+                        "sSearch": "Filtrar",
+                        "oPaginate": {
+                            "sNext": "Próximo",
+                            "sPrevious": "Anterior",
+                            "sFirst": "Primeiro",
+                            "sLast": "Último"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ordenar colunas de forma ascendente",
+                            "sSortDescending": ": Ordenar colunas de forma descendente"
+                        }
                     }
-                }
+                });
             });
-        });
-
-        function openDetails(uuid) {
-            $("#baseLoader").show();
-            $.ajax({
-                type: 'post',
-                url: "<?php echo baseUrl; ?>usuarios/detalhes",
-                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
-                async: true
-            }).done(function(data) {
-                $("#sis_content").html(data);
-                $("#baseLoader").hide();
-            }).fail(function() {
-                showInternalErrorAlert();
-                $("#baseLoader").hide();
-            });
-        }
-    </script>
+        </script>
+    <?php endif; ?>
     <?php if ($canCreate): ?>
         <script>
-            function createUser() {
+            async function createUser() {
                 $("#baseLoader").show();
-                $.ajax({
+                await $.ajax({
                     type: 'post',
                     url: "<?php echo baseUrl; ?>usuarios/cadastrar",
                     data: {
                         target: '<?php echo $this->getTarget(); ?>'
                     },
                     async: true
-                }).done(function(data) {
+                }).done(function (data) {
                     $("#sis_content").html(data);
-                    $("#baseLoader").hide();
-                }).fail(function() {
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
                     showInternalErrorAlert();
-                    $("#baseLoader").hide();
+                    $("#baseLoader").fadeOut();
                 });
             }
         </script>
     <?php endif; ?>
-    <?php if ($canUpdate): ?>
-        <script>
-            function updateUser(uuid) {
-                $("#baseLoader").show();
-                $.ajax({
-                    type: 'post',
-                    url: "<?php echo baseUrl; ?>usuarios/editar",
-                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
-                    async: true
-                }).done(function(data) {
-                    $("#sis_content").html(data);
-                    $("#baseLoader").hide();
-                }).fail(function() {
-                    showInternalErrorAlert();
-                    $("#baseLoader").hide();
-                });
-            }
-        </script>
-    <?php endif; ?>
-    <?php if ($canDelete): ?>
-        <script>
-            function deleteUser(uuid) {
-                $("#modalXL").modal('hide');
-                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Usuário');
-                $("#modalDeleteLoader").hide();
-                $("#modalDelete").modal('show');
-                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
-            }   
-
-            function runDelete(uuid) {
-                if (uuid !== null) {
-                    $("#modalDeleteLoader").show();
-                    let currentUser = '<?php echo $_SESSION['COD'] ?>';
-                    $.ajax({
-                        type: "POST",
-                        url: "<?php echo baseUrl; ?>usuarios/excluir",
-                        data: {uuid: uuid, target: '<?php echo $this->getTarget(); ?>'},
-                        dataType: 'json',
-                        async: true
-                    }).done(function(data) {
-                        showAlert(data.type, data.title, data.msg, data.pos);
-                        $("#modalDelete").modal('hide');
-                        $("#modalXL").modal('hide');
-
-                        if (uuid == currentUser) {
-                            location.reload();
-                        } else {
-                            openModule('usuarios');
-                        }
-                    }).fail(function() {
-                        showInternalErrorAlert();
-                        $("#modalDeleteLoader").hide();
-                    });
-                }
-            }
-        </script>
-    <?php endif; ?>
-    <?php if ($canViewAcl): ?>
-        <script>
-            function aclUser(uuid) {
-                $("#baseLoader").show();
-                $.ajax({
-                    type: 'post',
-                    url: "<?php echo baseUrl; ?>usuarios/acl",
-                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
-                    async: true
-                }).done(function(data) {
-                    $("#sis_content").html(data);
-                    $("#baseLoader").hide();
-                }).fail(function() {
-                    showInternalErrorAlert();
-                    $("#baseLoader").hide();
-                });
-            }
-        </script>
-    <?php endif; ?>
+    <script>
+        async function openUserDetails(id) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>usuarios/detalhes",
+                data: { 
+                    id: id,
+                    target: '<?php echo $this->getTarget(); ?>' 
+                },
+                async: true
+            }).done(function (data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").fadeOut();
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+    </script>
 <?php endif; ?>

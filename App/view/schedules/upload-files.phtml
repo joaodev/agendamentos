@@ -1,0 +1,65 @@
+<form method="post" enctype="multipart/form-data" id="formUploadFiles">
+    <div class="col-md-12">
+        <label for="input_file">Arquivos* <small style="color: red; margin-left: 5px;"><i>(jpg, jpeg, png, gif, pdf)</i></small></label>
+        <div class="form-group">
+            <input type="file" class="form-control inputUpload" name="input_file" id="input_file" accept=".png,.jpg,.jpeg,.gif,.pdf" required multiple>
+        </div>
+    </div>
+    <div class="col-md-12 mb-3">
+        <label for="send_email_status">Notificação</label><br>
+        <input type="checkbox" name="schedule_files_notification" id="schedule_files_notification" value="1" class="mr-1"> 
+        <small style="position: relative; top: -2px;">Enviar notificação sobre a operação.</small>
+    </div>
+    <div class="col-md-12">
+        <button type="submit" class="btn btn-info w-100 btnRadius" id="btnSubmitFile">
+            <i class="fa fa-upload"></i> Enviar
+        </button>
+    </div>
+</form>
+<script>
+    $(document).ready(function() {
+        $('#formUploadFiles').validate({
+            submitHandler: async function() {
+                let form_data = new FormData();         
+                
+                $.each($("input[type='file']")[0].files, function (i, file) {
+                    form_data.append('file_' + i, file);
+                });
+
+                form_data.append('id', '<?php echo $_POST['id']; ?>');    
+                form_data.append('target', '<?php echo $this->getTarget(); ?>');
+
+                if ($('#schedule_files_notification').is(':checked')) {
+                    form_data.append('schedule_files_notification', $("#schedule_files_notification").val());    
+                }
+
+                $("#modalGreenMidLoader").show();
+                $("#btnSubmitFile").show('disabled', true);
+
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>agendamentos/processa-upload",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    dataType: 'json',
+                    async: true
+                }).done(async function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    await loadScheduleFiles();
+                    $("#input_file").val('');
+                    $("#btnSubmitFile").attr('disabled', false);
+                    $("#modalGreenMidLoader").fadeOut();
+
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalGreenMidLoader").fadeOut();
+                    $("#btnSubmitFile").attr('disabled', false);
+                });
+
+                return false;
+            }
+        });
+    });
+</script>

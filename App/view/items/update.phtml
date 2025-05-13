@@ -1,0 +1,375 @@
+<?php
+$aclData = $this->view->acl;
+$canUpdate = $aclData['canUpdate'];
+$canCreateCategory = $this->view->acl['canCreateCategory'];
+$canCreateSubcategory = $this->view->acl['canCreateSubcategory'];
+$canCreateProvider = $this->view->acl['canCreateProvider'];
+
+if ($canUpdate): ?>
+    <?php $entity = $this->view->entity; ?>
+    <style>
+        .select2-selection {
+            height: 38px !important;
+        }
+    </style>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-pen-square pr-1"></i>
+                                Produto <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Produto"
+                                onclick="openItemDetails('<?php echo $entity['id']; ?>');">
+                                <i class="fas fa-arrow-left"></i> 
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body cardWrapperBody">
+                            <form method="post" name="formUpdateUser" id="formUpdateUser" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-12" style="border-radius: 5px;">
+                                        <h5 class="pt-2"><i class="fas fa-image pr-1"></i> Foto do Produto</h5>
+                                        <hr>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="title">Imagem <small style="color: red; margin-left: 5px;"><i>(jpg, jpeg, png, gif)</i></small></label>
+                                            <?php if (!empty($entity['file']) && $this->isImage($entity['file'], 'items')): ?><br>
+                                                <a href="<?php echo baseUrl . 'public/uploads/items/' . $entity['file']; ?>" 
+                                                    data-lightbox="image-1"
+                                                    data-title="<?php echo $entity['file']; ?>">
+                                                    <img src="<?php echo baseUrl . 'public/uploads/items/'
+                                                        . $entity['file']; ?>" style="max-height: 200px; margin-bottom: 15px;" alt="<?php echo $entity['name']; ?>">
+                                                </a>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" name="remove_image" id="remove_image" value="1" class="mr-1"> Remover imagem
+                                                </div>
+                                            <?php endif; ?>
+                                            <input type="file" class="form-control inputUpload" name="file" id="file" accept=".png,.jpg,.jpeg,.gif">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12" style="border-radius: 5px;">
+                                        <h5 class="pt-2"><i class="fas fa-info-circle pr-1"></i> Dados Produto</h5>
+                                        <hr>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>Código</label>
+                                            <input type="text" class="form-control" value="<?php echo $entity['id']; ?>" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label for="status">Situação</label>
+                                            <select name="status" id="status" class="form-control" required>
+                                                <option value="1" <?php echo ($entity['status'] == '1') ? 'selected' : ''; ?>>1 - Ativo</option>
+                                                <option value="0" <?php echo ($entity['status'] == '0') ? 'selected' : ''; ?>>2 - Inativo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="name">Nome do Produto*</label>
+                                            <input type="text" class="form-control" name="name" id="name" required
+                                                value="<?php echo $entity['name']; ?>" maxlength="100" placeholder="Nome do Produto">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="category_id">
+                                                Atribuir Categoria*
+                                            </label>
+                                            <?php if ($canCreateCategory): ?>
+                                                <a onclick="newCategory();" class="text-success" 
+                                                    style="cursor: pointer; float: right" title="Adicionar Categoria">
+                                                    <span class="fa fa-plus-circle"></span>
+                                                </a> 
+                                            <?php endif; ?>
+                                            <select name="category_id" id="category_id" class="form-control" required
+                                                onchange="getSubcategories();">
+                                                <option value="">Selecione</option>
+                                                <?php foreach ($this->view->categories as $category): ?>
+                                                    <option value="<?php echo $category['id']; ?>"
+                                                        <?php echo ($category['id'] == $entity['category_id']) ? 'selected' : ''; ?>>
+                                                        <?php echo $category['title']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>    
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="subcategory_id">
+                                                Atribuir Subcategoria
+                                            </label>
+                                            <?php if ($canCreateSubcategory): ?>
+                                                <a onclick="newSubcategory();" class="text-success" 
+                                                    style="cursor: pointer; float: right" title="Adicionar Subcategoria">
+                                                    <span class="fa fa-plus-circle"></span>
+                                                </a> 
+                                            <?php endif; ?>
+                                            <select name="subcategory_id" id="subcategory_id" class="form-control">
+                                                <option value="">Selecione</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="price">Valor Unitário*</label>
+                                            <input type="text" class="form-control" value="<?php echo number_format($entity['price'], 2, ",", "."); ?>" name="price" id="price" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="min_quantity">Qtd. Mínima (Alertas)</label>
+                                            <input type="number" class="form-control" value="<?php echo $entity['min_quantity']; ?>" min="0" name="min_quantity" id="min_quantity">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="provider_id">
+                                                Atribuir Fornecedor
+                                            </label>
+                                            <?php if ($canCreateProvider): ?>
+                                                <a onclick="newProvider();" class="text-success" 
+                                                    style="cursor: pointer; float: right" title="Adicionar Fornecedor">
+                                                    <span class="fa fa-plus-circle"></span>
+                                                </a> 
+                                            <?php endif; ?>
+                                            <select name="provider_id" id="provider_id" class="form-control" style="width: 100%;">
+                                                <option value="">Clique para Pesquisar</option>
+                                            </select>
+                                        </div>
+                                    </div>  
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="description">Informações adicionais do Produto</label>
+                                            <textarea name="description" id="description" class="form-control" rows="3" 
+                                                placeholder="Informações adicionais sobre o Produto"><?php echo $entity['description']; ?></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-1">
+                                        <div class="row">
+                                            <div class="col-md-6 offset-md-3 mb-2">
+                                                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit" title="Salvar Produto">
+                                                    <i class="fa fa-save pr-1"></i> Salvar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openItemDetails('<?php echo $entity['id']; ?>');" 
+                        title="Voltar para Produto">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $(document).ready(function() {
+            $('#provider_id').select2({
+                ajax: {
+                    type: 'POST',
+                    url: '<?php echo baseUrl; ?>fornecedores/busca-fornecedor',
+                    dataType: 'json',
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+
+            $("input[id=price]").maskMoney({allowNegative: false, thousands:'.', decimal:',', affixesStay: true});
+
+            $('#formUpdateUser').validate({
+                submitHandler: async  function() {
+                    let file_data = $('#file').prop('files')[0];
+                    let form_data = new FormData();         
+
+                    form_data.append('file', file_data);    
+                    form_data.append('name', $("#name").val());    
+                    form_data.append('category_id', $("#category_id").val());    
+                    form_data.append('subcategory_id', $("#subcategory_id").val());    
+                    form_data.append('price', $("#price").val());    
+                    form_data.append('min_quantity', $("#min_quantity").val());    
+                    form_data.append('provider_id', $("#provider_id").val());    
+                    form_data.append('description', $("#description").val());    
+                    form_data.append('id', '<?php echo $entity['id']; ?>');    
+                    form_data.append('target', '<?php echo $this->getTarget(); ?>');    
+
+                    if ($('#remove_image').is(':checked')) {
+                        form_data.append('remove_image', $("#remove_image").val());    
+                    }
+
+                    $("#baseLoader").show(); 
+                    $("#btnSubmit").attr('disabled', true);
+                
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>estoque/processa-edicao",
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: form_data,
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        if (data.type === 'success') {
+                            openItemDetails('<?php echo $entity['id']; ?>');
+                        } else {
+                            $("#baseLoader").fadeOut();
+                            $("#btnSubmit").attr('disabled', false);
+                        }
+                    }).fail(function() {
+                        showInternalErrorAlert(); 
+                        $("#baseLoader").fadeOut(); 
+                        $("#btnSubmit").attr('disabled', false);
+                    }); 
+
+                    return false;
+                }
+            });
+        });
+    </script>
+    <?php if ($canCreateCategory): ?>
+        <script>
+            async function newCategory() {
+                $("#modalGreenMidResult").empty();
+                $("#modalGreenMid").modal('hide');
+                $("#modalGreenMidTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Categoria');
+                $("#modalGreenMidLoader").show();
+                $("#modalGreenMid").modal('show');
+
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>estoque/cadastrar-categoria",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#modalGreenMidResult").html(data);
+                    $("#modalGreenMidLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalGreenMidLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canCreateProvider): ?>
+        <script>
+            async function newProvider() {
+                $("#modalGreenLargeResult").empty();
+                $("#modalGreenLarge").modal('hide');
+                $("#modalGreenLargeTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Fornecedor');
+                $("#modalGreenLargeLoader").show();
+                $("#modalGreenLarge").modal('show');
+
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>estoque/cadastrar-fornecedor",
+                    data: {
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#modalGreenLargeResult").html(data);
+                    $("#modalGreenLargeLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalGreenLargeLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canCreateSubcategory): ?>
+        <script>
+            async function newSubcategory() {
+                if ($("#category_id").val() === '') {
+                    $("#category_id").attr('style', 'border: 1px solid red;').focus();
+                } else {
+                    $("#modalGreenMidResult").empty();
+                    $("#modalGreenMid").modal('hide');
+                    $("#modalGreenMidTitle").html('<i class="fa fa-plus-circle pr-1"></i> Adicionar Subcategoria');
+                    $("#modalGreenMidLoader").show();
+                    $("#modalGreenMid").modal('show');
+
+                    await $.ajax({
+                        type: 'post',
+                        url: "<?php echo baseUrl; ?>estoque/cadastrar-subcategoria",
+                        data: {
+                            category_id: $("#category_id").val(),
+                            target: '<?php echo $this->getTarget(); ?>'
+                        },
+                        async: true
+                    }).done(function(data) {
+                        $("#modalGreenMidResult").html(data);
+                        $("#modalGreenMidLoader").hide();
+                    }).fail(function() {
+                        showInternalErrorAlert();
+                        $("#modalGreenMidLoader").hide();
+                    });
+                }
+            }
+        </script>
+    <?php endif; ?>
+    <script>
+        async function getSubcategories() {
+            let category_id = $("#category_id").val();
+            if (category_id !== '') {
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>estoque/subcategorias",
+                    data: {
+                        category_id: category_id,
+                        subcategory_id: '<?php echo $entity['subcategory_id']; ?>',
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#subcategory_id").html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            } else {
+                $("#subcategory_id").html('<option value="">Selecione</option>');
+            }
+        }
+
+        getSubcategories();
+    </script>
+    <?php if (!empty($entity['provider_id'])): ?>
+        <script>
+            $("#provider_id").html('<option value="<?php echo $entity['provider_id']; ?>"><?php echo $entity['providerId'] . ' - ' . $entity['providerName'] . ' ('.$entity['providerEmail'] . ')'; ?></option>');
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

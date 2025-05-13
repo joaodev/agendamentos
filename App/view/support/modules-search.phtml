@@ -1,0 +1,88 @@
+<?php 
+$support_id = $this->view->support_id;
+$title = $this->view->title;
+$target = $this->view->target;
+
+switch ($target) {
+    case 'responsavel': 
+        $searchRoute = baseUrl . 'usuarios/busca-responsavel';
+        break;
+    default: 
+        echo 'Parâmetro incorreto';
+    break;
+}
+?>
+<style>
+    .select2-selection {
+        height: 38px !important;
+    }
+</style>
+<form method="post" name="formAddSearchKeyword" id="formAddSearchKeyword">
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <span>Buscar <?php echo $title; ?></span>
+                <select class="form-control" name="keyword" id="keyword" required style="width: 100%;">
+                    <option value="">Clique para Pesquisar</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-12">
+            <input type="hidden" name="support_id" value="<?php echo $_POST['support_id']; ?>">
+            <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
+            <button type="submit"  class="btn btn-success btn-lg btnRadiusLg" style="width: 100%" id="btnSubmitSearchKeyword">
+                <span class="fa fa-plus pr-1"></span>
+                ATRIBUIR
+            </button>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function() {
+        $('#keyword').select2({
+            ajax: {
+                type: 'POST',
+                url: '<?php echo $searchRoute; ?>',
+                dataType: 'json',
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+                }
+              }
+        });
+
+        $('#formAddSearchKeyword').validate({
+            submitHandler: async function( form ){
+                let dados = $( form ).serialize();
+                let formTarget = '<?php echo $target; ?>';
+
+                $("#modalMidLoader").show();
+
+                await $.ajax({                
+                    type: "POST",
+                    url: "<?php echo baseUrl . 'chamados/processa-' . $target; ?>",
+                    data: dados,
+                    dataType: 'json',
+                    async: true
+                }).done(function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    $("#modalMidLoader").hide();   
+                   
+                    if (formTarget === 'responsavel') {
+                        loadModulesTable('responsibles');
+                    }
+                }).fail(function() {
+                    showInternalErrorAlert(); 
+                    $("#modalMidLoader").hide();   
+                }); 
+ 
+                return false;
+            }
+        });
+    });
+
+    function showLoader() {
+        $("#modalMidLoader").show();   
+    }
+</script>

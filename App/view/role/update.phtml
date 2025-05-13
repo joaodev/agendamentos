@@ -1,33 +1,30 @@
-<?php $entity = $this->view->entity; ?>
-<?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row mb-2">
-                <div class="col-11">
-                    <h1 style="position: relative; top: 5px">
-                        <i class="fas fa-pen-square pr-1"></i>
-                        Perfil
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary" title="Voltar para Controle de Acesso"
-                                onclick="openDetails('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+<?php if ($this->view->isAdmin): ?>
+    <?php $entity = $this->view->entity; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-pen-square pr-1"></i>
+                                Perfil
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Controle de Acesso"
+                                onclick="openRoleDetails('<?php echo $entity['id']; ?>');">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
-                        </li>
-                    </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body cardWrapperBody">
                             <form method="post" name="formUpdateRole" id="formUpdateRole">
                                 <div class="row">
                                     <div class="col-md-9">
@@ -46,19 +43,13 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-12 mt-1">
                                         <div class="row">
-                                            <div class="col-md-8 mt-2 mb-2">
-                                                <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
+                                            <div class="col-md-6 offset-md-3 mb-2">
+                                                <input type="hidden" name="id" value="<?php echo $entity['id']; ?>">
                                                 <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
-                                                <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Perfil">
+                                                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit" title="Salvar Perfil">
                                                     <i class="fa fa-save pr-1"></i> Salvar
-                                                </button>
-                                            </div>
-                                            <div class="col-md-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary w-100"
-                                                        onclick="openDetails('<?php echo $entity['uuid']; ?>');" title="Voltar para Controle de Acesso">
-                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
                                             </div>
                                         </div>
@@ -69,30 +60,27 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openRoleDetails('<?php echo $entity['id']; ?>');" 
+                        title="Voltar para Controle de Acesso">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
     <script>
         $(document).ready(function(){
             $('#formUpdateRole').validate({
-                rules: {
-                    name: {
-                        remote: { 
-                            type: "post",
-                            url: "<?php echo baseUrl; ?>controle-acesso/valor-existente",
-                            data: {uuid: '<?php echo $_POST['uuid']; ?>'}
-                        }
-                    },
-                },
-                messages: {
-                    name: {
-                        remote: "Nível já cadastrado"
-                    },
-                },
-                submitHandler: function( form ){
+                submitHandler: async function( form ){
                     let dados = $( form ).serialize();
+
                     $("#baseLoader").show();
+                    $("#btnSubmit").attr('disabled', false);
                 
-                    $.ajax({
+                    await $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>controle-acesso/processa-edicao",
                         data: dados,
@@ -100,10 +88,16 @@
                         async: true
                     }).done(function(data) {
                         showAlert(data.type, data.title, data.msg, data.pos);
-                        $("#baseLoader").hide();
+                        if (data.type === 'success') {
+                            openRoleDetails('<?php echo $entity['id']; ?>');
+                        } else {
+                            $("#baseLoader").fadeOut();
+                            $("#btnSubmit").attr('disabled', false);
+                        }
                     }).fail(function() {
                         showInternalErrorAlert(); 
-                        $("#baseLoader").hide();
+                        $("#baseLoader").fadeOut();
+                        $("#btnSubmit").attr('disabled', false);
                     }); 
 
                     return false;

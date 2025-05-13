@@ -1,0 +1,236 @@
+<?php
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canUpdate = $aclData['canUpdate'];
+$canDelete = $aclData['canDelete'];
+$canViewSubcategories = $aclData['canViewSubcategories'];
+
+if ($canView): ?>
+    <?php $entity = $this->view->entity; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-filter pr-1"></i>
+                                Categoria <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-info mr-1 btnRadius" title="Imprimir"
+                                onclick="window.print();">
+                                <i class="fas fa-print"></i> 
+                            </button>
+                            <button type="button" class="btn btn-primary btnRadius" title="Voltar para Categorias"
+                                onclick="openModule('categorias');">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <?php if ($entity['deleted'] == 1): ?>
+                    <div class="col-md-12">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-info-circle pr-1"></i> 
+                            Categoria removida em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body cardWrapperDetails">
+                            <div class="row w-100 pt-3" id="printable" style="margin: 0 !important;">
+                                <div class="col-6">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Código</b>
+                                    <p>
+                                        <?php echo $entity['id']; ?>
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Situação</b>
+                                    <p>
+                                        <?php if ($entity['status'] == '1'): ?>
+                                            <i class="fa fa-circle pr-1 text-success"></i> Ativa
+                                        <?php endif; ?>
+                                        <?php if ($entity['status'] == '0'): ?>
+                                            <i class="fa fa-circle pr-1 text-danger"></i> Inativa
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                                <div class="col-md-12">
+                                    <hr class="cardLine">
+                                </div>
+                                <div class="col-md-12">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Título</b>
+                                    <p>
+                                        <?php echo $entity['title']; ?>
+                                    </p>
+                                </div>
+                                <div class="col-md-12">
+                                    <hr class="cardLine">
+                                </div>
+                                <div class="col-6">
+                                    <span class="fa fa-calendar pr-1"></span>
+                                    <b>Cadastro</b> <br>
+                                    <p>
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <?php if (!empty($entity['updated_at'])): ?>
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <b>Última Atualização</b> <br>
+                                        <p>
+                                            <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <?php if ($canDelete && $entity['deleted'] == 0): ?>
+                                    <div class="col-md-4 mb-2">
+                                        <button type="button" class="btn btn-danger btnRadius"
+                                            onclick="deleteCategory('<?php echo $entity['id']; ?>');"
+                                            style="width: 100%;" title="Remover Categoria">
+                                            <i class="fa fa-trash"></i> Remover
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+                                    <div class="col-md-4 mb-2">
+                                        <button type="button" class="btn btn-success btnRadius"
+                                            onclick="updateCategory('<?php echo $entity['id']; ?>');"
+                                            style="width: 100%;" title="Editar Categoria">
+                                            <i class="fa fa-pen pr-1"></i> Editar
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if ($canViewSubcategories): ?>
+                                    <div class="col-md-4 mb-2">
+                                        <button type="button" class="btn btn-primary btnRadius"
+                                            onclick="listSubcategories('<?php echo $entity['id']; ?>');"
+                                            style="width: 100%;" title="Listar subcategorias">
+                                            <i class="fa fa-filter pr-1"></i> Subcategorias
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openModule('categorias');"
+                        title="Voltar para Categorias">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        async function openCategoryDetails(id) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>categorias/detalhes",
+                data: { 
+                    id: id,
+                    target: '<?php echo $this->getTarget(); ?>' 
+                },
+                async: true
+            }).done(function (data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").fadeOut();
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+
+        async function listSubcategories(id) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>subcategorias",
+                data: { 
+                    id: id,
+                    target: '<?php echo $this->getTarget(); ?>' 
+                },
+                async: true
+            }).done(function (data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").fadeOut();
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+    </script>
+    <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+        <script>
+            async function updateCategory(id) {
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>categorias/editar",
+                    data: { 
+                        id: id,
+                        target: '<?php echo $this->getTarget(); ?>' 
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+        </script>
+    <?php endif; ?>
+    <?php if ($canDelete && $entity['deleted'] == 0): ?>
+        <script>
+            function deleteCategory(id) {
+                $("#modalXL").modal('hide');
+                $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Categoria');
+                $("#modalDeleteLoader").hide();
+                $("#modalDelete").modal('show');
+                $("#modalDeleteResult").html('<button type="button" class="btn btn-danger btnRadius" title="Confirmar Exclusão" onclick="runDelete(\'' + id + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }
+
+            async function runDelete(id) {
+                if (id !== null) {
+                    $("#modalDeleteLoader").show();
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>categorias/excluir",
+                        data: { 
+                            id: id,
+                            target: '<?php echo $this->getTarget(); ?>' 
+                        },
+                        dataType: 'json',
+                        async: true
+                    }).done(async function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#modalDelete").modal('hide');
+                        $("#modalXL").modal('hide');
+                        await openModule('categorias');
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#modalDeleteLoader").hide();
+                    });
+                }
+            }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

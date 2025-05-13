@@ -5,13 +5,14 @@ namespace App\Model;
 use Core\Db\Crud;
 use Core\Db\Logs;
 use Core\Db\Model;
-use Core\Di\Container;
 
 class Files extends Model
 {
     private $grantedExtensions = [
         'jpg',
         'jpeg',
+        'png',
+        'gif',
         'png',
         'pdf'
     ];
@@ -44,16 +45,16 @@ class Files extends Model
         }
     }
 
-    public function uploadFiles(array $files, string $module, string $uuid): bool
+    public function uploadFiles(array $files, string $module, int $id, string $field): bool
     {
         if (!empty($files)) {
-            $parentDir = $this->configurePath("$module/$uuid");
+            $parentDir = $this->configurePath("$module/$id");
             if (!$parentDir) {
                 return false;
             }
 
-            for ($i = 0; $i < count($files); $i++) {
-                $file = $files['file_' . $i];
+            for ($i = 0; $i < count($_FILES); $i++) {
+                $file = $_FILES['file_' . $i];
                 $fileName = $file["name"];
                 $fileName = str_replace(" ", "_", $fileName);
 
@@ -62,15 +63,11 @@ class Files extends Model
                     $uploadDir = $parentDir . '/' . $fileName;
 
                     if (move_uploaded_file($tmpName, $uploadDir)) {
-
-                        $this->setFileWatermark($uploadDir);
-
                         $crudFiles = new Crud();
                         $crudFiles->setTable($this->getTable());
                         $crudFiles->create([
-                            'uuid' => $this->NewUUID(),
-                            'parent_uuid' => $uuid,
-                            'file' => $fileName
+                            'file' => $fileName,
+                            $field => $id,
                         ]);
                     } else {
                         $log = new Logs();
@@ -81,56 +78,5 @@ class Files extends Model
         }
 
         return true;
-    }
-
-    public function setFileWatermark($dir): void
-    {
-        $configModel = Container::getClass("Config", "app");
-        $config = $configModel->getEntity();
-        $image = false;
-
-        if (!empty($dir) && !empty($config['logo_watermark'])) {
-            $imageFile = $dir;
-            $watermarkFile = "../public/uploads/logo/{$config['logo_watermark']}";
-
-            $imageExt = pathinfo($imageFile);
-            $imageExt = $imageExt['extension'];
-
-            if ($imageExt == 'jpg' || $imageExt == 'jpeg') {
-                $image = @imagecreatefromjpeg($imageFile);
-            }
-
-            if ($imageExt == 'png') {
-                $image = @imagecreatefrompng($imageFile);
-            }
-
-            if ($image) {
-                $watermark = imagecreatefrompng($watermarkFile);
-                $watermarkWidth = imagesx($watermark);
-                $watermarkHeight = imagesy($watermark);
-
-                $imageWidth = imagesx($image);
-                $imageHeight = imagesy($image);
-
-                $positionX = ($imageWidth / 2) - ($watermarkWidth / 2);
-                $positionY = ($imageHeight / 2) - ($watermarkHeight / 2);
-
-                imagecopy(
-                    $image,
-                    $watermark,
-                    (int) $positionX,
-                    (int) $positionY,
-                    0,
-                    0,
-                    $watermarkWidth,
-                    $watermarkHeight
-                );
-
-                header('Content-type: image/png');
-                imagepng($image, $dir);
-                imagedestroy($image);
-                imagedestroy($watermark);
-            }
-        }
     }
 }

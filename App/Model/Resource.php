@@ -13,17 +13,15 @@ class Resource extends Model
         $this->setTable('resource');
     }
 
-    public function getOne($uuid)
+    public function getOne(int $id): bool|array |string
     {
         try {
-            $query = "
-                SELECT uuid, name, created_at
-                FROM resource
-                WHERE uuid = :uuid
-            ";
+            $query = "SELECT id, name, created_at
+                        FROM {$this->getTable()}
+                        WHERE id = :id";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":uuid", $uuid);
+            $stmt->bindValue(":id", $id);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,13 +35,11 @@ class Resource extends Model
         }
     }
 
-    public function getAll(): bool|array|string
+    public function getAll(): bool|array |string
     {
         try {
-            $query = "
-                SELECT uuid, name
-                FROM resource
-            ";
+            $query = "SELECT id, name
+                        FROM {$this->getTable()}";
 
             $stmt = $this->openDb()->query($query);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);

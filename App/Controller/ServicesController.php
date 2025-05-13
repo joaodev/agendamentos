@@ -3,94 +3,95 @@
 namespace App\Controller;
 
 use Core\Controller\ActionController;
-use Core\Di\Container;
 use Core\Db\Crud;
 use App\Interfaces\CrudInterface;
+use App\Model\Services;
 
 class ServicesController extends ActionController implements CrudInterface
 {
     private mixed $model;
+    private array $aclData;
 
     public function __construct()
     {
         parent::__construct();
-        $this->model = Container::getClass("Services", "app");
+        $this->model = new Services();
+
+        $this->aclData = [
+            'canView' => $this->getAcl('view', 'services'),
+            'canCreate' => $this->getAcl('create', 'services'),
+            'canUpdate' => $this->getAcl('update', 'services'),
+            'canDelete' => $this->getAcl('delete', 'services'),
+        ];
+
+        $this->view->acl = $this->aclData;
     }
 
     public function indexAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $stringFields = 'uuid, title, description, price, status, created_at, updated_at';
-            $data = $this->model->findAllBy($stringFields, 'parent_uuid', $this->parentUUID);
+        if ($this->validatePostParams($_POST) && $this->aclData['canView']) {
+            $stringFields = 'id, title, price, service_type, status, created_at, updated_at';
+            $data = $this->model->findAll($stringFields);
             $this->view->data = $data;
 
-            $activePlan = self::getActivePlan();
-            $totalServices = $this->model->totalData($this->model->getTable(), $this->parentUUID);
-
-            $totalFree = ($activePlan['total_services'] - $totalServices);
-            $this->view->total_free = $totalFree;
-
-            if ($totalServices >= $activePlan['total_services']) {
-                $reached_limit = true;
-            } else {
-                $reached_limit = false;
-            }   
-            $this->view->reached_limit = $reached_limit;
-            
             $this->render('index', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function createAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canCreate']) {
             $this->render('create', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function createProcessAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canCreate']) {
             unset($_POST['target']);
-            $activePlan = self::getActivePlan();
-            $totalServices = $this->model->totalData($this->model->getTable(), $this->parentUUID);
-            if ($totalServices >= $activePlan['total_services']) {
-                $data  = [
+
+            if ($this->model->fieldExists('title', $_POST['title'], 'id')) {
+                $data = [
                     'title' => 'Erro!',
-                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plano.',
-                    'type' => 'error',
-                    'pos'   => 'top-center'
+                    'msg' => 'Título já cadastrado, informe outro.',
+                    'type' => 'error', 'pos' => 'top-center'
+                ];
+
+                echo json_encode($data);
+                return false;
+            }
+
+            $_POST['price'] = $this->moneyToDb($_POST['price']);
+            
+            $crud = new Crud();
+            $crud->setTable($this->model->getTable());
+            $transaction = $crud->create($_POST);
+
+            if ($transaction) {
+                $newId = $transaction;
+
+                $this->toLog("Cadastrou o serviço $newId");
+                $data = [
+                    'title' => 'Sucesso!',
+                    'msg' => 'Serviço cadastrado.',
+                    'type' => 'success',
+                    'pos' => 'top-right',
+                    'id' => $newId,
+                    'titlesv' => $_POST['title'],
+                    'price' => number_format($_POST['price'], 2, ",", ".")
+
                 ];
             } else {
-                $uuid = $this->model->NewUUID();
-                $_POST['uuid'] = $uuid;
-                $_POST['parent_uuid'] = $this->parentUUID;
-                $_POST['price'] = $this->moneyToDb($_POST['price']);
-    
-                $crud = new Crud();
-                $crud->setTable($this->model->getTable());
-                $transaction = $crud->create($_POST);
-    
-                if ($transaction) { 
-                    $this->toLog("Cadastrou o serviço $uuid");
-                    $data  = [
-                        'title' => 'Sucesso!',
-                        'msg'   => 'Serviço cadastrado.',
-                        'type'  => 'success',
-                        'pos'   => 'top-right',
-                        'uuid'  => $uuid,
-                        'titlesv' => $_POST['title'],
-                        'price' => number_format($_POST['price'], 2, ",",".")
-    
-                    ];
-                } else {
-                    $data  = [
-                        'title' => 'Erro!',
-                        'msg' => 'O serviço não foi cadastrado.',
-                        'type' => 'error',
-                        'pos'   => 'top-center'
-                    ];
-                }
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'O serviço não foi cadastrado.',
+                    'type' => 'error',
+                    'pos' => 'top-center'
+                ];
             }
 
             echo json_encode($data);
@@ -102,40 +103,54 @@ class ServicesController extends ActionController implements CrudInterface
 
     public function updateAction(): void
     {
-        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $fields = "uuid, title, description, price, status";
-            $entity = $this->model->find($_POST['uuid'], $fields, 'uuid');
+        if (!empty($_POST['id']) && $this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            $fields = "id, title, price, service_type, status";
+            $entity = $this->model->find($_POST['id'], $fields, 'id');
             $this->view->entity = $entity;
 
             $this->render('update', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
             unset($_POST['target']);
+            
+            if ($this->model->fieldExists('title', $_POST['title'], 'id', $_POST['id'])) {
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'Título já cadastrado, informe outro.',
+                    'type' => 'error', 'pos' => 'top-center'
+                ];
+
+                echo json_encode($data);
+                return false;
+            }
+            
             $_POST['updated_at'] = date('Y-m-d H:i:s');
-            $_POST['price']  = $this->moneyToDb($_POST['price']);
+            $_POST['price'] = $this->moneyToDb($_POST['price']);
 
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
-            $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
+            $transaction = $crud->update($_POST, $_POST['id'], 'id');
 
             if ($transaction) {
-                $this->toLog("Atualizou o serviço {$_POST['uuid']}");
-                $data  = [
+                $this->toLog("Atualizou o serviço {$_POST['id']}");
+                $data = [
                     'title' => 'Sucesso!',
-                    'msg'   => 'Serviço atualizado.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right'
+                    'msg' => 'Serviço atualizado.',
+                    'type' => 'success',
+                    'pos' => 'top-right'
                 ];
             } else {
-                $data  = [
+                $data = [
                     'title' => 'Erro!',
                     'msg' => 'O serviço não foi atualizado.',
                     'type' => 'error',
-                    'pos'   => 'top-center'
+                    'pos' => 'top-center'
                 ];
             }
 
@@ -148,38 +163,43 @@ class ServicesController extends ActionController implements CrudInterface
 
     public function readAction(): void
     {
-        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $fields = "uuid, title, price, description, status, created_at, updated_at";
-            $entity = $this->model->find($_POST['uuid'], $fields, 'uuid');
-            $this->view->entity = $entity;
-            $this->render('read', false);
+        if (!empty($_POST['id']) && $this->validatePostParams($_POST) && $this->aclData['canView']) {
+            $entity = $this->model->getOne($_POST['id'], false);
+            if ($entity) {
+                $this->view->entity = $entity;
+                $this->render('read', false);
+            } else {
+                $this->render('../error/not-found', false);
+            }
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function deleteAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canDelete']) {
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
             $transaction = $crud->update([
                 'deleted' => '1',
                 'updated_at' => date('Y-m-d H:i:s')
-            ],$_POST['uuid'], 'uuid');
+            ], $_POST['id'], 'id');
 
             if ($transaction) {
-                $this->toLog("Removeu o serviço {$_POST['uuid']}");
-                $data  = [
+                $this->toLog("Removeu o serviço {$_POST['id']}");
+                $data = [
                     'title' => 'Sucesso!',
-                    'msg'   => 'Serviço removido.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right'
+                    'msg' => 'Serviço removido.',
+                    'type' => 'success',
+                    'pos' => 'top-right'
                 ];
             } else {
-                $data  = [
+                $data = [
                     'title' => 'Erro!',
                     'msg' => 'O serviço não foi removido.',
                     'type' => 'error',
-                    'pos'   => 'top-center'
+                    'pos' => 'top-center'
                 ];
             }
 
@@ -190,20 +210,27 @@ class ServicesController extends ActionController implements CrudInterface
         }
     }
 
-    public function fieldExistsAction()
+    public function searchServiceAction(): bool
     {
         if (!empty($_POST)) {
-            $uuid  = (!empty($_POST['uuid']) ? $_POST['uuid'] : null);
-            $field = "";
+            $res = [];
+            if (!empty($_POST['term']) && strlen($_POST['term']) >= 1) {
+                $data = $this->model->searchData($_POST['term']);
 
-            if (!empty($_POST['title'])) $field = 'title';
-
-            $exists = $this->model->fieldExists($field, $_POST[$field], 'uuid', $uuid);
-            if ($exists) {
-                echo 'false';
-            } else {
-                echo 'true';
+                foreach ($data as $entity) {
+                    $res[] = [
+                        'id' => $entity['id'],
+                        'text' => $entity['id']
+                        .' - '. $entity['title'] 
+                        . ' | Valor: R$ ' . number_format($entity['price'], 2,",",".")
+                    ];
+                }
             }
+
+            echo json_encode($res);
+            return true;
+        } else {
+            return false;
         }
     }
 }

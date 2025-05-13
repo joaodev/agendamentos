@@ -2,33 +2,44 @@
 
 namespace App\Controller;
 
+use App\Model\Config;
 use Core\Controller\ActionController;
-use Core\Di\Container;
 use Core\Db\Crud;
 
 class ConfigController extends ActionController
 {
     private mixed $model;
+    private array $aclData;
 
     public function __construct()
     {
         parent::__construct();
-        $this->model = Container::getClass("Config", "app");
+        $this->model = new Config();
+
+        $this->aclData = [
+            'canView' => $this->getAcl('view', 'configs'),
+            'canUpdate' => $this->getAcl('update', 'configs'),
+        ];
+
+        $this->view->acl = $this->aclData;
     }
 
     public function indexAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canView']) {
             $entity = $this->model->getEntity();
             $this->view->entity = $entity;
             $this->render('index', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
             unset($_POST['target']);
+            
             if (!empty($_FILES["logo"])) {
                 $image_name_f1 = $_FILES["logo"]["name"];
                 if ($image_name_f1 != null) {
@@ -116,7 +127,7 @@ class ConfigController extends ActionController
 
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
-            $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
+            $transaction = $crud->update($_POST, $_POST['id'], 'id');
 
             if ($transaction) {
                 $this->toLog("Atualizou as configurações do sistema");

@@ -1,0 +1,148 @@
+<?php $isAdmin = $this->view->isAdmin; ?>
+<?php if (!empty($this->view->files)): ?>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover tableFiles w-100">
+            <thead class="bg-primary text-white">
+                <tr class="text-center">
+                    <th style="font-size: 14px; padding: 2px; color: white;">Arquivo</th>
+                    <th style="font-size: 14px; padding: 2px; color: white;">Data</th>
+                    <th style="font-size: 14px; padding: 2px; color: white;">Ação</th>
+                    <th style="display: none;">cod</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->view->files as $file): ?>
+                    <tr style="text-align: center;" id="row_file_<?php echo $file['id']; ?>">
+                        <td style="font-size: 15px;">
+                            <?php if ($this->isFile($file['file'], 'schedules/' . $_POST['id'])): ?>
+                                <?php if ($this->isImage($file['file'])): ?>
+                                    <a href="<?php echo baseUrl . 'public/uploads/schedules/' . $_POST['id'] . '/' . $file['file']; ?>" 
+                                        data-lightbox="image-1"
+                                        data-title="<?php echo $file['file']; ?>">
+                                        <span class="fa fa-image pr-1"></span> <?php echo $file['file']; ?>
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?php echo baseUrl . 'public/uploads/schedules/' . $_POST['id'] . '/' . $file['file']; ?>" 
+                                        target="_blank">
+                                        <span class="fa fa-file-pdf pr-1"></span> <?php echo $file['file']; ?>
+                                    </a>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <span class="fa fa-info-circle pr-1"></span>
+                                <?php echo $file['file']; ?> <small class="text-red">(Arquivo indisponível)</small>
+                            <?php endif; ?>
+                        </td>
+                        <td style="font-size: 15px;">
+                            <?php echo $this->formatDateTime($file['created_at']); ?>
+                        </td>
+                        <td>
+                            <?php if ($_POST['hasUpdate'] == 'true' && $_POST['hasDeleted'] == 'false'): ?>
+                                <?php if ($_POST['status'] == '1' || $isAdmin): ?>
+                                    <button type="button" class="btn btn-danger btn-sm btnRadius" style="font-size: 10px;"
+                                        onclick="deleteFile(<?php echo $file['id']; ?>);">
+                                        <span class="fa fa-trash"></span>
+                                    </button>
+                                <?php else: ?>
+                                    <button type="button" class="btn btn-danger btn-sm btnRadius" style="font-size: 10px;" disabled>
+                                        <span class="fa fa-trash"></span>
+                                    </button>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <button type="button" class="btn btn-danger btn-sm btnRadius" style="font-size: 10px;" disabled>
+                                    <span class="fa fa-trash"></span>
+                                </button>
+                            <?php endif; ?>
+                        </td>
+                        <td style="display: none">
+                            <?php echo $file['id']; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php if ($_POST['hasUpdate'] == 'true' && $_POST['hasDeleted'] == 'false'): ?>
+        <?php if ($_POST['status'] == '1' || $isAdmin): ?>
+            <script>
+                function deleteFile(id) {
+                    $("#modalDeleteScheduleFileTitle").html('<i class="fa fa-trash pr-2"></i> Remover Arquivo');
+                    $("#modalDeleteScheduleFileLoader").hide();
+                    $("#modalDeleteScheduleFile").modal('show');
+                    $("#modalDeleteScheduleFileResult").html('<button type="button" class="btn btn-danger btnRadius" title="Confirmar Exclusão" onclick="runFileDelete(\'' + id + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+                }
+
+                async function runFileDelete(id) {
+                    if (id !== null) {
+                        $("#modalDeleteScheduleFileLoader").show();
+
+                        let send_notification_target = null;
+                        if ($('#schedule_delete_notification_file').is(':checked')) {
+                            send_notification_target = $("#schedule_delete_notification_file").val();    
+                        }
+
+                        await $.ajax({
+                            type: "POST",
+                            url: "<?php echo baseUrl; ?>agendamentos/remove-arquivo",
+                            data: { 
+                                id: id,
+                                schedule_id: '<?php echo $_POST['id']; ?>',
+                                target: '<?php echo $this->getTarget(); ?>',
+                                send_notification: send_notification_target
+                            },
+                            async: true
+                        }).done(async function (data) {
+                            await loadScheduleFiles();
+                            $("#modalDeleteScheduleFile").modal('hide');
+                        }).fail(function () {
+                            showInternalErrorAlert();
+                            $("#modalDeleteScheduleFileLoader").hide();
+                        });
+                    }
+                }
+            </script>
+        <?php endif; ?>
+    <?php endif; ?>
+    <script>
+        $(document).ready(function() {
+            $('.tableFiles').DataTable({
+                "sDom": 'tip',
+                searching: true,
+                order: [ [3, "desc"] ],
+                columnDefs: [{orderable: false, targets: [0,1,2]}],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+    </script>
+<?php else: ?>
+    <div class="alert alert-info mt-3" role="alert">
+        Nenhum arquivo enviado.
+    </div>
+<?php endif; ?>

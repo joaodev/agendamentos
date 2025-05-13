@@ -13,62 +13,62 @@ class Acl extends Model
         $this->setTable('acl');
     }
 
-    public function getGrantedPrivilege($userUuid, $roleUuid, $resourceUuid, $moduleUuid): bool|string
+    public function getGrantedPrivilege(int $userId, int $roleId, int $resourceId, int $moduleId): bool|string
     {
         try {
-            $query = "SELECT a.uuid, r.is_admin
-                        FROM acl AS a
+            $query = "SELECT a.id, r.is_admin
+                        FROM {$this->getTable()} AS a
                         INNER JOIN privilege AS p  
-                            ON a.privilege_uuid = p.uuid
+                            ON a.privilege_id = p.id
                         INNER JOIN role AS r 
-                            ON p.role_uuid = r.uuid
-                        WHERE a.user_uuid = :user_uuid AND p.status = :pstatus AND a.status = :status
-                        AND p.role_uuid = :role_uuid AND p.resource_uuid = :resource_uuid
-                        AND p.module_uuid = :module_uuid";
+                            ON p.role_id = r.id
+                        WHERE a.user_id = :user_id AND p.status = :pstatus AND a.status = :status
+                        AND p.role_id = :role_id AND p.resource_id = :resource_id
+                        AND p.module_id = :module_id";
 
-                $stmt = $this->openDb()->prepare($query);
-                $stmt->bindValue(":user_uuid", $userUuid);
-                $stmt->bindValue(":pstatus", '1');
-                $stmt->bindValue(":status", '1');
-                $stmt->bindValue(":role_uuid", $roleUuid);
-                $stmt->bindValue(":resource_uuid", $resourceUuid);
-                $stmt->bindValue(":module_uuid", $moduleUuid);
-                $stmt->execute();
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":user_id", $userId);
+            $stmt->bindValue(":pstatus", '1');
+            $stmt->bindValue(":status", '1');
+            $stmt->bindValue(":role_id", $roleId);
+            $stmt->bindValue(":resource_id", $resourceId);
+            $stmt->bindValue(":module_id", $moduleId);
+            $stmt->execute();
 
-                $rowCount = $stmt->rowCount();
+            $rowCount = $stmt->rowCount();
 
-                $stmt = null;
-                $this->closeDb();
+            $stmt = null;
+            $this->closeDb();
 
-                if ($rowCount > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-         
+            if ($rowCount > 0) {
+                return true;
+            } else {
+                return false;
+            }
+
         } catch (Exception $e) {
             return $e->getMessage();
         }
     }
 
-    public function getUserPrivileges($userUuid): bool|array|string
+    public function getUserPrivileges(int $userId): bool|array |string
     {
         try {
-            $query = "SELECT a.uuid, a.privilege_uuid, a.status,
-                             p.uuid as pv, r.name as resourceName,
+            $query = "SELECT a.id, a.privilege_id, a.status,
+                             p.id as pv, r.name as resourceName,
                              m.name as moduleName
-                        FROM acl AS a
+                        FROM {$this->getTable()} AS a
                         INNER JOIN privilege AS p  
-                            ON a.privilege_uuid = p.uuid
+                            ON a.privilege_id = p.id
                         INNER JOIN resource AS r
-                            ON p.resource_uuid = r.uuid
+                            ON p.resource_id = r.id
                         INNER JOIN modules AS m
-                            ON p.module_uuid = m.uuid
-                        WHERE a.user_uuid = :user_uuid
+                            ON p.module_id = m.id
+                        WHERE a.user_id = :user_id
                             AND p.status = :status";
-            
+
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":user_uuid", $userUuid);
+            $stmt->bindValue(":user_id", $userId);
             $stmt->bindValue(":status", '1');
             $stmt->execute();
 
@@ -83,23 +83,23 @@ class Acl extends Model
         }
     }
 
-    public function checkDeletePermission($privilegeUuid): bool|string
+    public function checkDeletePermission(int $privilegeId): bool|string
     {
         try {
             $query = "SELECT a.status 
-                        FROM acl AS a
+                        FROM {$this->getTable()} AS a
                         INNER JOIN privilege AS p 
-                            ON a.privilege_uuid = p.uuid
-                        WHERE a.privilege_uuid = :privilege_uuid
+                            ON a.privilege_id = p.id
+                        WHERE a.privilege_id = :privilege_id
                             AND a.status = :status";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":privilege_uuid", $privilegeUuid);
+            $stmt->bindValue(":privilege_id", $privilegeId);
             $stmt->bindValue(":status", '1');
             $stmt->execute();
 
-            $results = $stmt->rowCount();   
-            
+            $results = $stmt->rowCount();
+
             $stmt = null;
             $this->closeDb();
 
@@ -107,20 +107,20 @@ class Acl extends Model
                 return false;
             } else {
                 return true;
-            }            
+            }
         } catch (Exception $e) {
             return $e->getMessage();
         }
     }
-    
-    public function cleanUserAcl($user): bool|string
+
+    public function cleanUserAcl(int $user): bool|string
     {
         try {
-            $query = "DELETE FROM acl
-                        WHERE user_uuid = :user_uuid";
+            $query = "DELETE FROM {$this->getTable()}
+                        WHERE user_id = :user_id";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":user_uuid", $user);
+            $stmt->bindValue(":user_id", $user);
             $stmt->execute();
 
             $stmt = null;

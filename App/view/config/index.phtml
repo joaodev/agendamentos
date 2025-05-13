@@ -1,80 +1,83 @@
 <?php 
-$entity = $this->view->entity; 
-$role = $_SESSION['ROLE'];
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canUpdate = $aclData['canUpdate'];
 
-$canView    = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('config'));
-$canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('config'));
-?>
-<?php if ($canView): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row mb-2">
-                <div class="col-11">
-                    <h1 style="position: relative; top: 5px">
-                        <i class="fas fa-cogs pr-1"></i>
-                        Configurações
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inical">
+if ($canView): ?>
+    <?php $entity = $this->view->entity; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-cogs pr-1"></i>
+                                Configurações
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <a href="<?php echo baseUrl; ?>"  
+                                class="btn btn-primary btnRadius" 
+                                title="Página Inicial">
                                 <i class="fas fa-home"></i> 
                             </a>
-                        </li>
-                    </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body cardWrapperBody">
                             <form method="post" name="formUpdateConfig" id="formUpdateConfig" enctype="multipart/form-data">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="" class="form-control-label">Logomarca</label><br>
-                                        <?php if (!empty($entity['logo'])): ?>
+                                        <label for="logo" class="form-control-label">Logomarca <small style="color: red; margin-left: 5px;"><i>(jpg, jpeg, png, gif)</i></small></label><br>
+                                        <?php if (!empty($entity['logo']) && $this->isImage($entity['logo'], 'logo')): ?>
                                             <div class="mb-3">
                                                 <a href="<?php echo baseUrl . 'public/uploads/logo/'
-                                                    . $entity['logo']; ?>"  data-lightbox="image-1"
+                                                    . $entity['logo']; ?>" 
+                                                    data-lightbox="image-1"
                                                     data-title="<?php echo $entity['logo']; ?>">
                                                     <img src="<?php echo baseUrl . 'public/uploads/logo/'
                                                         . $entity['logo']; ?>" alt="" style="max-height: 100px;">
                                                 </a>
                                                 <div class="my-2">
-                                                    <input type="checkbox" name="remove_image_logo" id="remove_image_logo" value="1"> Excluir imagem
+                                                    <input type="checkbox" name="remove_image_logo" id="remove_image_logo" value="1"> Remover imagem
                                                 </div>
                                             </div>
                                         <?php endif; ?>
                                         <?php if ($canUpdate): ?>
-                                            <input type="file" class="form-control" name="logo" id="logo">
+                                            <input type="file" class="form-control inputUpload" name="logo" id="logo" accept=".png,.jpg,.jpeg,.gif">
                                         <?php endif; ?>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="" class="form-control-label">Ícone</label><br>
-                                        <?php if (!empty($entity['logo_icon'])): ?>
+                                        <label for="logo_icon" class="form-control-label">Ícone <small style="color: red; margin-left: 5px;"><i>(jpg, jpeg, png, gif)</i></small></label><br>
+                                        <?php if (!empty($entity['logo_icon']) && $this->isImage($entity['logo_icon'], 'logo')): ?>
                                             <div class="mb-3">
                                                 <a href="<?php echo baseUrl . 'public/uploads/logo/'
-                                                    . $entity['logo_icon']; ?>"  data-lightbox="image-1"
+                                                    . $entity['logo_icon']; ?>" 
+                                                    data-lightbox="image-1"
                                                     data-title="<?php echo $entity['logo_icon']; ?>">
                                                     <img src="<?php echo baseUrl . 'public/uploads/logo/'
                                                         . $entity['logo_icon']; ?>" alt="" style="max-height: 100px;">
                                                 </a>
                                                 <div class="my-2">
-                                                    <input type="checkbox" name="remove_image_icon" id="remove_image_icon" value="1"> Excluir imagem
+                                                    <input type="checkbox" name="remove_image_icon" id="remove_image_icon" value="1"> Remover imagem
                                                 </div>
                                             </div>
                                         <?php endif; ?>
                                         <?php if ($canUpdate): ?>
-                                            <input type="file" class="form-control" name="logo_icon" id="logo_icon">
+                                            <input type="file" class="form-control inputUpload" name="logo_icon" id="logo_icon" accept=".png,.jpg,.jpeg,.gif">
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <hr>
+                                <div class="row">
+                                    <div class="col-12 my-2">
+                                        <hr>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="primary_color" class="form-control-label">Cor Primária</label><br>
@@ -93,7 +96,11 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <hr>
+                                <div class="row">
+                                    <div class="col-12 my-2">
+                                        <hr>
+                                    </div>
+                                </div>
                                 <div class="form-group row">
                                     <label for="site_title" class="col-sm-2 form-control-label">Título</label>
                                     <div class="col-sm-10">
@@ -101,42 +108,45 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                                             value="<?php echo $entity['site_title']; ?>" <?php echo ($canUpdate) ? 'required' : 'readonly'; ?>>
                                     </div>
                                 </div>
-                                <div class="form-group"><hr></div>
+                                <div class="form-group row">
+                                    <label for="customer_area" class="col-sm-2 form-control-label">Área para Clientes</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control" name="customer_area" id="customer_area" <?php echo ($canUpdate) ? 'required' : 'disabled'; ?>>
+                                            <option value="0" <?php echo ($entity['customer_area'] == '0' ? 'selected' : ''); ?>>Acesso negado</option>
+                                            <option value="1" <?php echo ($entity['customer_area'] == '1' ? 'selected' : ''); ?>>Acesso liberado</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6 offset-md-3 text-center">
-                                        <label for="file_menu" class="form-control-label">Imagem de Fundo para o Menu</label><br>
-                                        <?php if (!empty($entity['file_menu'])): ?>
+                                        <?php if (!empty($entity['file_menu']) && $this->isImage($entity['file_menu'], 'menu')): ?>
+                                        <label for="file_menu" class="form-control-label">Imagem para o Menu <small style="color: red; margin-left: 5px;"><i>(jpg, jpeg, png, gif)</i></small></label><br>
                                             <div class="mb-3 text-center">
                                                 <a href="<?php echo baseUrl . 'public/uploads/menu/'
-                                                    . $entity['file_menu']; ?>"  data-lightbox="image-1"
+                                                    . $entity['file_menu']; ?>" 
+                                                    data-lightbox="image-1"
                                                     data-title="<?php echo $entity['file_menu']; ?>">
                                                     <img src="<?php echo baseUrl . 'public/uploads/menu/'
                                                         . $entity['file_menu']; ?>" alt="" style="max-height: 250px;">
                                                 </a>
                                                 <?php if ($canUpdate): ?>
                                                     <div class="my-2">
-                                                        <input type="checkbox" name="remove_image_menu" id="remove_image_menu" value="1"> Excluir imagem
+                                                        <input type="checkbox" name="remove_image_menu" id="remove_image_menu" value="1"> Remover imagem
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
                                         <?php endif; ?>
                                         <?php if ($canUpdate): ?>
-                                            <input type="file" class="form-control" name="file_menu" id="file_menu">
+                                            <input type="file" class="form-control inputUpload" name="file_menu" id="file_menu" accept=".png,.jpg,.jpeg,.gif">
                                         <?php endif; ?>
                                     </div>
                                 </div>
                                 <?php if ($canUpdate): ?>
-                                    <div class="row">
-                                        <div class="col-12"><hr></div>
-                                        <div class="col-md-8 mt-2 mb-2">
-                                            <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Atualizar Configurações">
+                                    <div class="row mt-4">
+                                        <div class="col-md-6 offset-md-3 mb-2">
+                                            <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit" title="Atualizar Configurações">
                                                 <i class="fa fa-save pr-1"></i> Atualizar Configurações
                                             </button>
-                                        </div>
-                                        <div class="col-md-4 mt-2 mb-2">
-                                            <a href="<?php echo baseUrl; ?>" class="btn btn-outline-primary w-100" title="Página Inicial">
-                                                <i class="fas fa-home pr-1"></i> Início
-                                            </a>
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -147,7 +157,6 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
             </div>
         </div>
     </section>
-    
     <link rel="stylesheet" href="<?php echo baseUrl; ?>public/app/farbtastic/farbtastic.css" type="text/css" />
     <script type="text/javascript" src="<?php echo baseUrl; ?>public/app/farbtastic/farbtastic.js"></script>
     <script>
@@ -161,22 +170,25 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
             $(document).ready(function(){
 
                 $('#formUpdateConfig').validate({
-                    submitHandler: function() {
+                    submitHandler: async function() {
                         let logo = $('#logo').prop('files')[0];
                         let logo_icon = $('#logo_icon').prop('files')[0];
                         let file_menu = $('#file_menu').prop('files')[0];
                         let form_data = new FormData();     
                         
-                        form_data.append('uuid', '<?php echo $entity['uuid']; ?>');
+                        form_data.append('id', '<?php echo $entity['id']; ?>');
                         form_data.append('site_title', $("#site_title").val());
                         
 
                         form_data.append('primary_color', $("#primary_color").val());
                         form_data.append('secondary_color', $("#secondary_color").val());
+                        form_data.append('customer_area', $("#customer_area").val());
 
                         form_data.append('logo', logo);    
                         form_data.append('logo_icon', logo_icon);
                         form_data.append('file_menu', file_menu);
+
+                        form_data.append('target', '<?php echo $this->getTarget(); ?>');
 
                         if ($('#remove_image_logo').is(':checked')) {
                             form_data.append('remove_image_logo', $("#remove_image_logo").val());    
@@ -189,13 +201,11 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                         if ($('#remove_image_menu').is(':checked')) {
                             form_data.append('remove_image_menu', $("#remove_image_menu").val());    
                         }
-                        
-                        form_data.append('target', '<?php echo $this->getTarget(); ?>');
 
                         $("#baseLoader").show();
                         $("#btnSubmit").attr('disabled', true);
 
-                        $.ajax({
+                        await $.ajax({
                             type: "POST",
                             url: "<?php echo baseUrl; ?>configuracoes/processa-edicao",
                             cache: false,
@@ -209,7 +219,7 @@ $canUpdate  = $_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceC
                             window.location.href = "<?php echo baseUrl; ?>?mod=configuracoes";
                         }).fail(function() {
                             showInternalErrorAlert(); 
-                            $("#baseLoader").hide();   
+                            $("#baseLoader").fadeOut();   
                             $("#btnSubmit").attr('disabled', false);
                         }); 
 

@@ -2,28 +2,30 @@
 
 namespace App\Controller;
 
+use App\Model\Financial;
 use Core\Controller\ActionController;
-use Core\Di\Container;
 
 class FinancialController extends ActionController
 {
-    private mixed $schedulesModel;
-    private mixed $expensesModel;
-    private mixed $revenuesModel;
+    private mixed $model;
+    private array $aclData;
+
 
     public function __construct()
     {
         parent::__construct();
-        $this->schedulesModel = Container::getClass("Schedules", "app");
-        $this->expensesModel = Container::getClass("Expenses", "app");
-        $this->revenuesModel = Container::getClass("Revenues", "app");
+        $this->model = new Financial();
+
+        $this->aclData = [
+            'canView' => $this->getAcl('view', 'financial'),
+        ];
+
+        $this->view->acl = $this->aclData;
     }
-    
+
     public function indexAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $parentUUID = $this->parentUUID;
-
+        if ($this->validatePostParams($_POST) && $this->aclData['canView']) {
             if (!empty($_GET['m'])) {
                 $month = $_GET['m'];
             } else {
@@ -31,26 +33,14 @@ class FinancialController extends ActionController
             }
 
             $this->view->month = self::formatMonth($month);
-
-            $total_expenses = $this->expensesModel->getTotalAmountByMonth($month, $parentUUID);
-            $this->view->total_expenses = $total_expenses;
-
-            $total_revenues = $this->revenuesModel->getTotalAmountByMonth($month, $parentUUID);
-            $this->view->total_revenues = $total_revenues;
-
-            $total_schedules = $this->schedulesModel->getTotalAmountByMonth($month, $parentUUID);
-            $this->view->total_schedules = $total_schedules;
-
-            $schedules = $this->schedulesModel->getAllByMonth('2', $month, $parentUUID);
-            $this->view->schedules = $schedules;
-
-            $expenses = $this->expensesModel->getAllByMonth('2', $month, $parentUUID);
-            $this->view->expenses = $expenses;
-
-            $revenues = $this->revenuesModel->getAllByMonth('2', $month, $parentUUID);
-            $this->view->revenues = $revenues;
+            $this->view->month_not_formatted = $month;
+            
+            $data = $this->model->getAllByMonth($month);
+            $this->view->data = $data;  
 
             $this->render('index', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 }

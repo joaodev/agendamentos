@@ -8,14 +8,14 @@ use PDO;
 class InitDb
 {
     public mixed $db;
-    protected mixed $table;
+    protected string $table;
 
-    public function getTable()
+    public function getTable(): string
     {
         return $this->table;
     }
 
-    public function setTable($table): void
+    public function setTable(string $table): void
     {
         $this->table = $table;
     }

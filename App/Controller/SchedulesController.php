@@ -2,190 +2,170 @@
 
 namespace App\Controller;
 
+use App\Model\ChangesHistoric;
 use Core\Controller\ActionController;
-use Core\Di\Container;
 use Core\Db\Crud;
 use App\Interfaces\CrudInterface;
+use App\Model\Files;
+use App\Model\Schedules;
+use App\Model\User;
 
 class SchedulesController extends ActionController implements CrudInterface
 {
     private mixed $model;
-    private mixed $customersModel;
-    private mixed $paymentTypesModel;
-    private mixed $servicesModel;
     private mixed $filesModel;
     private mixed $userModel;
+    private mixed $changesHistoricModel;
+    private array $aclData;
 
     public function __construct()
     {
         parent::__construct();
-        $this->model = Container::getClass("Schedules", "app");
-        $this->customersModel = Container::getClass("Customers", "app");
-        $this->paymentTypesModel = Container::getClass("PaymentTypes", "app");
-        $this->servicesModel = Container::getClass("Services", "app");
-        $this->filesModel = Container::getClass("Files", "app");
-        $this->userModel = Container::getClass("User", "app");
+        $this->model = new Schedules();
+        $this->filesModel = new Files();
+        $this->userModel = new User();
+        $this->changesHistoricModel = new ChangesHistoric();
+
+        $this->aclData = [
+            'canView' => $this->getAcl('view', 'schedules'),
+            'canCreate' => $this->getAcl('create', 'schedules'),
+            'canUpdate' => $this->getAcl('update', 'schedules'),
+            'canDelete' => $this->getAcl('delete', 'schedules'),
+            'canCreateCustomer' => $this->getAcl('create', 'customers'),
+        ];
+
+        $this->view->acl = $this->aclData;
     }
 
     public function indexAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $parentUUID = $this->parentUUID;
-
-            if (!empty($_GET['m'])) {
-                $month = $_GET['m'];
-            } else {
-                $month = date('Y-m');
-            }
-
-            $this->view->month = self::formatMonth($month);
-
-            $data = $this->model->getAllByMonth('0', $month, $parentUUID);
+        if ($this->validatePostParams($_POST) && $this->aclData['canView']) {
+            $data = $this->model->getAll();
             $this->view->data = $data;
-
-            $activePlan = self::getActivePlan();
-            $totalSchedules = $this->model->totalMonthlyData(
-                $month, $this->model->getTable(), 'schedule_date', $parentUUID
-            );
-            
-            $totalFree = ($activePlan['total_schedules'] - $totalSchedules);
-            $this->view->total_free = $totalFree;
-
-            if ($activePlan['total_schedules'] == 0) {
-                $reached_limit = false;
-            } else {
-                if ($totalSchedules >= $activePlan['total_schedules']) {
-                    $reached_limit = true;
-                } else {
-                    $reached_limit = false;
-                }   
-            }
-
-            $this->view->reached_limit = $reached_limit;
-
             $this->render('index', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function createAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $parentUUID = $this->parentUUID;
-
-            $customers = $this->customersModel->findAllActivesBy('uuid, name', 'parent_uuid', $parentUUID);
-            $this->view->customers = $customers;
-
-            $stringFields = 'uuid, title, description, price';
-            $services = $this->servicesModel->findAllActivesBy($stringFields, 'parent_uuid', $parentUUID);
-            $this->view->services = $services;
-
-            $paymentTypes = $this->paymentTypesModel->getAllActives();
-            $this->view->paymentTypes = $paymentTypes;
-
-            $users = $this->userModel->getAllActives($this->parentUUID);
+        if ($this->validatePostParams($_POST) && $this->aclData['canCreate']) {
+            $users = $this->userModel->getAllActives();
             $this->view->users = $users;
-
             $this->render('create', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
-    
+
     public function createProcessAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canCreate']) {
             unset($_POST['target']);
-            $parentUUID = $this->parentUUID;
 
-            if (!empty($_POST['send_email_customer'])) {
+            if (!empty($_POST['send_email_customer']) && !empty($_POST['customer_id'])) {
                 $sendEmailCustomer = $_POST['send_email_customer'];
                 unset($_POST['send_email_customer']);
             } else {
                 $sendEmailCustomer = false;
             }
 
-            if (!empty($_POST['send_email_user'])) {
+            if (!empty($_POST['send_email_user']) && !empty($_POST['user_id'])) {
                 $sendEmailUser = $_POST['send_email_user'];
                 unset($_POST['send_email_user']);
             } else {
                 $sendEmailUser = false;
             }
 
-            $activePlan = self::getActivePlan();
-            $month = substr($_POST['schedule_date'], 0, 7);
-            $totalSchedules = $this->model->totalMonthlyData(
-                $month, $this->model->getTable(), 'schedule_date', $parentUUID
-            );
-            
-            if ($totalSchedules >= $activePlan['total_schedules']) {
+            if (empty($_POST['user_id'])) {
+                unset($_POST['user_id']);
+            }
+
+            if (empty($_POST['customer_id'])) {
+                unset($_POST['customer_id']);
+            }
+
+            $crud = new Crud();
+            $crud->setTable($this->model->getTable());
+            $transaction = $crud->create($_POST);
+
+            if ($transaction) { 
+                $newId = $transaction;
+
+                if (!empty($_FILES)) {
+                    $this->filesModel->uploadFiles($_FILES, "schedules", $newId, 'schedule_id');
+                }
+
+                $scheduleStatus = "Pendente";
+                $entity = $this->model->getOne($newId);
+         
+                if (!empty($entity['user_id']) && $sendEmailUser == 1) {
+                    $this->sendNotification([
+                        'parent' => 'schedules',
+                        'user_id' => $entity['user_id'],
+                        'schedule_id' => $entity['id'],
+                        'description' => "Agendamento #{$entity['id']} $scheduleStatus."
+                    ]);
+
+                    $url = baseUrl;
+                    $message = "<h3>Informações do agendamento emitido:</h3>";
+                    $message .= "<p><b>{$_POST['title']}</b></p>
+                                <p>Situação: <b>$scheduleStatus</b></p>";
+                    $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
+
+                    $this->sendMail([
+                        'title' => 'Novo Agendamento - ' . $scheduleStatus,
+                        'message' => $message,
+                        'name' => $entity['userName'],
+                        'toAddress' => $entity['userEmail']
+                    ]);
+                }
+
+                if (!empty($entity['customer_id']) && $sendEmailCustomer == 1) {
+                    $this->sendNotification([
+                        'parent' => 'schedules',
+                        'customer_id' => $entity['customer_id'],
+                        'schedule_id' => $entity['id'],
+                        'description' => "Agendamento #{$entity['id']} $scheduleStatus."
+                    ]);
+
+                    $url = baseUrl . 'cliente';
+                    $message = "<h3>Informações do agendamento emitido:</h3>";
+                    $message .= "<p><b>{$_POST['title']}</b></p>
+                                <p>Situação: <b>$scheduleStatus</b></p>";
+                    $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
+
+                    $this->sendMail([
+                        'title' => 'Novo Agendamento - ' . $scheduleStatus,
+                        'message' => $message,
+                        'name' => $entity['customerName'],
+                        'toAddress' => $entity['customerEmail']
+                    ]);
+                }
+
+                $this->saveHistoric([
+                    'schedule_id' => $newId, 
+                    'status' => 1,
+                    'user_id' => $_SESSION['COD']
+                ]);
+
+                $this->toLog("Cadastrou o agendamento $newId");
+                $data  = [
+                    'title' => 'Sucesso!',
+                    'msg'   => 'Agendamento cadastrado.',
+                    'type'  => 'success',
+                    'pos'   => 'top-right',
+                    'id'  => $newId
+
+                ];
+            } else {
                 $data  = [
                     'title' => 'Erro!',
-                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plano.',
+                    'msg' => 'O Agendamento não foi cadastrado.',
                     'type' => 'error',
                     'pos'   => 'top-center'
                 ];
-            } else {
-                $uuid = $this->model->NewUUID();
-                $_POST['uuid'] = $uuid;
-                $_POST['parent_uuid'] = $parentUUID;
-                $_POST['amount'] = $this->moneyToDb($_POST['amount']);
-    
-                $crud = new Crud();
-                $crud->setTable($this->model->getTable());
-                $transaction = $crud->create($_POST);
-    
-                if ($transaction) {
-                    if (!empty($_FILES)) {
-                        $this->filesModel->uploadFiles($_FILES, "schedules", $uuid);
-                    }
-                    
-                    $scheduledTo = $this->formatDate($_POST['schedule_date']);
-                    $scheduledTime = substr($_POST['schedule_time'], 0, 5);
-
-                    $scheduleStatus = "Pendente";
-                    if ($_POST['status'] == 1) $scheduleStatus = "Agendandado";
-                    if ($_POST['status'] == 2) $scheduleStatus = "Finalizado";
-                    if ($_POST['status'] == 3) $scheduleStatus = "Cancelado";
-                    
-                    if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
-                        $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
-                        $message = "<p>Novo agendamento para: $scheduledTo às $scheduledTime.</p>
-                                    <p>Situação: <b>$scheduleStatus</b></p>";
-
-                        $this->sendMail([
-                            'title' => 'Agendamento - ' . $scheduleStatus,
-                            'message' => $message,
-                            'name' => $customer['name'],
-                            'toAddress' => $customer['email']
-                        ]);
-                    }
-
-                    if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
-                        $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
-                        $message = "<p>Você foi atribuído como responsável em um agendamento para: $scheduledTo às $scheduledTime.</p>
-                                    <p>Situação: <b>$scheduleStatus</b></p>";
-
-                        $this->sendMail([
-                            'title' => 'Agendamento - ' . $scheduleStatus,
-                            'message' => $message,
-                            'name' => $user['name'],
-                            'toAddress' => $user['email']
-                        ]);
-                    }
-
-                    $this->toLog("Cadastrou o agendamento $uuid");
-                    $data  = [
-                        'title' => 'Sucesso!', 
-                        'msg'   => 'Agendamento cadastrado.',
-                        'type'  => 'success',
-                        'pos'   => 'top-right'
-                    ];
-                } else {
-                    $data  = [
-                        'title' => 'Erro!', 
-                        'msg' => 'O Agendamento não foi cadastrado.',
-                        'type' => 'error',
-                        'pos'   => 'top-center'
-                    ];
-                }
             }
 
             echo json_encode($data);
@@ -194,109 +174,131 @@ class SchedulesController extends ActionController implements CrudInterface
             return false;
         }
     }
-    
+
     public function updateAction(): void
     {
-        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $parentUUID = $this->parentUUID;
-            $entity = $this->model->getOne($_POST['uuid'], $parentUUID);
+        if (!empty($_POST['id']) && $this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            $entity = $this->model->getOne($_POST['id']);
             $this->view->entity = $entity;
-    
-            $paymentTypes = $this->paymentTypesModel->getAllActives();
-            $this->view->paymentTypes = $paymentTypes;
 
-            $customers = $this->customersModel->findAllActivesBy('uuid, name', 'parent_uuid', $parentUUID);
-            $this->view->customers = $customers;
-
-            $stringFields = 'uuid, title, description, price';
-            $services = $this->servicesModel->findAllActivesBy($stringFields, 'parent_uuid', $parentUUID);
-            $this->view->services = $services;
-            
-            $files = $this->filesModel->findAllBy('uuid, file', 'parent_uuid', $_POST['uuid']);
+            $files = $this->filesModel->findAllBy('id, file, created_at', 'schedule_id', $_POST['id']);
             $this->view->files = $files;
 
-            $users = $this->userModel->getAllActives($this->parentUUID);
-            $this->view->users = $users;
-
             $this->render('update', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
             unset($_POST['target']);
+            $oldEntity = $this->model->getOne($_POST['id']);
 
-            if (!empty($_POST['send_email_customer'])) {
+            $_POST['updated_at'] = date('Y-m-d H:i:s');
+
+            if (!empty($_POST['send_email_customer']) && !empty($_POST['customer_id'])) {
                 $sendEmailCustomer = $_POST['send_email_customer'];
                 unset($_POST['send_email_customer']);
             } else {
                 $sendEmailCustomer = false;
             }
 
-            if (!empty($_POST['send_email_user'])) {
+            if (!empty($_POST['send_email_user']) && !empty($_POST['user_id'])) {
                 $sendEmailUser = $_POST['send_email_user'];
                 unset($_POST['send_email_user']);
             } else {
                 $sendEmailUser = false;
             }
 
-            $_POST['updated_at'] = date('Y-m-d H:i:s');
-            $_POST['amount']  = $this->moneyToDb($_POST['amount']);
+            if (empty($_POST['user_id'])) {
+                unset($_POST['user_id']);
+            }
+
+            if (empty($_POST['customer_id'])) {
+                unset($_POST['customer_id']);
+            }
 
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
-            $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
-
+            $transaction = $crud->update($_POST, $_POST['id'], 'id');
+          
             if ($transaction) {
+                $entity = $this->model->getOne($_POST['id']);
+         
                 if (!empty($_FILES)) {
-                    $this->filesModel->uploadFiles($_FILES, "schedules", $_POST['uuid']);
+                    $this->filesModel->uploadFiles($_FILES, "schedules", $_POST['id'], 'schedule_id');
                 }
-
-                $scheduledTo = $this->formatDate($_POST['schedule_date']);
-                $scheduledTime = substr($_POST['schedule_time'], 0, 5);
 
                 $scheduleStatus = "Pendente";
                 if ($_POST['status'] == 1) $scheduleStatus = "Pendente";
-                if ($_POST['status'] == 2) $scheduleStatus = "Finalizado";
-                if ($_POST['status'] == 3) $scheduleStatus = "Cancelado";
-                
-                if (!empty($_POST['customer_uuid']) && $sendEmailCustomer == 1) {
-                    $customer = $this->customersModel->getOne($_POST['customer_uuid'], $this->parentUUID);
-                    $message = "<p>Novo agendamento para: $scheduledTo às $scheduledTime.</p>
+                if ($_POST['status'] == 2) $scheduleStatus = "Confirmado";
+                if ($_POST['status'] == 3) $scheduleStatus = "Concluído";
+                if ($_POST['status'] == 4) $scheduleStatus = "Cancelado";
+
+                if (!empty($entity['user_id']) && $sendEmailUser == 1) {
+                    $url = baseUrl;
+                    $message = "<h3>Atualização do agendamento emitido:</h3>";
+                    $message .= "<p><b>{$_POST['title']}</b></p>
                                 <p>Situação: <b>$scheduleStatus</b></p>";
+                    $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
 
                     $this->sendMail([
                         'title' => 'Agendamento - ' . $scheduleStatus,
                         'message' => $message,
-                        'name' => $customer['name'],
-                        'toAddress' => $customer['email']
+                        'name' => $entity['userName'],
+                        'toAddress' => $entity['userEmail']
+                    ]);
+
+                    $this->sendNotification([
+                        'parent' => 'schedules',
+                        'user_id' => $entity['user_id'],
+                        'schedule_id' => $entity['id'],
+                        'description' => "Atualização no Agendamento #{$entity['id']}."
                     ]);
                 }
 
-                if (!empty($_POST['user_uuid']) && $sendEmailUser == 1) {
-                    $user = $this->userModel->getOne($_POST['user_uuid'], $this->parentUUID);
-                    $message = "<p>Você foi atribuído como responsável em um agendamento para: $scheduledTo às $scheduledTime.</p>
+                if (!empty($entity['customer_id']) && $sendEmailCustomer == 1) {
+                    $this->sendNotification([
+                        'parent' => 'schedules',
+                        'customer_id' => $entity['customer_id'],
+                        'schedule_id' => $entity['id'],
+                        'description' => "Atualização no Agendamento #{$entity['id']}."
+                    ]);
+
+                    $url = baseUrl . 'cliente';
+                    $message = "<h3>Atualização do agendamento emitido:</h3>";
+                    $message .= "<p><b>{$_POST['title']}</b></p>
                                 <p>Situação: <b>$scheduleStatus</b></p>";
+                    $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
 
                     $this->sendMail([
                         'title' => 'Agendamento - ' . $scheduleStatus,
                         'message' => $message,
-                        'name' => $user['name'],
-                        'toAddress' => $user['email']
+                        'name' => $entity['customerName'],
+                        'toAddress' => $entity['customerEmail']
+                    ]);
+                }
+               
+                if ($entity['status'] != $oldEntity['status']) {
+                    $this->saveHistoric([
+                        'schedule_id' => $entity['id'], 
+                        'status' => $_POST['status'],
+                        'user_id' => $_SESSION['COD']
                     ]);
                 }
 
-                $this->toLog("Atualizou o agendamento {$_POST['uuid']}");
+                $this->toLog("Atualizou o agendamento {$_POST['id']}");
                 $data  = [
-                    'title' => 'Sucesso!', 
+                    'title' => 'Sucesso!',
                     'msg'   => 'Agendamento atualizado.',
                     'type'  => 'success',
                     'pos'   => 'top-right'
                 ];
             } else {
                 $data  = [
-                    'title' => 'Erro!', 
+                    'title' => 'Erro!',
                     'msg' => 'O Agendamento não foi atualizado.',
                     'type' => 'error',
                     'pos'   => 'top-center'
@@ -312,41 +314,292 @@ class SchedulesController extends ActionController implements CrudInterface
 
     public function readAction(): void
     {
-        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
-            $this->view->entity = $entity;
+        if (!empty($_POST['id']) && $this->validatePostParams($_POST) && $this->aclData['canView']) {
+            $entity = $this->model->getOne($_POST['id'], null, false);
+            if ($entity) {
+                $this->view->entity = $entity;
 
-            $files = $this->filesModel->findAllBy('file', 'parent_uuid', $_POST['uuid']);
-            $this->view->files = $files;
+                $historic = $this->changesHistoricModel->getAllByModule('schedule_id', $_POST['id']);
+                $this->view->historic = $historic;
 
-            $this->render('read', false);
+                $this->render('read', false);
+            } else {
+                $this->render('../error/not-found', false);
+            }
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
-	public function deleteAction(): bool
+    public function deleteAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $crud = new Crud();
-            $crud->setTable($this->model->getTable());
-            $transaction = $crud->update([
-                'deleted' => '1',
-                'updated_at' => date('Y-m-d H:i:s')
-            ],$_POST['uuid'], 'uuid');
+        if ($this->validatePostParams($_POST) && $this->aclData['canDelete']) {
+            $entity = $this->model->getOne($_POST['id']);
 
-            if ($transaction) {
-                $this->toLog("Removeu o agendamento {$_POST['uuid']}");
-                $data  = [
-                    'title' => 'Sucesso!', 
-                    'msg'   => 'Agendamento removido.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right'
-                ];
+            if ($entity) {
+                $crud = new Crud();
+                $crud->setTable($this->model->getTable());
+                $transaction = $crud->update([
+                    'deleted' => '1',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ], $_POST['id'], 'id');
+
+                if ($transaction) {
+                    if (!empty($_POST['send_mail']) && $_POST['send_mail'] == 1) {
+                        if (!empty($entity['user_id'])) {
+                            $this->sendNotification([
+                                'parent' => 'schedules',
+                                'user_id' => $entity['user_id'],
+                                'schedule_id' => $entity['id'],
+                                'description' => "Agendamento #{$entity['id']} removido."
+                            ]);
+
+                            $url = baseUrl;
+                            $message = "<h3>Agendamento #{$entity['id']} removido:</h3>";
+                            $message .= "<p><b>{$entity['title']}</b></p>";
+                            $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
+
+                            $this->sendMail([
+                                'title' => "Agendamento #{$entity['id']} removido",
+                                'message' => $message,
+                                'name' => $entity['userName'],
+                                'toAddress' => $entity['userEmail']
+                            ]);
+                        }
+
+                        if (!empty($entity['customer_id'])) {
+                            $this->sendNotification([
+                                'parent' => 'schedules',
+                                'customer_id' => $entity['customer_id'],
+                                'schedule_id' => $entity['id'],
+                                'description' => "Agendamento #{$entity['id']} removido."
+                            ]);
+
+                            $url = baseUrl . 'cliente';
+                            $message = "<h3>Agendamento #{$entity['id']} removido:</h3>";
+                            $message .= "<p><b>{$entity['title']}</b></p>";
+                            $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
+
+                            $this->sendMail([
+                                'title' => "Agendamento #{$entity['id']} removido",
+                                'message' => $message,
+                                'name' => $entity['customerName'],
+                                'toAddress' => $entity['customerEmail']
+                            ]);
+                        }
+                    }
+
+                    $this->toLog("Removeu o agendamento {$_POST['id']}");
+                    $data  = [
+                        'title' => 'Sucesso!',
+                        'msg'   => 'Agendamento removido.',
+                        'type'  => 'success',
+                        'pos'   => 'top-right'
+                    ];
+                } else {
+                    $data  = [
+                        'title' => 'Erro!',
+                        'msg' => 'O Agendamento não foi removido.',
+                        'type' => 'error',
+                        'pos'   => 'top-center'
+                    ];
+                }
+
+                echo json_encode($data);
+                return true;
             } else {
-                $data  = [
-                    'title' => 'Erro!', 
-                    'msg' => 'O Agendamento não foi removido.',
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public function deleteFileAction(): bool
+    {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            $crud = new Crud();
+            $crud->setTable($this->filesModel->getTable());
+            $deleted = $crud->update(['deleted' => '1'], $_POST['id'], 'id');
+
+            if ($deleted) {
+                if (!empty($_POST['send_notification'])) {
+                    $entity = $this->model->getOne($_POST['schedule_id']);
+                    
+                    if (!empty($entity) && !empty($entity['customerEmail'])) {
+                        $this->sendNotification([
+                            'parent' => 'schedules',
+                            'customer_id' => $entity['customer_id'],
+                            'schedule_id' => $entity['id'],
+                            'description' => "Arquivo removido no Agendamento #{$entity['id']}.",
+                            'for_files' => 1
+                        ]);
+
+                        $url = baseUrl . 'cliente';
+                        $message = "<p>Arquivo removido no Agendamento #{$entity['id']}, 
+                            <a href='$url'>acesse a plataforma</a> para conferir.</p>";
+                        
+                        $this->sendMail([
+                            'title' => 'Informações do Agendamento #'.$entity['id'],
+                            'message' => $message,
+                            'name' => $entity['customerName'],
+                            'toAddress' => $entity['customerEmail']
+                        ]);
+                    }
+                    
+                    if (!empty($entity) && !empty($entity['userEmail'])) {
+                        $this->sendNotification([
+                            'parent' => 'schedules',
+                            'user_id' => $entity['user_id'],
+                            'schedule_id' => $entity['id'],
+                            'description' => "Arquivo removido no Agendamento #{$entity['id']}.",
+                            'for_files' => 1
+                        ]);
+
+                        $url = baseUrl;
+                        $message = "<p>Arquivo removido no Agendamento #{$entity['id']},  
+                            <a href='$url'>acesse a plataforma</a> para conferir.</p>";
+                        
+                        $this->sendMail([
+                            'title' => 'Informações do Agendamento #'.$entity['id'],
+                            'message' => $message,
+                            'name' => $entity['userName'],
+                            'toAddress' => $entity['userEmail']
+                        ]);
+                    }
+                }         
+
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public function createCustomerAction(): void
+    {
+        if ($this->validatePostParams($_POST) && $this->aclData['canCreateCustomer']) {
+            $this->render('create-customer', false);
+        } else {
+            $this->render('../error/not-found', false);
+        }
+    }
+
+    public function changeStatusAction(): void
+    {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+
+            $entity = $this->model->getOne($_POST['id']);
+            $this->view->entity = $entity;
+
+            $this->render('change-status', false);
+        } else {
+            $this->render('../error/not-found', false);
+        }
+    }
+
+    public function processStatusAction(): bool
+    {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            $entity = $this->model->getOne($_POST['id']);
+
+            if ($entity) {
+                if (!empty($_POST['schedule_notification'])) {
+                    $sendEmailNotification = $_POST['schedule_notification'];
+                    unset($_POST['schedule_notification']);
+                } else {
+                    $sendEmailNotification = false;
+                }
+
+                $updateData = [
+                    'status' => $_POST['status'],
+                    'description' => $_POST['description'],
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+
+                $crud = new Crud();
+                $crud->setTable($this->model->getTable());
+                $transaction = $crud->update($updateData, $entity['id'], 'id');
+
+                if ($transaction) {
+                    $scheduleStatus = "Pendente";
+                    if ($_POST['status'] == 1) $scheduleStatus = "Pendente";
+                    if ($_POST['status'] == 2) $scheduleStatus = "Confirmado";
+                    if ($_POST['status'] == 3) $scheduleStatus = "Concluído";
+                    if ($_POST['status'] == 4) $scheduleStatus = "Cancelado";
+                    
+                    if (!empty($entity) && !empty($entity['customerEmail']) && $sendEmailNotification) {
+                        $this->sendNotification([
+                            'parent' => 'schedules',
+                            'customer_id' => $entity['customer_id'],
+                            'schedule_id' => $entity['id'],
+                            'description' => "Agendamento #{$entity['id']} $scheduleStatus."
+                        ]);
+
+                        $url = baseUrl . 'cliente';
+                        $message = "<p>O Agendamento #{$entity['id']} acaba de ser atualizado, 
+                            <a href='$url'>acesse a plataforma</a> para conferir.</p>";
+                        
+                        $this->sendMail([
+                            'title' => 'Informações do Agendamento #'.$entity['id'],
+                            'message' => $message,
+                            'name' => $entity['customerName'],
+                            'toAddress' => $entity['customerEmail']
+                        ]);
+                    }
+                    
+                    if (!empty($entity) && !empty($entity['userEmail']) && $sendEmailNotification) {
+                        $this->sendNotification([
+                            'parent' => 'schedules',
+                            'user_id' => $entity['user_id'],
+                            'schedule_id' => $entity['id'],
+                            'description' => "Agendamento #{$entity['id']} $scheduleStatus."
+                        ]);
+
+                        $url = baseUrl;
+                        $message = "<p>O Agendamento #{$entity['id']} acaba de ser atualizado pelo cliente, 
+                            <a href='$url'>acesse a plataforma</a> para conferir.</p>";
+                        
+                        $this->sendMail([
+                            'title' => 'Informações do Agendamento #'.$entity['id'],
+                            'message' => $message,
+                            'name' => $entity['userName'],
+                            'toAddress' => $entity['userEmail']
+                        ]);
+                    }
+
+                    if (!empty($_POST['status']) && $_POST['status'] != $entity['status']) {
+                        $this->saveHistoric([
+                            'schedule_id' => $entity['id'], 
+                            'status' => $_POST['status'],
+                            'user_id' => $_SESSION['COD']
+                        ]);
+                    }
+
+                    $this->toLog("Atualizou a situação do Agendamento {$entity['id']}");
+                    $data = [
+                        'title' => 'Sucesso!',
+                        'msg' => 'O Agendamento foi atualizado.',
+                        'type' => 'success',
+                        'pos' => 'top-right',
+                        'id' => $entity['id']
+                    ];
+                } else {
+                    $data = [
+                        'title' => 'Erro!',
+                        'msg' => 'O Agendamento não foi atualizado.',
+                        'type' => 'error',
+                        'pos' => 'top-center'
+                    ];
+                }
+            } else {
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'O Agendamento é inválido.',
                     'type' => 'error',
-                    'pos'   => 'top-center'
+                    'pos' => 'top-center'
                 ];
             }
 
@@ -357,50 +610,184 @@ class SchedulesController extends ActionController implements CrudInterface
         }
     }
 
-    public function serviceDetailsAction(): bool
+    public function filesAction(): void
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $fields = "description, price";
-            $entity = $this->servicesModel->find($_POST['uuid'], $fields, 'uuid');
+        if (!empty($_POST['id']) && $this->validatePostParams($_POST)) {
+            $files = $this->filesModel->findAllBy('id, file, created_at', 'schedule_id', $_POST['id']);
+            $this->view->files = $files;
+            $this->render('files', false);
+        } else {
+            $this->render('../error/not-found', false);
+        }
+    }
 
-            if ($entity){
-                $data =  number_format($entity['price'], 2, ",", ".");
+    public function uploadFilesAction(): void
+    {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            
+            $this->render('upload-files', false);
+        } else {
+            $this->render('../error/not-found', false);
+        }
+    }
+
+    public function uploadProcessAction(): bool
+    {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            
+            if (!empty($_FILES)) {
+                $this->filesModel->uploadFiles($_FILES, "schedules", $_POST['id'], 'schedule_id');
+
+                $entity = $this->model->getOne($_POST['id']);
+                if (!empty($_POST['schedule_files_notification'])) {
+                    if (!empty($entity['customer_id'])) {
+                        $this->sendNotification([
+                            'parent' => 'schedules',
+                            'customer_id' => $entity['customer_id'],
+                            'schedule_id' => $entity['id'],
+                            'description' => "Novos arquivos no Agendamento #{$entity['id']}.",
+                            'for_files' => 1
+                        ]);
+
+                        $url = baseUrl . 'cliente';
+                        $message = "<p>O Agendamento #{$entity['id']} acaba de ser atualizado, 
+                            <a href='$url'>acesse a plataforma</a> para conferir.</p>";
+                        
+                        $this->sendMail([
+                            'title' => "Novos arquivos no Agendamento #{$entity['id']}.",
+                            'message' => $message,
+                            'name' => $entity['customerName'],
+                            'toAddress' => $entity['customerEmail']
+                        ]);
+                    }
+
+                    if (!empty($entity['user_id'])) {
+                        $this->sendNotification([
+                            'parent' => 'schedules',
+                            'user_id' => $entity['user_id'],
+                            'schedule_id' => $entity['id'],
+                            'description' => "Novos arquivos no Agendamento #{$entity['id']}.",
+                            'for_files' => 1
+                        ]);
+
+                        $url = baseUrl;
+                        $message = "<p>O Agendamento #{$entity['id']} acaba de ser atualizado pelo cliente, 
+                            <a href='$url'>acesse a plataforma</a> para conferir.</p>";
+                        
+                        $this->sendMail([
+                            'title' => "Novos arquivos no Agendamento #{$entity['id']}.",
+                            'message' => $message,
+                            'name' => $entity['userName'],
+                            'toAddress' => $entity['userEmail']
+                        ]);
+                    }
+                }
+                
+                $data = [
+                    'title' => 'Sucesso!',
+                    'msg' => 'Os arquivos foram enviados.',
+                    'type' => 'success',
+                    'pos' => 'top-right'
+                ];
             } else {
-                $data  = [
-                    'Erro ao consultar valor'
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'Os arquivos não foram enviados.',
+                    'type' => 'error',
+                    'pos' => 'top-center'
                 ];
             }
 
-            echo $data;
+            echo json_encode($data);
             return true;
         } else {
-            echo 'Erro ao consultar valor';
             return false;
         }
     }
 
-    public function createServiceAction(): void
+    public function restoreProcessAction(): bool
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $this->render('create-service', false);
-        }
-    }
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            
+            $entity = $this->model->getOne($_POST['id'], null, false);
+            if ($entity) {
 
-    public function createCustomerAction(): void
-    {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $this->render('create-customer', false);
-        }
-    }
+                $crud = new Crud();
+                $crud->setTable($this->model->getTable());
+                $transaction = $crud->update([
+                    'deleted' => '0',
+                    'status' => '1',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ], $_POST['id'], 'id');
 
-    public function deleteFileAction(): bool
-    {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $crud = new Crud();
-            $crud->setTable($this->filesModel->getTable());
-            return $crud->update(['deleted' => '1'], $_POST['uuid'], 'uuid');
+                if ($transaction) {
+                    if (!empty($_POST['send_mail']) && $_POST['send_mail'] == 1) {
+                        if (!empty($entity['user_id'])) {
+                            $this->sendNotification([
+                                'parent' => 'schedules',
+                                'user_id' => $entity['user_id'],
+                                'schedule_id' => $entity['id'],
+                                'description' => "Agendamento #{$entity['id']} restaurado."
+                            ]);
+
+                            $url = baseUrl;
+                            $message = "<h3>Agendamento #{$entity['id']} restaurado:</h3>";
+                            $message .= "<p><b>{$entity['title']}</b></p>";
+                            $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
+
+                            $this->sendMail([
+                                'title' => "Agendamento #{$entity['id']} restaurado",
+                                'message' => $message,
+                                'name' => $entity['userName'],
+                                'toAddress' => $entity['userEmail']
+                            ]);
+                        }
+
+                        if (!empty($entity['customer_id'])) {
+                            $this->sendNotification([
+                                'parent' => 'schedules',
+                                'customer_id' => $entity['customer_id'],
+                                'schedule_id' => $entity['id'],
+                                'description' => "Agendamento #{$entity['id']} restaurado."
+                            ]);
+
+                            $url = baseUrl . 'cliente';
+                            $message = "<h3>Agendamento #{$entity['id']} restaurado:</h3>";
+                            $message .= "<p><b>{$entity['title']}</b></p>";
+                            $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
+
+                            $this->sendMail([
+                                'title' => "Agendamento #{$entity['id']} restaurado",
+                                'message' => $message,
+                                'name' => $entity['customerName'],
+                                'toAddress' => $entity['customerEmail']
+                            ]);
+                        }
+                    }
+
+                    $this->toLog("Restaurou o agendamento {$_POST['id']}");
+                    $data  = [
+                        'title' => 'Sucesso!',
+                        'msg'   => 'Agendamento restaurado.',
+                        'type'  => 'success',
+                        'pos'   => 'top-right'
+                    ];
+                } else {
+                    $data  = [
+                        'title' => 'Erro!',
+                        'msg' => 'O Agendamento não foi restaurado.',
+                        'type' => 'error',
+                        'pos'   => 'top-center'
+                    ];
+                }
+
+                echo json_encode($data);
+                return true;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            return false;   
         }
     }
 }

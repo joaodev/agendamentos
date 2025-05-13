@@ -1,0 +1,114 @@
+<?php if ($this->view->acl['canUpdateTimeSheets']): ?>
+    <?php $entity = $this->view->entity; ?>
+    <form method="post" name="formUpdateTimeSheetUser" id="formUpdateTimeSheetUser">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <label for="work_date">Data*</label>
+                    <input type="date" class="form-control" name="work_date" id="work_date"
+                        required value="<?php echo $entity['work_date']; ?>">
+                </div>
+            </div>
+            <div class="col-12">
+                <hr class="cardLine">
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <label for="start_time">Início*</label>
+                    <input type="time" class="form-control" name="start_time" id="start_time"
+                        required value="<?php echo $entity['start_time']; ?>">
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <label for="lunch_start_time">Início Almoço</label>
+                    <input type="time" class="form-control" name="lunch_start_time"
+                        id="lunch_start_time" value="<?php echo $entity['lunch_start_time']; ?>">
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <label for="lunch_end_time">Fim Almoço</label>
+                    <input type="time" class="form-control" name="lunch_end_time"
+                        id="lunch_end_time" value="<?php echo $entity['lunch_end_time']; ?>">
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <label for="end_time">Fim</label>
+                    <input type="time" class="form-control" name="end_time" id="end_time" 
+                        value="<?php echo $entity['end_time']; ?>">
+                </div>
+            </div>
+            <div class="col-12">
+                <hr class="cardLine">
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="description">Informações adicionais</label>
+                    <textarea name="description" id="description" class="form-control" rows="2"
+                        placeholder="Informe uma descrição caso necessário"><?php echo $entity['description']; ?></textarea>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="send_email_status">Notificação</label><br>
+                    <input type="checkbox" name="send_email_status" id="send_email_status" value="1" class="mr-1"> 
+                    <small style="position: relative; top: -2px;">Enviar notificação sobre a operação.</small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-md-12 mt-2 mb-2">
+                        <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
+                        <input type="hidden" name="id" value="<?php echo $this->view->entity['id']; ?>">
+                        <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit"
+                            title="Salvar Carga Horária">
+                            <i class="fa fa-save pr-1"></i> Salvar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center mt-2">
+                <button type="button" class="btn btn-default btn-sm btnRadius"
+                    onclick="openUserTimeSheetModalDetails('<?php echo $this->view->entity['id']; ?>');" 
+                    title="Voltar para Usuário">
+                    <i class="fas fa-arrow-left pr-1"></i> Voltar
+                </button>
+            </div>
+        </div>
+    </form>
+     <script>
+        $(document).ready(function () {
+            $('#formUpdateTimeSheetUser').validate({
+                submitHandler: async function (form) {
+                    let dados = $(form).serialize();
+
+                    $("#modalLargeLoader").show();
+                    $("#btnSubmit").attr('disabled', true);
+            
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>folha-ponto/processa-edicao",
+                        data: dados,
+                        dataType: 'json',
+                        async: true
+                    }).done(async function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#btnSubmit").attr('disabled', false);
+                        await openUserTimeSheetModalDetails('<?php echo $this->view->entity['id']; ?>');
+                        $("#modalLargeLoader").hide();
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#modalLargeLoader").hide();
+                        $("#btnSubmit").attr('disabled', false);
+                    });
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

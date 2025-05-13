@@ -1,0 +1,363 @@
+<?php 
+$data = $this->view->data; 
+$unreadTotal = $this->customerUnreadMessages();
+?>
+<section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body cardWrapper">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="pt-2">
+                            <i class="fas fa-comments pr-1"></i>
+                            Mensagens
+                        </h5>
+                    </div>
+                    <div class="col-6 text-right">
+                        <a href="<?php echo baseUrl; ?>cliente" class="btn btn-primary btnRadius" 
+                            title="Página Inicial">
+                            <i class="fas fa-home"></i> 
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center mb-3">
+                <?php if ($data): ?>
+                    <?php if ($unreadTotal > 0): ?>
+                        <a onclick="readAll();" 
+                            class="cPointer btn btn-info btnRadius" 
+                            title="Marcar todas como lida">
+                            <i class="fas fa-check pr-1"></i> Marcar como lidas
+                        </a>
+                    <?php endif; ?>
+                    <a onclick="deleteAll();" 
+                        class="cPointer btn btn-danger btnRadius" 
+                        title="Excluir todas">
+                        <i class="fas fa-trash pr-1"></i> Excluir todas
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+            <div class="card">
+                    <div class="card-body cardWrapperList">
+                        <?php if (!$data): ?>
+                            <div class="alert alert-info mt-3" role="alert">
+                                <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="tbl_messages" style="width: 100%;">
+                                    <thead>
+                                        <tr class="text-center" style="height: 30px;">
+                                            <th style="font-size: 14px;"><i class="fa fa-image"></i></th>
+                                            <th style="font-size: 14px;">Por</th>
+                                            <th style="font-size: 14px;">Mensagem</th>
+                                            <th style="font-size: 14px;">Data</th>
+                                            <th style="font-size: 14px;">Horário</th>
+                                            <th style="font-size: 14px;">Ações</th>
+                                            <th style="display: none;">cod</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($data as $entity): 
+                                            $expData = explode(" ", $this->formatDateTime($entity['created_at']));
+                                            $hasRead = ($entity['has_read'] == 1) ? 'text-gray' : 'text-success';
+                                            $userData = $this->getUserDataByMsg($entity);
+                                            ?>
+                                            <tr class="text-center">
+                                                <td style="width: 30px;"style="width: 30px;" class="cPointer"
+                                                    onclick="jumpToMessage(<?php echo $entity['id']; ?>, '<?php echo $entity['parent']; ?>');">
+                                                    <?php if (!empty($userData['username']) && !empty($userData['userAvatar'])
+                                                        && $this->isImage($userData['userAvatar'], 'users')): ?>
+                                                        <img src="<?php echo baseUrl . 'public/uploads/users/' . $userData['userAvatar']; ?>" 
+                                                            alt="avatar" class="img-circle text-center" style="width: 30px; height: 30px;">
+                                                    
+                                                    <?php elseif (!empty($userData['customername']) && !empty($userData['customerAvatar'])
+                                                        && $this->isImage($userData['customerAvatar'], 'customers')): ?>
+                                                        <img src="<?php echo baseUrl . 'public/uploads/customers/' . $userData['customerAvatar']; ?>" 
+                                                            alt="avatar" class="img-circle text-center" style="width: 30px; height: 30px;">
+                                                    
+                                                    <?php else: ?>
+                                                        <img src="<?php echo baseUrl; ?>public/app/dist/img/avatar5.png" 
+                                                            alt="avatar" class="img-circle text-center" style="width: 30px; height: 30px;">
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="font-size: 15px;" class="<?php echo $hasRead; ?> cPointer"
+                                                    onclick="jumpToMessage(<?php echo $entity['id']; ?>, '<?php echo $entity['parent']; ?>');">
+                                                    <?php if (!empty($userData['username'])): ?>
+                                                        <?php echo $userData['username']; ?>
+                                                    <?php else: ?>
+                                                        <?php if (!empty($userData['customername'])): ?>
+                                                            <?php echo $userData['customername']; ?> <small>(Cliente)</small>
+                                                        <?php endif; ?>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="font-size: 15px" class="<?php echo $hasRead; ?> cPointer"
+                                                    onclick="jumpToMessage(<?php echo $entity['id']; ?>, '<?php echo $entity['parent']; ?>');">
+                                                    <?php echo $entity['description']; ?>
+                                                </td>
+                                                <td style="font-size: 15px" class="<?php echo $hasRead; ?> cPointer"
+                                                    onclick="jumpToMessage(<?php echo $entity['id']; ?>, '<?php echo $entity['parent']; ?>');">
+                                                    <?php echo $expData[0]; ?>
+                                                </td>
+                                                <td style="font-size: 15px" class="<?php echo $hasRead; ?> cPointer"
+                                                    onclick="jumpToMessage(<?php echo $entity['id']; ?>, '<?php echo $entity['parent']; ?>');">
+                                                    <?php echo $expData[1]; ?>
+                                                </td>
+                                                <td style="font-size: 15px">
+                                                    <?php if ($entity['has_read'] != 1): ?>
+                                                        <a onclick="readMessage(<?php echo $entity['id']; ?>);" 
+                                                            class="text-info btn-xs cPointer"
+                                                            title="Marcar como lida">
+                                                            <i class="fa fa-check"></i>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                    <a onclick="deleteMessage(<?php echo $entity['id']; ?>);" 
+                                                        class="text-danger btn-xs cPointer"
+                                                        title="Excluir mensagem">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                                <td style="display: none;" class="<?php echo $hasRead; ?>">
+                                                    <?php echo $entity['id']; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<?php if ($data): ?>
+    <script type="text/javascript">
+        $(document).ready(function() {
+          
+            $('#tbl_messages').DataTable({
+                "sDom": 'fltip',
+                searching: true,
+               
+                order: [ [6, "desc"] ],
+                columnDefs: [ 
+                    {
+                        type: 'date-eu', 
+                        targets: [3]
+                    },
+                    {
+                        orderable: false,
+                        targets: [0, 5]
+                    },
+                ],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+
+        async function readMessage(id) {
+            if (id !== null) {
+                $("#baseLoader").show();
+
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>cliente/mensagens/ler",
+                    data: { 
+                        id: id,
+                        target: '<?php echo $this->getClientTarget(); ?>' 
+                    },
+                    dataType: 'json',
+                    async: true
+                }).done(function (data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    openModule('mensagens');
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").hide();
+                });
+            }
+        }
+
+        async function deleteMessage(id) {
+            if (id !== null) {
+                $("#baseLoader").show();
+
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>cliente/mensagens/excluir",
+                    data: { 
+                        id: id,
+                        target: '<?php echo $this->getClientTarget(); ?>' 
+                    },
+                    dataType: 'json',
+                    async: true
+                }).done(function (data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    openModule('mensagens');
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").hide();
+                });
+            }
+        }
+
+        async function jumpToMessage(id, param) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: '<?php echo baseUrl; ?>cliente/mensagens/valida-modulo',
+                data: {
+                    id: id,
+                    param: param,
+                    target: '<?php echo $this->getClientTarget(); ?>'
+                },  
+                dataType: 'json',
+                async: true
+            }).done(async function (data) {
+                if (data.mod_id) {
+                    await $.ajax({
+                        type: 'post',
+                        url: '<?php echo baseUrl; ?>cliente/mensagens/lidas',
+                        data: {
+                            id: id,
+                            target: '<?php echo $this->getClientTarget(); ?>',
+                        },  
+                        async: true
+                    }).done(async function() {
+                        await $.ajax({
+                            type: 'post',
+                            url: "<?php echo baseUrl; ?>cliente/mensagens/checa-mensagens",
+                            data: {
+                                target: '<?php echo $this->getClientTarget(); ?>'
+                            },  
+                            async: true
+                        }).done(async function (dataMsg) {
+                            $("#messages_box").html(dataMsg);
+                            await $.ajax({
+                                type: 'post',
+                                url: `<?php echo baseUrl; ?>cliente/${data.mod_name}`,
+                                data: {
+                                    id: data.mod_id,
+                                    target: '<?php echo $this->getClientTarget(); ?>',
+                                    month: $("#f_month").val(),
+                                    viewMsgs: true
+                                },  
+                                async: true
+                            }).done(function (data) {
+                                $("#sis_content").html(data);
+                                $("#baseLoader").fadeOut();
+                            }).fail(function () {
+                                showInternalErrorAlert();
+                                $("#baseLoader").fadeOut();
+                            });
+                        }).fail(function () {
+                            showInternalErrorAlert();
+                            $("#baseLoader").fadeOut();
+                        });
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#baseLoader").fadeOut();
+                    });
+                } else {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                }
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+
+        function deleteAll() {
+            $("#modalMid").modal('show');
+            $("#modalMidTitle").html('<i class="fa fa-bell pr-2"></i> Mensagens');
+            $("#modalMidLoader").hide();
+            $("#modalMidResult").html('<div class="text-center"><p>Deseja excluir todas as mensagens?</p><button type="button" class="btn btn-danger btnRadius" title="Excluir todas as noticicações" onclick="runDeleteAll();"><i class="fa fa-check"></i> CONFIRMAR</button></div>');
+        }
+
+        async function runDeleteAll() {
+            $("#modalMidLoader").show();
+
+            await $.ajax({
+                type: "POST",
+                url: "<?php echo baseUrl; ?>cliente/mensagens/excluir-todas",
+                data: { 
+                    target: '<?php echo $this->getClientTarget(); ?>' 
+                },
+                dataType: 'json',
+                async: true
+            }).done(async function (data) {
+                showAlert(data.type, data.title, data.msg, data.pos);
+                $("#modalMid").modal('hide');
+                await openModule('mensagens');
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#modalMidLoader").hide();
+            });
+        }
+    </script>
+    <?php if ($unreadTotal > 0): ?>
+        <script>
+            async function readAll() {
+                $("#modalMid").modal('show');
+                $("#modalMidTitle").html('<i class="fa fa-bell pr-2"></i> Mensagens');
+                $("#modalMidLoader").hide();
+                $("#modalMidResult").html('<div class="text-center"><p>Deseja marcar todas as mensagens como lidas?</p><button type="button" class="btn btn-primary btnRadius" title="Marcar noticicações como lidas" onclick="runReadAll();"><i class="fa fa-check"></i> CONFIRMAR</button></div>');
+            }
+
+            async function runReadAll() {
+                $("#modalMidLoader").show();
+
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>cliente/mensagens/ler-todas",
+                    data: { 
+                        target: '<?php echo $this->getClientTarget(); ?>' 
+                    },
+                    dataType: 'json',
+                    async: true
+                }).done(async function (data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    $("#modalMid").modal('hide');
+                    await openModule('mensagens');
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#modalMidLoader").hide();
+                });
+            }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

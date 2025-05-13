@@ -1,0 +1,295 @@
+<?php $data = $this->view->data; ?>
+<section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body cardWrapper">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="pt-2">
+                            <i class="fas fa-desktop pr-1"></i>
+                            Chamados
+                        </h5>
+                    </div>
+                    <div class="col-6 text-right">
+                        <a href="<?php echo baseUrl; ?>cliente" class="btn btn-primary btnRadius" 
+                            title="Página Inicial">
+                            <i class="fas fa-home"></i> 
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="calls-tab" data-toggle="tab" data-target="#calls" 
+                            type="button" role="tab" aria-controls="calls" aria-selected="true">
+                            <span class="fa fa-th-list pr-1"></span> Meus Chamados
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="new-tab" data-toggle="tab" data-target="#new" 
+                            type="button" role="tab" aria-controls="new" aria-selected="false">
+                            <span class="fa fa-plus pr-1"></span> Abrir Chamado
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="calls" role="tabpanel" aria-labelledby="calls-tab">
+                        <div class="card">
+                            <div class="card-body cardWrapperList">
+                                <div class="row">
+                                    <div class="col-12">
+                                       <?php if (!$data): ?>
+                                            Nenhum chamado aberto até o momento.
+                                        <?php else: ?>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-hover" id="table_sv" style="width: 100%;">
+                                                    <thead>
+                                                        <tr class="text-center" style="height: 30px;">
+                                                            <th style="font-size: 14px;">Código</th>
+                                                            <th style="font-size: 14px;">Data</th>
+                                                            <th style="font-size: 14px;">Horário</th>
+                                                            <th style="font-size: 14px;">Assunto</th>
+                                                            <th style="font-size: 14px;">Situação</th>
+                                                            <th style="display: none;">Situação</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($data as $entity): ?>
+                                                            <tr class="text-center" style="cursor: pointer;"
+                                                                onclick="openDetails('<?php echo $entity['id']; ?>');">
+                                                                <td style="font-size: 15px">
+                                                                    <?php echo $entity['id']; ?>
+                                                                </td>
+                                                                <td style="font-size: 15px">
+                                                                    <?php echo $this->formatDateTime($entity['created_at'], false); ?>
+                                                                </td>
+                                                                <td style="font-size: 15px">
+                                                                    <?php echo substr(substr($entity['created_at'], 11), 0, 5); ?>
+                                                                </td>
+                                                                <td style="font-size: 15px">
+                                                                    <?php echo $entity['title']; ?>
+                                                                </td>
+                                                                <td style="font-size: 15px;">
+                                                                    <?php if ($entity['status'] == '1'): ?>
+                                                                        <span class="text-info">Aberto</span> 
+                                                                    <?php endif; ?>
+                                                                    <?php if ($entity['status'] == '2'): ?>
+                                                                        <span class="text-purple">Em Atendimento</span> 
+                                                                    <?php endif; ?>
+                                                                    <?php if ($entity['status'] == '3'): ?>
+                                                                        <span class="text-success">Finalizado</span> 
+                                                                    <?php endif; ?>
+                                                                    <?php if ($entity['status'] == '4'): ?>
+                                                                        <span class="text-danger">Fechado</span> 
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                                <td style="display: none;">
+                                                                    <?php if ($entity['status'] == '1'): ?>
+                                                                        Aberto
+                                                                    <?php endif; ?>
+                                                                    <?php if ($entity['status'] == '2'): ?>
+                                                                        Em Atendimento
+                                                                    <?php endif; ?>
+                                                                    <?php if ($entity['status'] == '3'): ?>
+                                                                        Finalizado
+                                                                    <?php endif; ?>
+                                                                    <?php if ($entity['status'] == '4'): ?>
+                                                                        Fechado
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade show" id="new" role="tabpanel" aria-labelledby="new-tab">
+                        <div class="card">
+                            <div class="card-body cardWrapper">
+                                <form method="post" name="formCreateCall" id="formCreateCall"
+                                    enctype="multipart/form-data">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="title">Assunto*</label>
+                                                <input type="text" class="form-control" name="title" id="title" required
+                                                    maxlength="150" placeholder="Assunto do Chamado">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="description">Descrição do problema*</label>
+                                                <textarea name="description" id="description" class="form-control" rows="9" 
+                                                    placeholder="Descrição completa do Chamado" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 offset-md-3 mt-2 mb-3">
+                                            <div class="bg-info text-center p-3 btnRadius">
+                                                <span style="font-size: 20px; color: #fff; ">
+                                                    <i class="fa fa-file-upload pr-1"></i> <b>Enviar Arquivos</b>
+                                                </span>
+                                                <div class="form-group text-center">
+                                                    <label for="file"><small style="color: #fff;">
+                                                        <i>(jpg, jpeg, png, gif, pdf)</i></small>
+                                                    </label>
+                                                    <input type="file" class="form-control inputUpload" name="file[]" multiple id="file"
+                                                        accept=".png,.jpg,.jpeg,.gif,.pdf">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 offset-md-3 mb-2">
+                                            <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit"
+                                                title="Abrir Chamado">
+                                                <i class="fa fa-check pr-1"></i> Abrir Chamado
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<?php if (!empty($data)): ?>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let buttonCommon = {
+                exportOptions: {
+                    format: {
+                        body: function ( data ) {
+                            return data;
+                        }
+                    }
+                }
+            };
+        
+            $('#table_sv').DataTable({
+                "sDom": 'flBtip',
+                searching: true,
+                buttons: [
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'excel',
+                        title: 'Chamados',
+                        exportOptions: {columns: [0,1,2,3,5]}
+                    })
+                ],
+                order: [ [0, "desc"] ],
+                columnDefs: [
+                    {type: 'date-eu', targets: [1]},
+                ],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyTask": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+
+        async function openDetails(id) {
+            $("#baseLoader").show();
+            await $.ajax({
+                type: 'post',
+                url: "<?php echo baseUrl; ?>cliente/chamados/detalhes",
+                data: {
+                    id:id,
+                    target: '<?php echo $this->getClientTarget(); ?>'
+                },
+                async: true
+            }).done(function(data) {
+                $("#sis_content").html(data);
+                $("#baseLoader").fadeOut();
+            }).fail(function() {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+            });
+        }
+    </script>
+<?php endif; ?>
+<script>
+    $(document).ready(function() {
+        $('#formCreateCall').validate({
+
+        submitHandler: async function () {
+            let form_data = new FormData();
+
+            $.each($("input[type='file']")[0].files, function (i, file) {
+                form_data.append('file_' + i, file);
+            });
+
+            form_data.append('title', $("#title").val());
+            form_data.append('description', $("#description").val());
+
+            form_data.append('target', '<?php echo $this->getClientTarget(); ?>');
+
+            $("#baseLoader").show();
+            $("#btnSubmit").attr('disabled', true);
+
+            await $.ajax({
+                type: "POST",
+                url: "<?php echo baseUrl; ?>cliente/chamados/abre-chamado",
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                dataType: 'json',
+                async: true
+            }).done(async function (data) {
+                showAlert(data.type, data.title, data.msg, data.pos);
+                if (data.type === 'success') {
+                    await openModule('chamados');
+                } else {
+                    $("#baseLoader").fadeOut();
+                    $("#btnSubmit").attr('disabled', false);
+                }
+            }).fail(function () {
+                showInternalErrorAlert();
+                $("#baseLoader").fadeOut();
+                $("#btnSubmit").attr('disabled', false);
+            });
+
+            return false;
+        }
+        });
+    });
+
+    function resetForm() {
+        $("#title").val('');
+        $("#description").val('');
+        $("#file").val('');
+    }
+</script>

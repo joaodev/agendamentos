@@ -1,212 +1,380 @@
-<?php 
-$entity = $this->view->entity; 
+<?php
+$aclData = $this->view->acl;
 
-$isAdmin = $_SESSION['ROLE_ADM'] == '0';
-$role    = $_SESSION['ROLE'];
-
-$canView    = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('user'));
-$canUpdate  = $isAdmin || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('user'));
-$canDelete  = $isAdmin || $this->acl($role, $this->resourceCodes('delete'), $this->moduleCodes('user'));
-$canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this->moduleCodes('privileges'));
+$canView = $aclData['canView'];
+$canUpdate = $aclData['canUpdate'];
+$canDelete = $aclData['canDelete'];
+$canViewAcl = $aclData['canViewAcl'];
+$canViewTimeSheets = $aclData['canViewTimeSheets'];
 ?>
 <?php if ($canView): ?>
+    <?php $entity = $this->view->entity; ?>
     <?php if(empty($_POST['modal'])): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-9" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-info-circle pr-1"></i>
-                        Usuário
-                    </h1>
-                </div>
-                <div class="col-3">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-info mr-1" title="Imprimir"
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-user pr-1"></i>
+                                Usuário <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-info mr-1 btnRadius" title="Imprimir"
                                 onclick="window.print();">
                                 <i class="fas fa-print"></i> 
                             </button>
-                            <button type="button" class="btn btn-outline-primary"
+                            <button type="button" class="btn btn-primary btnRadius" title="Voltar para Usuários"
                                 onclick="openModule('usuarios');">
-                                <i class="fas fa-arrow-left"></i> 
+                                <i class="fas fa-arrow-left"></i>
                             </button>
-                        </li>
-                    </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
+                <?php if ($entity['deleted'] == 1): ?>
+                    <div class="col-md-12">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-info-circle pr-1"></i> 
+                            Usuário removido em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
                 <div class="col-md-12">
                     <?php endif; ?>
                     <div class="card">
-                        <div class="card-body">
-                            <div class="row" id="printable">
-                                <div class="col-md-6">
-                                    <?php if ($entity['status'] == '1'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Ativo no sistema
-                                    <?php endif; ?>
-                                    <?php if ($entity['status'] == '0'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Inativo no sistema
-                                    <?php endif; ?>
+                        <div class="card-body cardWrapperDetails">
+                            <div class="row w-100 pt-3" id="printable" style="margin: 0 !important;">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Código</b>
+                                        <p>
+                                            <?php echo $entity['id']; ?>
+                                        </p>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <?php if ($_SESSION['ROLE_ADM'] == '0'): ?>
-                                        <div class="form-group">
-                                            <label for="role">Nível de Acesso</label>:
-                                            <span><?php echo $entity['role'] ? $entity['role'] : 'Não Informado'; ?></span>
+                                <div class="col-4">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Situação</b>
+                                    <p>
+                                        <?php if ($entity['status'] == '1'): ?>
+                                            <i class="fa fa-circle pr-1 text-success"></i> Ativo
+                                        <?php endif; ?>
+                                        <?php if ($entity['status'] == '0'): ?>
+                                            <i class="fa fa-circle pr-1 text-danger"></i> Inativo
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                                <div class="col-4">
+                                    <span class="fa fa-info-circle pr-1"></span>
+                                    <b>Perfil</b>
+                                    <p>
+                                        <?php echo $entity['job_role']; ?>
+                                    </p>   
+                                </div>
+                                <?php if (!empty($entity['file']) && $this->isImage($entity['file'], 'users')): ?>
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <hr class="cardLine">
+                                            </div>
+                                            <div class="col-md-12" style="margin-top: -10px;">
+                                                <h5 class="pt-2"><i class="fas fa-image pr-1"></i> Foto de Perfil</h5>
+                                                <hr class="cardLine" style="margin-top: 13px;">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <a href="<?php echo baseUrl . 'public/uploads/users/' . $entity['file']; ?>" 
+                                                        data-lightbox="image-1"
+                                                        data-title="<?php echo $entity['file']; ?>">
+                                                        <img src="<?php echo baseUrl . 'public/uploads/users/'
+                                                            . $entity['file']; ?>" style="max-height: 200px; " alt="<?php echo $entity['name']; ?>">
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
-                                    <?php endif; ?>
-                                </div>
+                                    </div>
+                                <?php endif; ?>
                                 <div class="col-md-12" style="border-radius: 5px;">
-                                    <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
+                                    <hr class="cardLine">
+                                    <h5><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
                                     <hr>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="name">Nome</label>
-                                        <p><?php echo $entity['name'] ? $entity['name'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Nome</b>
+                                        <p>
+                                            <?php echo $entity['name']; ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="cnpj">CPF</label>
-                                        <p><?php echo $entity['document_1'] ? $entity['document_1'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <b>Dt. Nascimento</b>
+                                        <p>
+                                            <?php echo (!empty($entity['birthdate']) ? $this->formatDate($entity['birthdate']) : 'Não informada'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="cnpj">CNPJ</label>
-                                        <p><?php echo $entity['document_2'] ? $entity['document_2'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Sexo</b>
+                                        <p>
+                                            <?php
+                                            switch ($entity['gender']) {
+                                                case 'F':
+                                                    echo 'Feminino';
+                                                    break;
+                                                case 'M':
+                                                    echo 'Masculino';
+                                                    break;
+                                                case 'O':
+                                                    echo 'Outros';
+                                                    break;
+                                                default:
+                                                    echo 'Não informado';
+                                                    break;
+                                            }
+                                            ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="job_role">Cargo</label>
-                                        <p><?php echo $entity['job_role'] ? $entity['job_role'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>CPF</b>
+                                        <p>
+                                            <?php echo (!empty($entity['document_1']) ? $entity['document_1'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="phone">Telefone</label>
-                                        <p><?php echo $entity['phone'] ? $entity['phone'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>CNPJ</b>
+                                        <p>
+                                            <?php echo (!empty($entity['document_2']) ? $entity['document_2'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="cellphone">Celular</label>
-                                        <p><?php echo $entity['cellphone'] ? $entity['cellphone'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-phone pr-1"></span>
+                                        <b>Telefone</b>
+                                        <p>
+                                            <?php echo (!empty($entity['phone']) ? $entity['phone'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="whatsapp">WhatsApp</label>
-                                        <p><?php echo $entity['whatsapp'] ? $entity['whatsapp'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-mobile pr-1"></span>
+                                        <b>Celular</b>
+                                        <p>
+                                            <?php echo (!empty($entity['cellphone']) ? $entity['cellphone'] : 'Não informado'); ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <span class="fa fa-envelope pr-1"></span>
+                                        <b>Email</b>
+                                        <p>
+                                            <?php echo (!empty($entity['email']) ? $entity['email'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="name">Email</label>
-                                        <p><?php echo $entity['email'] ? $entity['email'] : 'Não Informado'; ?></p>
-                                    </div>
+                                    <hr class="cardLine">
                                 </div>
                                 <div class="col-md-12" style="border-radius: 5px;">
-                                    <h5 class="pt-2"><i class="fas fa-map-marker-alt pr-1"></i> Localização</h5>
+                                    <h5><i class="fas fa-map-marker-alt pr-1"></i> Localização</h5>
                                     <hr>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="postal_code">CEP</label>
-                                        <p><?php echo $entity['postal_code'] ? $entity['postal_code'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>CEP</b>
+                                        <p>
+                                            <?php echo (!empty($entity['postal_code']) ? $entity['postal_code'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="address">Endereço</label>
-                                        <p><?php echo $entity['address'] ? $entity['address'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Endereço</b>
+                                        <p>
+                                            <?php echo (!empty($entity['address']) ? $entity['address'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
-                                        <label for="number">Número</label>
-                                        <p><?php echo $entity['number'] ? $entity['number'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Número</b>
+                                        <p>
+                                            <?php echo (!empty($entity['number']) ? $entity['number'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="complement">Complemento</label>
-                                        <p><?php echo $entity['complement'] ? $entity['complement'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Complemento</b>
+                                        <p>
+                                            <?php echo (!empty($entity['complement']) ? $entity['complement'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label for="neighborhood">Bairro</label>
-                                        <p><?php echo $entity['neighborhood'] ? $entity['neighborhood'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Bairro</b>
+                                        <p>
+                                            <?php echo (!empty($entity['neighborhood']) ? $entity['neighborhood'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label for="city">Cidade</label>
-                                        <p><?php echo $entity['city'] ? $entity['city'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Cidade</b>
+                                        <p>
+                                            <?php echo (!empty($entity['city']) ? $entity['city'] : 'Não informada'); ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
-                                        <label for="state">UF</label>
-                                        <p><?php echo $entity['state'] ? $entity['state'] : 'Não Informado'; ?></p>
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>UF</b>
+                                        <p>
+                                            <?php echo (!empty($entity['state']) ? $entity['state'] : 'Não informado'); ?>
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="col-md-12"><hr></div>
-                                <div class="col-6 text-left">
-                                    <span class="fa fa-calendar pr-1"></span>
-                                    <span>Cadastrado em</span> <br>
-                                    <b>
-                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
-                                    </b>
+                                <div class="col-md-12">
+                                    <hr class="cardLine">
                                 </div>
-                                <div class="col-6 text-right">
+                                <div class="col-md-12" style="border-radius: 5px;">
+                                    <h5><i class="fas fa-info-circle pr-1"></i> Informação Profissional</h5>
+                                    <hr>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <span class="fa fa-user pr-1"></span>
+                                        <b>Cargo</b>
+                                        <p>
+                                            <?php echo $entity['job_role']; ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <span class="fa fa-dollar-sign pr-1"></span>
+                                        <b>Salário</b>
+                                        <p>
+                                            <?php echo (!empty($entity['salary']) ? 'R$ ' . number_format($entity['salary'], 2, ",", ".") : 'Não informado'); ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <b>Dt. Admissão</b>
+                                        <p>
+                                            <?php echo (!empty($entity['start_date']) ? $this->formatDate($entity['start_date']) : 'Não informada'); ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <b>Dt. Saída</b>
+                                        <p>
+                                            <?php echo (!empty($entity['end_date']) ? $this->formatDate($entity['end_date']) : 'Não informada'); ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <hr class="cardLine">
+                                </div>
+                                <div class="col-6">
+                                    <span class="fa fa-calendar pr-1"></span>
+                                    <b>Cadastro</b> <br>
+                                    <p>
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </p>
+                                </div>
+                                <div class="col-6">
                                     <?php if (!empty($entity['updated_at'])): ?>
                                         <span class="fa fa-calendar pr-1"></span>
-                                        <span>Atualizado em</span> <br>
-                                        <b>
+                                        <b>Última Atualização</b> <br>
+                                        <p>
                                             <?php echo $this->formatDateTime($entity['updated_at']); ?>
-                                        </b>
+                                        </p>
                                     <?php endif; ?>
                                 </div>
-                                <div class="col-md-12"><hr></div>
                             </div>
                             <?php if(empty($_POST['modal'])): ?>
-                                <div class="row">
-                                    <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canDelete) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
-                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                            <button type="button" class="btn btn-outline-danger" onclick="deleteUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                <i class="fa fa-trash"></i> Excluir
-                                            </button>
+                                <div class="row mb-1">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <?php if ($canViewAcl && $entity['deleted'] == 0): ?>
+                                                <div class="col-md-6 mb-2">
+                                                    <button type="button" class="btn btn-info btnRadius"
+                                                        title="Permissões do Usuário"
+                                                        onclick="aclUser('<?php echo $entity['id']; ?>');" style="width: 100%;">
+                                                        <i class="fa fa-unlock pr-1"></i> Permissões
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if ($canViewTimeSheets): ?>
+                                                <div class="col-md-6 mb-2">
+                                                    <button type="button" class="btn btn-info btnRadius"
+                                                        title="Folha de Ponto do Usuário"
+                                                        onclick="timeSheetUser('<?php echo $entity['id']; ?>', '<?php echo date('Y-m') ?>');"
+                                                        style="width: 100%;">
+                                                        <i class="fa fa-calendar-check pr-1"></i> Folha de Ponto
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if ($canDelete && $entity['deleted'] == 0): ?>
+                                                <div class="col-md-6 mb-2">
+                                                    <button type="button" class="btn btn-danger btnRadius" title="Remover Usuário"
+                                                        onclick="deleteUser('<?php echo $entity['id']; ?>');"
+                                                        style="width: 100%;">
+                                                        <i class="fa fa-trash"></i> Remover
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+                                                <div class="col-md-6 mb-2">
+                                                    <button type="button" class="btn btn-success btnRadius" title="Editar Usuário"
+                                                        onclick="updateUser('<?php echo $entity['id']; ?>');"
+                                                        style="width: 100%;">
+                                                        <i class="fa fa-pen pr-1"></i> Editar
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if ($entity['deleted'] == 1 && $canUpdate): ?>
+                                                <div class="col-md-12 mb-2 text-center">
+                                                    <button type="button" class="btn btn-primary btn-lg mb-2 btnRadiusLg" 
+                                                        title="Restaurar Usuário"
+                                                        onclick="restoreUser('<?php echo $entity['id']; ?>');">
+                                                        <i class="fa fa-sync pr-1"></i> Restaurar
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
-                                    <?php endif; ?>
-                                    <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canUpdate) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
-                                        <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                            <button type="button" class="btn btn-outline-success" onclick="updateUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                <i class="fa fa-pen pr-1"></i> Editar
-                                            </button>
-                                        </div>
-                                    <?php endif; ?>
-                                    <?php if (($entity['uuid'] != $entity['parent_uuid'] && $canViewAcl) || $_SESSION['COD'] == $entity['parent_uuid']): ?>
-                                        <?php if ($entity['uuid'] != $_SESSION['COD']): ?>
-                                            <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-info" onclick="aclUser('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-users pr-1"></i> Permissões
-                                                </button>
-                                            </div>
-                                        <?php endif; ?>
-                                    <?php endif; ?>
-                                    <div class="col-md-6 col-lg-3 mt-2 mb-2">
-                                        <button type="button" class="btn btn-outline-primary" onclick="openModule('usuarios');" style="width: 100%;">
-                                            <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                        </button>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -215,28 +383,202 @@ $canViewAcl = $isAdmin || $this->acl($role, $this->resourceCodes('view'), $this-
                     <?php if (!empty($_POST['modal']) && $_POST['modal'] == true): ?>
                         <div class="row mt-md-4">
                             <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-success w-100 mb-3" 
-                                    onclick="openModDetails('<?php echo $entity['uuid']; ?>', 'usuarios');">
+                                <button type="button" class="btn btn-success w-100 mb-3 btnRadius" 
+                                    onclick="openModDetails('<?php echo $entity['id']; ?>', 'usuarios', '<?php echo substr($entity['created_at'], 0,7); ?>');">
                                     <i class="fa fa-external-link-alt pr-1"></i> Acessar
                                 </button>
                             </div>
                             <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-primary w-100 mb-3" title="Imprimir"
+                                <button type="button" class="btn btn-info w-100 mb-3 btnRadius" title="Imprimir"
                                     onclick="window.print();">
                                     <i class="fas fa-print pr-1"></i> Imprimir
                                 </button>
                             </div>
                             <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-danger w-100" data-dismiss="modal">
+                                <button type="button"  class="btn btn-primary w-100 btnRadius" data-dismiss="modal">
                                     <i class="fa fa-window-close pr-1"></i> Fechar
                                 </button>
                             </div>
                         </div>
                     <?php endif; ?>
                     <?php if(empty($_POST['modal'])): ?>
-                    </div>
                 </div>
             </div>
-        </section>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openModule('usuarios');"
+                        title="Voltar para Usuários">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
+    <?php if(empty($_POST['modal'])): ?>
+        <?php if ($entity['deleted'] == 1 && $canUpdate): ?>
+            <script>
+                function restoreUser(id) {
+                    $("#modalRestoreTitle").html('<i class="fa fa-sync pr-2"></i> Restaurar Usuário');
+                    $("#modalRestoreLoader").hide();
+                    $("#modalRestore").modal('show');
+                    $("#modalRestoreResult").html('<button type="button" class="btn btn-primary btnRadius" title="Confirmar" onclick="runRestore(\''+id+'\');"><i class="fa fa-check"></i> CONFIRMAR</button>');
+                }
+
+                async function runRestore(id) {
+                    if (id !== null) {
+                        $("#modalRestoreLoader").show();
+
+                        let status_mail = null;
+                        if ($('#basic_restore_notification').is(':checked')) {
+                            status_mail = $("#basic_restore_notification").val();
+                        } 
+
+                        await $.ajax({
+                            type: "POST",
+                            url: "<?php echo baseUrl; ?>usuarios/restaurar",
+                            data: {
+                                id: id, 
+                                send_mail: status_mail,
+                                target: '<?php echo $this->getTarget(); ?>'
+                            },
+                            dataType: 'json',
+                            async: true
+                        }).done(async function(data) {
+                            showAlert(data.type, data.title, data.msg, data.pos);
+                            $("#modalRestore").modal('hide');
+                            await openUserDetails(id);
+                        }).fail(function() {
+                            showInternalErrorAlert();
+                            $("#modalRestoreLoader").hide();
+                        });
+                    }
+                }
+            </script>
+        <?php endif; ?>
+        <script>
+            async function openUserDetails(id) {
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>usuarios/detalhes",
+                    data: { 
+                        id: id,
+                        target: '<?php echo $this->getTarget(); ?>' 
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+        </script>
+        <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+            <script>
+                async function updateUser(id) {
+                    $("#baseLoader").show();
+                    await $.ajax({
+                        type: 'post',
+                        url: "<?php echo baseUrl; ?>usuarios/editar",
+                        data: { 
+                            id: id,
+                            target: '<?php echo $this->getTarget(); ?>' 
+                        },
+                        async: true
+                    }).done(function (data) {
+                        $("#sis_content").html(data);
+                        $("#baseLoader").fadeOut();
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#baseLoader").fadeOut();
+                    });
+                }
+            </script>
+        <?php endif; ?>
+        <?php if ($canDelete && $entity['deleted'] == 0): ?>
+            <script>
+                function deleteUser(id) {
+                    $("#modalXL").modal('hide');
+                    $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Remover Usuário');
+                    $("#modalDeleteLoader").hide();
+                    $("#modalDelete").modal('show');
+                    $("#modalDeleteResult").html('<button type="button" class="btn btn-danger btnRadius" title="Confirmar Exclusão" onclick="runDelete(\'' + id + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+                }
+
+                async function runDelete(id) {
+                    if (id !== null) {
+                        $("#modalDeleteLoader").show();
+
+                        await $.ajax({
+                            type: "POST",
+                            url: "<?php echo baseUrl; ?>usuarios/excluir",
+                            data: { 
+                                id: id,
+                                target: '<?php echo $this->getTarget(); ?>' 
+                            },
+                            dataType: 'json',
+                            async: true
+                        }).done(async function (data) {
+                            showAlert(data.type, data.title, data.msg, data.pos);
+                            $("#modalDelete").modal('hide');
+                            $("#modalXL").modal('hide');
+                            await openModule('usuarios');
+                        }).fail(function () {
+                            showInternalErrorAlert();
+                            $("#modalDeleteLoader").hide();
+                        });
+                    }
+                }
+            </script>
+        <?php endif; ?>
+        <?php if ($canViewAcl && $entity['deleted'] == 0): ?>
+            <script>
+                async function aclUser(id) {
+                    $("#baseLoader").show();
+                    await $.ajax({
+                        type: 'post',
+                        url: "<?php echo baseUrl; ?>usuarios/acl",
+                        data: { 
+                            id: id,
+                            target: '<?php echo $this->getTarget(); ?>' 
+                        },
+                        async: true
+                    }).done(function (data) {
+                        $("#sis_content").html(data);
+                        $("#baseLoader").fadeOut();
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#baseLoader").fadeOut();
+                    });
+                }
+            </script>
+        <?php endif; ?>
+        <?php if ($canViewTimeSheets): ?>
+            <script>
+                async function timeSheetUser(id, month = null) {
+                    $("#baseLoader").show();
+                    await $.ajax({
+                        type: 'post',
+                        url: "<?php echo baseUrl; ?>usuarios/folha-ponto",
+                        data: { 
+                            id: id, 
+                            month: month,
+                            target: '<?php echo $this->getTarget(); ?>' 
+                        },
+                        async: true
+                    }).done(function (data) {
+                        $("#sis_content").html(data);
+                        $("#baseLoader").fadeOut();
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#baseLoader").fadeOut();
+                    });
+                }
+            </script>
+        <?php endif; ?>
     <?php endif; ?>
 <?php endif; ?>

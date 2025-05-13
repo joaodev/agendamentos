@@ -13,17 +13,15 @@ class Module extends Model
         $this->setTable('modules');
     }
 
-    public function getOne($uuid)
+    public function getOne(int $id): bool|array |string
     {
         try {
-            $query = "
-                SELECT uuid, name
-                FROM modules
-                WHERE uuid = :uuid
-            ";
+            $query = "SELECT id, name
+                        FROM {$this->getTable()}
+                        WHERE id = :id";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":uuid", $uuid);
+            $stmt->bindValue(":id", $id);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,14 +35,12 @@ class Module extends Model
         }
     }
 
-    public function getAll(): bool|array|string
+    public function getAll(): bool|array |string
     {
         try {
-            $query = "
-                SELECT uuid, name, view_uuid, 
-                        create_uuid, update_uuid, delete_uuid
-                FROM modules
-            ";
+            $query = "SELECT id, name, view_id, 
+                            create_id, update_id, delete_id
+                        FROM {$this->getTable()}";
 
             $stmt = $this->openDb()->query($query);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);

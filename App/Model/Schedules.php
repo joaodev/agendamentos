@@ -13,39 +13,47 @@ class Schedules extends Model
         $this->setTable('schedules');
     }
 
-    public function getOne($uuid, $parentUUID)
+    public function getOne(int $id, int $customerId = null, bool $deleted = true): bool|array|string
     {
         try {
-            $query = "SELECT o.id, o.uuid, o.title, o.description,
-                                o.customer_uuid, o.amount, 
-                                o.payment_type_uuid, o.status, 
-                                o.created_at, o.updated_at,
-                                o.schedule_date, o.file,
-                                o.service_uuid, o.schedule_time,
-                                s.title as serviceName, 
-                                s.description as serviceDescription,
-                                c.name as customerName,
-                                c.email as customerEmail,
-                                c.cellphone as customerCellphone,
-                                p.name as paymentTypeName,
-                                u.name as userName, o.user_uuid
-                        FROM schedules AS o
-                        INNER JOIN services AS s
-                            ON o.service_uuid = s.uuid
+            $withDeleted = "";
+            if ($deleted) {
+                $withDeleted = " AND t.deleted = :deleted ";
+            }
+
+            $whereCustomer = "";
+            if (!empty($customerId)) {
+                $whereCustomer = " AND t.customer_id = :customer_id ";
+            }
+
+            $query = "SELECT t.id, t.title, t.description, 
+                            t.schedule_date, t.schedule_time,
+                            t.status, t.created_at, t.updated_at,
+                            t.user_id, u.name as userName, 
+                            u.id as userCod, u.email as userEmail,
+                            u.job_role as userRole, t.customer_id, 
+                            c.name as customerName, c.id as customerCod,
+                            c.email as customerEmail, t.deleted
+                        FROM {$this->getTable()} AS t
+                        LEFT JOIN user AS u 
+                            ON t.user_id = u.id
                         LEFT JOIN customers AS c
-                            ON o.customer_uuid = c.uuid
-                        LEFT JOIN payment_types AS p
-                            ON o.payment_type_uuid = p.uuid
-                        LEFT JOIN user AS u
-                            ON o.user_uuid = u.uuid
-                        WHERE o.uuid = :uuid 
-                            AND o.deleted = :deleted
-                            AND o.parent_uuid = :parent_uuid";
+                            ON t.customer_id = c.id
+                        WHERE t.id = :id 
+                            $withDeleted
+                            $whereCustomer";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":uuid", $uuid);
-            $stmt->bindValue(":deleted", "0");
-            $stmt->bindValue(":parent_uuid", $parentUUID);
+            $stmt->bindValue(":id", $id);
+            
+            if ($deleted) {
+                $stmt->bindValue(":deleted", "0");
+            }
+
+            if (!empty($customerId)) {
+                $stmt->bindValue(":customer_id", $customerId);
+            }
+
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -59,88 +67,25 @@ class Schedules extends Model
         }
     }
 
-    public function getAll($parentUUID): bool|array|string
+    public function getAll(): bool|array|string
     {
         try {
-            $query = "SELECT o.id, o.uuid, o.title, o.description,
-                                o.customer_uuid, o.amount, 
-                                o.payment_type_uuid, o.status, 
-                                o.created_at, o.updated_at,
-                                o.schedule_date, o.schedule_time,
-                                s.title as serviceName, 
-                                c.name as customerName,
-                                p.name as paymentTypeName,
-                                u.name as userName, o.user_uuid
-                        FROM schedules AS o
-                        INNER JOIN services AS s
-                            ON o.service_uuid = s.uuid
+            $query = "SELECT t.id, t.title, t.description, 
+                            t.schedule_date, t.schedule_time,
+                            t.status, t.created_at, t.updated_at,
+                            u.name as userName, u.id as userCod, t.customer_id, 
+                            u.email as userEmail, u.job_role as userRole,
+                            c.name as customerName, c.id as customerCod,
+                            c.email as customerEmail
+                        FROM {$this->getTable()} AS t
+                        LEFT JOIN user AS u 
+                            ON t.user_id = u.id
                         LEFT JOIN customers AS c
-                            ON o.customer_uuid = c.uuid
-                        LEFT JOIN payment_types AS p
-                            ON o.payment_type_uuid = p.uuid
-                        LEFT JOIN user AS u
-                            ON o.user_uuid = u.uuid
-                        WHERE o.deleted = :deleted
-                            AND o.parent_uuid = :parent_uuid";
+                            ON t.customer_id = c.id
+                        WHERE t.deleted = :deleted";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", "0");
-            $stmt->bindValue(":parent_uuid", $parentUUID);
-            $stmt->execute();
-
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $stmt = null;
-            $this->closeDb();
-            
-            return $result;
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-   
-    public function getAllByMonth($status, $month, $parentUUID): bool|array|string
-    {
-        try {
-            $m = explode("-", $month);
-            $d1 = $m[0];
-            $d2 = $m[1];
-
-            $whereStatus = "";
-            if ($status != '0') {
-                $whereStatus = ' o.status = :status AND ';
-            }
-
-            $query = "SELECT o.id, o.uuid, o.title, o.description,
-                                o.customer_uuid, o.amount, 
-                                o.payment_type_uuid, o.status, 
-                                o.created_at, o.updated_at,
-                                o.schedule_date, o.schedule_time,
-                                s.title as serviceName, 
-                                c.name as customerName,
-                                p.name as paymentTypeName,
-                                u.name as userName, o.user_uuid
-                        FROM schedules AS o
-                        INNER JOIN services AS s
-                            ON o.service_uuid = s.uuid
-                        LEFT JOIN customers AS c
-                            ON o.customer_uuid = c.uuid
-                        LEFT JOIN payment_types AS p
-                            ON o.payment_type_uuid = p.uuid
-                        LEFT JOIN user AS u
-                            ON o.user_uuid = u.uuid
-                        WHERE $whereStatus o.deleted = :deleted
-                            AND o.parent_uuid = :parent_uuid
-                            AND YEAR(o.schedule_date) = :d1 AND MONTH(o.schedule_date) = :d2";
-
-            $stmt = $this->openDb()->prepare($query);
-            if ($status != '0') {
-                $stmt->bindValue(":status", $status);
-            }
-            $stmt->bindValue(":deleted", "0");
-            $stmt->bindValue(":parent_uuid", $parentUUID);
-            $stmt->bindValue(":d1", $d1);
-            $stmt->bindValue(":d2", $d2);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -154,25 +99,51 @@ class Schedules extends Model
         }
     }
 
-    public function getTotalByStatus($status, $parentUUID)
+    public function getAllByCustomer(int $customerId): bool|array|string
     {
         try {
-            $d1 = date('Y');
-            $d2 = date('m');
+            $query = "SELECT t.id, t.title, t.description, 
+                            t.schedule_date, t.schedule_time,
+                            t.status, t.created_at, t.updated_at,
+                            u.name as userName, u.id as userCod, t.customer_id, 
+                            u.email as userEmail, u.job_role as userRole,
+                            c.name as customerName, c.id as customerCod,
+                            c.email as customerEmail
+                        FROM {$this->getTable()} AS t
+                        LEFT JOIN user AS u 
+                            ON t.user_id = u.id
+                        LEFT JOIN customers AS c
+                            ON t.customer_id = c.id
+                        WHERE t.deleted = :deleted
+                            AND t.customer_id = :customer_id";
 
-            $query = "SELECT COUNT(uuid) as total
-                        FROM schedules 
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":deleted", "0");
+            $stmt->bindValue(":customer_id", $customerId);
+            $stmt->execute();
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+            
+            return $result;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function getTotalByStatus(string $status)
+    {
+        try {
+            $query = "SELECT COUNT(id) as total
+                        FROM {$this->getTable()} 
                         WHERE status = :status
-                        AND deleted = :deleted
-                        AND parent_uuid = :parent_uuid
-                        AND YEAR(schedule_date) = :d1 AND MONTH(schedule_date) = :d2";
+                        AND deleted = :deleted";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":parent_uuid", $parentUUID);
-            $stmt->bindValue(":d1", $d1);
-            $stmt->bindValue(":d2", $d2);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -190,99 +161,19 @@ class Schedules extends Model
         }
     }
 
-    public function getTotalByStatusByMonth($status, $month, $parentUUID)
+    public function getTotalByStatusAndCustomer(string $status, int $customerId)
     {
         try {
-            $month = explode("/", $month, 2);
-            $d1 = $month[1];
-            $d2 = $month[0];
-
-            $query = "SELECT COUNT(uuid) as total
-                        FROM schedules 
+            $query = "SELECT COUNT(id) as total
+                        FROM {$this->getTable()} 
                         WHERE status = :status
                         AND deleted = :deleted
-                        AND parent_uuid = :parent_uuid
-                        AND YEAR(schedule_date) = :d1 AND MONTH(schedule_date) = :d2";
+                        AND customer_id = :customer_id";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":status", $status);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":parent_uuid", $parentUUID);
-            $stmt->bindValue(":d1", $d1);
-            $stmt->bindValue(":d2", $d2);
-            $stmt->execute();
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            $stmt = null;
-            $this->closeDb();
-            
-            if ($result) {
-                return $result['total'];
-            } else {
-                return 0;
-            }
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    public function getTotalAmountByStatus($status, $parentUUID)
-    {
-        try {
-            $d1 = date('Y');
-            $d2 = date('m');
-
-            $query = "SELECT SUM(amount) as total
-                        FROM schedules 
-                        WHERE status = :status
-                        AND deleted = :deleted
-                        AND parent_uuid = :parent_uuid
-                        AND YEAR(schedule_date) = :d1 AND MONTH(schedule_date) = :d2";
-
-            $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":status", $status);
-            $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":parent_uuid", $parentUUID);
-            $stmt->bindValue(":d1", $d1);
-            $stmt->bindValue(":d2", $d2);
-            $stmt->execute();
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            $stmt = null;
-            $this->closeDb();
-            
-            if ($result) {
-                return $result['total'];
-            } else {
-                return 0;
-            }
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    public function getTotalAmountByMonth($month, $parentUUID)
-    {
-        try {
-            $m = explode("-", $month);
-            $d1 = $m[0];
-            $d2 = $m[1];
-
-            $query = "SELECT SUM(amount) as total
-                        FROM schedules 
-                        WHERE status = :status
-                        AND deleted = :deleted
-                        AND parent_uuid = :parent_uuid
-                        AND YEAR(schedule_date) = :d1 AND MONTH(schedule_date) = :d2";
-
-            $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":status", '2');
-            $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":parent_uuid", $parentUUID);
-            $stmt->bindValue(":d1", $d1);
-            $stmt->bindValue(":d2", $d2);
+            $stmt->bindValue(":customer_id", $customerId);
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);

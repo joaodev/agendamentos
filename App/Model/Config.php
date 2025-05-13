@@ -16,15 +16,12 @@ class Config extends Model
     public function getEntity()
     {
         try {
-            $query = "
-                SELECT uuid, version, site_title, primary_color, secondary_color, email,phone,
-                        cellphone, full_address, logo, logo_icon, mail_host, mail_port,
-                        mail_username, mail_password, mail_from_address, mail_to_address, updated_at,
-                        google_maps, facebook, linkedin, instagram, twitter, youtube, tiktok,
-                        pagseguro_email, pagseguro_token, file_menu, logo_site
-                FROM site_config
-                ORDER BY id LIMIT 1
-            ";
+            $query = "SELECT id, version, site_title, primary_color, secondary_color, email,phone,
+                            cellphone, full_address, logo, logo_icon, updated_at,
+                            google_maps, facebook, linkedin, instagram, twitter, youtube, tiktok,
+                            pagseguro_email, pagseguro_token, file_menu, logo_site, customer_area
+                        FROM {$this->getTable()}
+                        ORDER BY id LIMIT 1";
 
             $stmt = $this->openDb()->query($query);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);

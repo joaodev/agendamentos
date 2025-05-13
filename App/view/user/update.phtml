@@ -1,52 +1,63 @@
-<?php 
-$entity = $this->view->entity; 
-$roles = $this->view->roles; 
-$role = $_SESSION['ROLE'];
-?>
-<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('user'))): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-pen-square pr-1"></i>
-                        Usuário
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary"
-                                onclick="openDetails('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+<?php if ($this->view->acl['canUpdate']): ?>
+    <?php 
+    $entity = $this->view->entity; 
+    $roles = $this->view->roles; 
+    ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-pen-square pr-1"></i>
+                                Usuário <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Usuário"
+                                onclick="openUserDetails('<?php echo $entity['id']; ?>');">
                                 <i class="fas fa-arrow-left"></i> 
                             </button>
-                        </li>
-                    </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body cardWrapperBody">
                             <form method="post" name="formUpdateUser" id="formUpdateUser">
                                 <div class="row">
                                     <div class="col-md-12" style="border-radius: 5px;">
                                         <h5 class="pt-2"><i class="fas fa-user pr-1"></i> Dados Pessoais</h5>
                                         <hr>
                                     </div>
-                                    <?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
-                                        <div class="col-md-4">
+                                    <div class="col-6 col-md-4">
+                                        <div class="form-group">
+                                            <label>Código</label>
+                                            <input type="text" class="form-control" value="<?php echo $entity['id']; ?>" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <div class="form-group">
+                                            <label for="status">Situação</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>1 - Ativo</option>
+                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>2 - Inativo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <?php if ($this->view->isAdmin): ?>
+                                        <div class="col-12 col-md-4">
                                             <div class="form-group">
                                                 <label for="name">Nível de Acesso</label>
-                                                <select class="form-control" name="role_uuid" required>
+                                                <select class="form-control" name="role_id" required>
                                                     <option value="">-</option>
                                                     <?php foreach ($roles as $role): ?>
-                                                        <option value="<?php echo $role['uuid']; ?>" 
-                                                            <?php echo ($entity['role_uuid'] == $role['uuid']) ? 'selected' : ''; ?>>
+                                                        <option value="<?php echo $role['id']; ?>" 
+                                                            <?php echo ($entity['role_id'] == $role['id']) ? 'selected' : ''; ?>>
                                                             <?php echo $role['name']; ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -54,21 +65,30 @@ $role = $_SESSION['ROLE'];
                                             </div>
                                         </div>
                                     <?php endif; ?>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="name">Situação*</label>
-                                            <select name="status" id="status_1" class="form-control">
-                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>Ativo no sistema</option>
-                                                <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>Inativo no sistema</option>
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col-12"><hr></div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="name">Nome</label>
                                             <input type="text" class="form-control" name="name" id="name" required
                                                 value="<?php echo $entity['name']; ?>" maxlength="100">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="birthdate">Dt. Nascimento</label>
+                                            <input type="date" class="form-control" name="birthdate" id="birthdate"
+                                                value="<?php echo $entity['birthdate']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="document_1">Sexo</label>
+                                            <select name="gender" id="gender" class="form-control">
+                                                <option value="">-</option>
+                                                <option value="F" <?php echo ($entity['gender'] == 'F') ? 'selected' : ''; ?>>1 - Feminino</option>
+                                                <option value="M" <?php echo ($entity['gender'] == 'M') ? 'selected' : ''; ?>>2 - Masculino</option>
+                                                <option value="O" <?php echo ($entity['gender'] == 'O') ? 'selected' : ''; ?>>3 - Outros</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -87,13 +107,6 @@ $role = $_SESSION['ROLE'];
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="job_role">Cargo</label>
-                                            <input type="text" class="form-control" name="job_role" id="job_role"
-                                                value="<?php echo $entity['job_role']; ?>" maxlength="50">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
                                             <label for="phone">Telefone</label>
                                             <input type="text" class="form-control" name="phone" id="phone"
                                                 value="<?php echo $entity['phone']; ?>">
@@ -104,13 +117,6 @@ $role = $_SESSION['ROLE'];
                                             <label for="cellphone">Celular</label>
                                             <input type="text" class="form-control" name="cellphone" id="cellphone" 
                                                 value="<?php echo $entity['cellphone']; ?>">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="whatsapp">WhatsApp</label>
-                                            <input type="text" class="form-control" name="whatsapp" id="whatsapp"
-                                                value="<?php echo $entity['whatsapp']; ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -173,19 +179,45 @@ $role = $_SESSION['ROLE'];
                                                 value="<?php echo $entity['state']; ?>">
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-md-12" style="border-radius: 5px;">
+                                        <h5 class="pt-2"><i class="fas fa-info-circle pr-1"></i> Informação Profissional</h5>
+                                        <hr>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="job_role">Cargo</label>
+                                            <input type="text" class="form-control" name="job_role" id="job_role" required
+                                                value="<?php echo $entity['job_role']; ?>" maxlength="50">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="salary">Salário</label>
+                                            <input type="text" class="form-control" name="salary" id="salary"
+                                                value="<?php echo !empty($entity['salary']) ? number_format($entity['salary'], 2, ",",".") : '0,00'; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="start_date">Dt. Admissão</label>
+                                            <input type="date" class="form-control" name="start_date" id="start_date" required
+                                                value="<?php echo $entity['start_date']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="end_date">Dt. Saída</label>
+                                            <input type="date" class="form-control" name="end_date" id="end_date"
+                                                value="<?php echo $entity['end_date']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-1">
                                         <div class="row">
-                                            <div class="col-md-8 mt-2 mb-2">
-                                                <input type="hidden" name="uuid" value="<?php echo $entity['uuid']; ?>">
+                                            <div class="col-md-6 offset-md-3 mb-2">
                                                 <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
-                                                <button type="submit" class="btn btn-success w-100" id="btnSubmit" title="Salvar Usuário">
+                                                <input type="hidden" name="id" value="<?php echo $entity['id']; ?>">
+                                                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit" title="Salvar Usuário">
                                                     <i class="fa fa-save pr-1"></i> Salvar
-                                                </button>
-                                            </div>
-                                            <div class="col-md-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary w-100"
-                                                        onclick="openDetails('<?php echo $entity['uuid']; ?>');" title="Voltar para Usuários">
-                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
                                             </div>
                                         </div>
@@ -196,59 +228,37 @@ $role = $_SESSION['ROLE'];
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openUserDetails('<?php echo $entity['id']; ?>');" 
+                        title="Voltar para Usuário">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
     <script src="<?php echo baseUrl; ?>public/js/api_cep.js"></script>
     <script src="<?php echo baseUrl; ?>public/js/documents_validators.js"></script>
     <script>
         $(document).ready(function() {
+            $("input[id=salary]").maskMoney({allowNegative: false, thousands:'.', decimal:',', affixesStay: true});
+            
             $("#document_1").mask("999.999.999-99");
             $("#document_2").mask("99.999.999/9999-99");
             $("#phone").mask("(99)9999-9999");
             $("#cellphone").mask("(99)99999-9999");
-            $("#whatsapp").mask("(99)99999-9999");
             $("#postal_code").mask("99999-999");
 
             $('#formUpdateUser').validate({
-                rules: {
-                    name: {
-                        remote: { 
-                            type: "post",
-                            url: "<?php echo baseUrl; ?>usuarios/valor-existente",
-                            data: {uuid: '<?php echo $_POST['uuid']; ?>'}
-                        }
-                    },
-                    email: {
-                        remote: { 
-                            type: "post",
-                            url: "<?php echo baseUrl; ?>usuarios/valor-existente",
-                            data: {uuid: '<?php echo $_POST['uuid']; ?>'}
-                        }
-                    },
-                    cellphone: {
-                        remote: { 
-                            type: "post",
-                            url: "<?php echo baseUrl; ?>usuarios/valor-existente",
-                            data: {uuid: '<?php echo $_POST['uuid']; ?>'}
-                        }
-                    },
-                },
-                messages: {
-                    name: {
-                        remote: "Nome já cadastrado"
-                    },
-                    email: {
-                        remote: "Email já cadastrado"
-                    },
-                    cellphone: {
-                        remote: "Celular já cadastrado"
-                    }
-                },
-                submitHandler: function( form ){
+                submitHandler: async function( form ){
                     let dados = $( form ).serialize();
-                    $("#baseLoader").show(); 
+
+                    $("#baseLoader").show();
+                    $("#btnSubmit").attr('disabled', true);
                 
-                    $.ajax({
+                    await $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>usuarios/processa-edicao",
                         data: dados,
@@ -256,15 +266,15 @@ $role = $_SESSION['ROLE'];
                         async: true
                     }).done(function(data) {
                         showAlert(data.type, data.title, data.msg, data.pos);
-                        $("#baseLoader").hide();
-                        $("#btnSubmit").attr('disabled', false);
-
-                        if (data.type == 'success') {
-                            openDetails('<?php echo $entity['uuid']; ?>');
+                        if (data.type === 'success') {
+                            openUserDetails('<?php echo $entity['id']; ?>');
+                        } else {
+                            $("#baseLoader").fadeOut();
+                            $("#btnSubmit").attr('disabled', false);
                         }
                     }).fail(function() {
                         showInternalErrorAlert(); 
-                        $("#baseLoader").hide(); 
+                        $("#baseLoader").fadeOut(); 
                         $("#btnSubmit").attr('disabled', false);
                     }); 
 

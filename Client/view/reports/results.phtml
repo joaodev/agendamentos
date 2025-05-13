@@ -1,0 +1,663 @@
+<?php $data = $this->view->data; ?>
+<div class="card">
+    <div class="card-body cardWrapperList">
+        <?php if (!$data): ?>
+            <div class="alert alert-info mt-3" role="alert">
+                <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+            </div>
+        <?php else: ?>
+            <?php if ($_POST['sis_module'] == 1): ?>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="table_purchases" style="width: 100%;">
+                        <thead>
+                            <tr class="text-center" style="height: 30px;">
+                                <th style="font-size: 14px;">Código</th>
+                                <th style="font-size: 14px;">Data</th>
+                                <th style="font-size: 14px;">Valor</th>
+                                <th style="font-size: 14px;">Cliente</th>
+                                <th style="font-size: 14px;">Vendedor</th>
+                                <th style="font-size: 14px;">Situação</th>
+                                <th style="display: none;">Horário</th>
+                                <th style="display: none;">Forma de Pagamento</th>
+                                <th style="display: none;">Descrição</th>
+                                <th style="display: none;">Cadastro</th>
+                                <th style="display: none;">Última Atualização</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($data as $entity): ?>
+                                <tr class="text-center" style="cursor: pointer;" 
+                                    onclick="openModalDetails('<?php echo $entity['id']; ?>');">
+                                    <td style="font-size: 15px">
+                                        <?php echo $entity['id']; ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo $this->formatDate($entity['sale_date']); ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo number_format($entity['amount'], 2, ",","."); ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php if (!empty($entity['customerCod'])): ?>
+                                            <?php echo $entity['customerCod'] . ' - ' . $entity['customerName']; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php if (!empty($entity['userCod'])): ?>
+                                            <?php echo $entity['userCod'] . ' - ' . $entity['userName']; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo ($entity['status'] == '1') ? 'Iniciada' : 'Finalizada'; ?>
+                                    </td>
+                                    <td style="display: none;">
+                                        <?php echo substr($entity['sale_time'], 0, 5); ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['paymentTypeName']; ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['description']; ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                    </td> 
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function() {
+                        
+                        let buttonCommon = {
+                            exportOptions: {
+                                format: {
+                                    body: function ( data, row, column ) {
+                                        return  column === 2  ?
+                                            parseFloat(data.replace(/[.]/g, '' ).replace( ',', '.' )).toLocaleString('en-IN',
+                                            {minimumFractionDigits: 2 , maximumFractionDigits: 2}) : data;
+                                    }
+                                }
+                            }
+                        };	
+
+                        $('#table_purchases').DataTable({
+                            "sDom": 'flBtip',
+                            searching: true,
+                            buttons: [
+                                $.extend( true, {}, buttonCommon, {
+                                    extend: 'excel',
+                                    title: 'Relatório de Compras',
+                                })
+                            ],
+                            order: [ [0, "<?php echo $this->view->orderType; ?>"] ],
+                            columnDefs: [
+                                {type: 'date-eu', targets: [1]},
+                                {type: 'valoresemreais', targets: [2]},
+                            ],
+                            responsive: true,
+                            info: true,
+                            processing: true,
+                            scrollCollapse: true,
+                            paging: true,
+                            "pageLength": 25,
+                            "language": {
+                                "sEmptyTable": "Nenhum registro encontrado",
+                                "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                                "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                                "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                                "sInfoPostFix": "",
+                                "sInfoThousands": ".",
+                                "sLengthMenu": "_MENU_ &nbsp;",
+                                "sLoadingRecords": "Carregando...",
+                                "sProcessing": "Processando...",
+                                "sZeroRecords": "Nenhum registro encontrado",
+                                "sSearch": "Filtrar",
+                                "oPaginate": {
+                                    "sNext": "Próximo",
+                                    "sPrevious": "Anterior",
+                                    "sFirst": "Primeiro",
+                                    "sLast": "Último"
+                                },
+                                "oAria": {
+                                    "sSortAscending": ": Ordenar colunas de forma ascendente",
+                                    "sSortDescending": ": Ordenar colunas de forma descendente"
+                                }
+                            }
+                        });
+                    });
+                </script>
+            <?php endif; ?>
+            <?php if ($_POST['sis_module'] == 2): ?>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="table_expenses" style="width: 100%;">
+                    <thead>
+                            <tr class="text-center" style="height: 30px;">
+                                <th style="font-size: 14px;">Código</th>
+                                <th style="font-size: 14px;">Data</th>
+                                <th style="font-size: 14px;">Conta</th>
+                                <th style="font-size: 14px;">Valor</th>
+                                <th style="font-size: 14px;">Situação</th>
+                                <th style="display: none;">Tipo</th>
+                                <th style="display: none;">Forma de Pagamento</th>
+                                <th style="display: none;">Cliente</th>
+                                <th style="display: none;">Fornecedor</th>
+                                <th style="display: none;">Usuário</th>
+                                <th style="display: none;">Descrição</th>
+                                <th style="display: none;">Cadastro</th>
+                                <th style="display: none;">Última Atualização</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($data as $entity): ?>
+                                <tr class="text-center" style="cursor: pointer;" 
+                                    onclick="openModalDetails('<?php echo $entity['id']; ?>');">
+                                    <td style="font-size: 15px">
+                                        <?php echo $entity['id']; ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo $this->formatDate($entity['expense_date']); ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo $entity['title']; ?>   
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo number_format($entity['amount'], 2, ",","."); ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo ($entity['status'] == '1') ? 'Pendente' : ''; ?>
+                                        <?php echo ($entity['status'] == '2') ? 'Pago' : ''; ?>
+                                        <?php echo ($entity['status'] == '3') ? 'Cancelado' : ''; ?>
+                                        <?php echo ($entity['status'] == '4') ? 'Em Análise' : ''; ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php if ($entity['expense_type'] == '1'): ?>
+                                            Conta a Receber
+                                        <?php endif; ?>   
+                                        <?php if ($entity['expense_type'] == '2'): ?>
+                                            Conta a Pagar
+                                        <?php endif; ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['paymentTypeName']; ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['customerName'] ? $entity['customerName'] : ''; ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['providerName'] ? $entity['providerName'] : ''; ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['userName'] ? $entity['userName'] : ''; ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['description']; ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                    </td> 
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function() {
+                        
+                        let buttonCommon = {
+                            exportOptions: {
+                                format: {
+                                    body: function ( data, row, column ) {
+                                        return  column === 3  ?
+                                            parseFloat(data.replace(/[.]/g, '' ).replace( ',', '.' )).toLocaleString('en-IN',
+                                            {minimumFractionDigits: 2 , maximumFractionDigits: 2}) : data;
+                                    }
+                                }
+                            }
+                        };	
+
+                        $('#table_expenses').DataTable({
+                            "sDom": 'flBtip',
+                            searching: true,
+                            buttons: [
+                                $.extend( true, {}, buttonCommon, {
+                                    extend: 'excel',
+                                    title: 'Relatório de Pagamentos',
+                                })
+                            ],
+                            order: [ [0, "<?php echo $this->view->orderType; ?>"] ],
+                            columnDefs: [
+                                {type: 'date-eu', targets: [1]},
+                                {type: 'valoresemreais', targets: [3]},
+                            ],
+                            responsive: true,
+                            info: true,
+                            processing: true,
+                            scrollCollapse: true,
+                            paging: true,
+                            "pageLength": 25,
+                            "language": {
+                                "sEmptyTable": "Nenhum registro encontrado",
+                                "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                                "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                                "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                                "sInfoPostFix": "",
+                                "sInfoThousands": ".",
+                                "sLengthMenu": "_MENU_ &nbsp;",
+                                "sLoadingRecords": "Carregando...",
+                                "sProcessing": "Processando...",
+                                "sZeroRecords": "Nenhum registro encontrado",
+                                "sSearch": "Filtrar",
+                                "oPaginate": {
+                                    "sNext": "Próximo",
+                                    "sPrevious": "Anterior",
+                                    "sFirst": "Primeiro",
+                                    "sLast": "Último"
+                                },
+                                "oAria": {
+                                    "sSortAscending": ": Ordenar colunas de forma ascendente",
+                                    "sSortDescending": ": Ordenar colunas de forma descendente"
+                                }
+                            }
+                        });
+                    });
+                </script>
+            <?php endif; ?>
+            <?php if ($_POST['sis_module'] == 3): ?>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="table_budgets" style="width: 100%;">
+                    <thead>
+                            <tr class="text-center" style="height: 30px;">
+                                <th style="font-size: 14px;">Código</th>
+                                <th style="font-size: 14px;">Data</th>
+                                <th style="font-size: 14px;">Valor</th>
+                                <th style="font-size: 14px;">Situação</th>
+                                <th style="display: none;">Horário</th>
+                                <th style="display: none;">Cliente</th>
+                                <th style="display: none;">Descrição</th>
+                                <th style="display: none;">Cadastro</th>
+                                <th style="display: none;">Última Atualização</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($data as $entity): ?>
+                                <tr class="text-center" style="cursor: pointer;" 
+                                    onclick="openModalDetails('<?php echo $entity['id']; ?>');">
+                                    <td style="font-size: 15px">
+                                        <?php echo $entity['id']; ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo $this->formatDate($entity['budget_date']); ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo number_format($entity['budget_total'], 2, ",","."); ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo ($entity['status'] == '1') ? 'Pendente' : ''; ?>
+                                        <?php echo ($entity['status'] == '2') ? 'Recebido' : ''; ?>
+                                        <?php echo ($entity['status'] == '3') ? 'Aprovado' : ''; ?>
+                                        <?php echo ($entity['status'] == '4') ? 'Cancelado' : ''; ?>
+                                    </td>
+                                    <td style="display: none;">
+                                        <?php echo substr($entity['budget_time'], 0, 5); ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['customerName']; ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['description']; ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                    </td> 
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function() {
+                        
+                        let buttonCommon = {
+                            exportOptions: {
+                                format: {
+                                    body: function ( data, row, column ) {
+                                        return  column === 2  ?
+                                            parseFloat(data.replace(/[.]/g, '' ).replace( ',', '.' )).toLocaleString('en-IN',
+                                            {minimumFractionDigits: 2 , maximumFractionDigits: 2}) : data;
+                                    }
+                                }
+                            }
+                        };	
+
+                        $('#table_budgets').DataTable({
+                            "sDom": 'flBtip',
+                            searching: true,
+                            buttons: [
+                                $.extend( true, {}, buttonCommon, {
+                                    extend: 'excel',
+                                    title: 'Relatório de Orçamentos',
+                                })
+                            ],
+                            order: [ [0, "<?php echo $this->view->orderType; ?>"] ],
+                            columnDefs: [
+                                {type: 'date-eu', targets: [1]},
+                                {type: 'valoresemreais', targets: [2]},
+                            ],
+                            responsive: true,
+                            info: true,
+                            processing: true,
+                            scrollCollapse: true,
+                            paging: true,
+                            "pageLength": 25,
+                            "language": {
+                                "sEmptyTable": "Nenhum registro encontrado",
+                                "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                                "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                                "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                                "sInfoPostFix": "",
+                                "sInfoThousands": ".",
+                                "sLengthMenu": "_MENU_ &nbsp;",
+                                "sLoadingRecords": "Carregando...",
+                                "sProcessing": "Processando...",
+                                "sZeroRecords": "Nenhum registro encontrado",
+                                "sSearch": "Filtrar",
+                                "oPaginate": {
+                                    "sNext": "Próximo",
+                                    "sPrevious": "Anterior",
+                                    "sFirst": "Primeiro",
+                                    "sLast": "Último"
+                                },
+                                "oAria": {
+                                    "sSortAscending": ": Ordenar colunas de forma ascendente",
+                                    "sSortDescending": ": Ordenar colunas de forma descendente"
+                                }
+                            }
+                        });
+                    });
+                </script>
+            <?php endif; ?>
+            <?php if ($_POST['sis_module'] == 4): ?>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="table_os" style="width: 100%;">
+                        <thead>
+                            <tr class="text-center" style="height: 30px;">
+                                <th style="font-size: 14px;">Código</th>
+                                <th style="font-size: 14px;">Data</th>
+                                <th style="font-size: 14px;">Horário</th>
+                                <th style="font-size: 14px;">Valor</th>
+                                <th style="font-size: 14px;">Situação</th>
+                                <th style="display: none;">Cliente</th>
+                                <th style="display: none;">Descrição</th>
+                                <th style="display: none;">Cadastro</th>
+                                <th style="display: none;">Última Atualização</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($data as $entity): ?>
+                                <tr class="text-center" style="cursor: pointer;" 
+                                    onclick="openModalDetails('<?php echo $entity['id']; ?>');">
+                                    <td style="font-size: 15px">
+                                        <?php echo $entity['id']; ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo $this->formatDate($entity['os_date']); ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo substr($entity['os_time'], 0, 5); ?>   
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo number_format($entity['os_total'], 2, ",","."); ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo ($entity['status'] == '1') ? 'Pendente' : ''; ?>
+                                        <?php echo ($entity['status'] == '2') ? 'Em Execução' : ''; ?>
+                                        <?php echo ($entity['status'] == '3') ? 'Concluída' : ''; ?>
+                                        <?php echo ($entity['status'] == '4') ? 'Cancelada' : ''; ?>
+                                    </td>
+                                    <td style="display: none;">
+                                        <?php echo $entity['customerName']; ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $entity['description']; ?>   
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                    </td> 
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function() {
+                        
+                        let buttonCommon = {
+                            exportOptions: {
+                                format: {
+                                    body: function ( data, row, column ) {
+                                        return  column === 3  ?
+                                            parseFloat(data.replace(/[.]/g, '' ).replace( ',', '.' )).toLocaleString('en-IN',
+                                            {minimumFractionDigits: 2 , maximumFractionDigits: 2}) : data;
+                                    }
+                                }
+                            }
+                        };	
+
+                        $('#table_os').DataTable({
+                            "sDom": 'flBtip',
+                            searching: true,
+                            buttons: [
+                                $.extend( true, {}, buttonCommon, {
+                                    extend: 'excel',
+                                    title: 'Relatório de Ordens de Serviço',
+                                })
+                            ],
+                            order: [ [0, "<?php echo $this->view->orderType; ?>"] ],
+                            columnDefs: [
+                                {type: 'date-eu', targets: [1]},
+                                {type: 'valoresemreais', targets: [3]},
+                            ],
+                            responsive: true,
+                            info: true,
+                            processing: true,
+                            scrollCollapse: true,
+                            paging: true,
+                            "pageLength": 25,
+                            "language": {
+                                "sEmptyTable": "Nenhum registro encontrado",
+                                "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                                "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                                "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                                "sInfoPostFix": "",
+                                "sInfoThousands": ".",
+                                "sLengthMenu": "_MENU_ &nbsp;",
+                                "sLoadingRecords": "Carregando...",
+                                "sProcessing": "Processando...",
+                                "sZeroRecords": "Nenhum registro encontrado",
+                                "sSearch": "Filtrar",
+                                "oPaginate": {
+                                    "sNext": "Próximo",
+                                    "sPrevious": "Anterior",
+                                    "sFirst": "Primeiro",
+                                    "sLast": "Último"
+                                },
+                                "oAria": {
+                                    "sSortAscending": ": Ordenar colunas de forma ascendente",
+                                    "sSortDescending": ": Ordenar colunas de forma descendente"
+                                }
+                            }
+                        });
+                    });
+                </script>
+            <?php endif; ?>
+            <?php if ($_POST['sis_module'] == 5): ?>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="table_schedules" style="width: 100%;">
+                        <thead>
+                            <tr class="text-center" style="height: 30px;">
+                                <th style="font-size: 14px;">Código</th>
+                                <th style="font-size: 14px;">Data</th>
+                                <th style="font-size: 14px;">Horário</th>
+                                <th style="font-size: 14px;">Agendamento</th>
+                                <th style="font-size: 14px;">Responsável</th>
+                                <th style="font-size: 14px;">Situação</th>
+                                <th style="display: none;">Cadastro</th>
+                                <th style="display: none;">Última Atualização</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($data as $entity): ?>
+                                <tr class="text-center" style="cursor: pointer;" 
+                                    onclick="openModalDetails('<?php echo $entity['id']; ?>');">
+                                    <td style="font-size: 15px">
+                                        <?php echo $entity['id']; ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo $this->formatDate($entity['schedule_date']); ?>
+                                    </td>
+                                    <td style="font-size: 15px;">
+                                        <?php echo substr($entity['schedule_time'], 0, 5); ?>
+                                    </td>
+                                    <td style="font-size: 15px;">
+                                        <?php echo $entity['title']; ?>
+                                    </td>
+                                    <td style="font-size: 15px;">
+                                        <?php echo $entity['userName'] ? $entity['userCod'] . ' - ' . $entity['userName'] : 'Não atribuido'; ?>
+                                    </td>
+                                    <td style="font-size: 15px">
+                                        <?php echo ($entity['status'] == '1') ? 'Iniciada' : 'Finalizada'; ?>
+                                    </td>
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                    </td> 
+                                    <td style="display: none;">
+                                        <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                    </td> 
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function() {
+                        
+                        let buttonCommon = {
+                            exportOptions: {
+                                format: {
+                                    body: function ( data, row, column ) {
+                                        return data;
+                                    }
+                                }
+                            }
+                        };	
+
+                        $('#table_schedules').DataTable({
+                            "sDom": 'flBtip',
+                            searching: true,
+                            buttons: [
+                                $.extend( true, {}, buttonCommon, {
+                                    extend: 'excel',
+                                    title: 'Relatório de Agendamentos',
+                                })
+                            ],
+                            order: [ [0, "<?php echo $this->view->orderType; ?>"] ],
+                            columnDefs: [
+                                {type: 'date-eu', targets: [1]},
+                            ],
+                            responsive: true,
+                            info: true,
+                            processing: true,
+                            scrollCollapse: true,
+                            paging: true,
+                            "pageLength": 25,
+                            "language": {
+                                "sEmptyTable": "Nenhum registro encontrado",
+                                "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                                "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                                "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                                "sInfoPostFix": "",
+                                "sInfoThousands": ".",
+                                "sLengthMenu": "_MENU_ &nbsp;",
+                                "sLoadingRecords": "Carregando...",
+                                "sProcessing": "Processando...",
+                                "sZeroRecords": "Nenhum registro encontrado",
+                                "sSearch": "Filtrar",
+                                "oPaginate": {
+                                    "sNext": "Próximo",
+                                    "sPrevious": "Anterior",
+                                    "sFirst": "Primeiro",
+                                    "sLast": "Último"
+                                },
+                                "oAria": {
+                                    "sSortAscending": ": Ordenar colunas de forma ascendente",
+                                    "sSortDescending": ": Ordenar colunas de forma descendente"
+                                }
+                            }
+                        });
+                    });
+                </script>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+</div>
+<script>
+    async function openModalDetails(id) {
+        $("#modalReportDetailsTitle").html('<i class="fa fa-info-circle pr-2"></i> <?php echo $this->view->modalTitle; ?>');
+        $("#modalReportDetailsLoader").show();
+        $("#modalReportDetails").modal('show');     
+        
+        await $.ajax({
+            type: 'post',
+            url: "<?php echo baseUrl . 'cliente/' . $this->view->module; ?>/detalhes",
+            data: {
+                id:id,
+                modal: true,
+                target: '<?php echo $this->getClientTarget(); ?>'
+            },
+            async: true
+        }).done(function(data) {
+            $("#modalReportDetailsResult").html(data);
+            $("#modalReportDetailsLoader").hide();
+        }).fail(function() {
+            showInternalErrorAlert();
+            $("#modalReportDetailsLoader").hide();
+        });
+    }
+
+    async function openModDetails(id, mod, month = null) {
+        $("#modalReportDetailsLoader").show();
+        
+        $("#baseLoader").show();
+        await $.ajax({
+            type: 'post',
+            url: "<?php echo baseUrl; ?>cliente/"+mod+"/detalhes",
+            data: {
+                id:id,
+                month: month,
+                target: '<?php echo $this->getClientTarget(); ?>'
+            },
+            async: true
+        }).done(function(data) {
+            $("#sis_content").html(data);
+            $("#baseLoader").fadeOut();
+            $("#modalReportDetails").modal('hide');  
+        }).fail(function() {
+            showInternalErrorAlert();
+            $("#baseLoader").fadeOut();
+        });
+    }
+</script>

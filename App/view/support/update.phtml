@@ -1,0 +1,325 @@
+<?php if ($this->view->acl['canUpdate']): ?>
+    <?php 
+    $entity = $this->view->entity; 
+    $isAdmin = $this->view->isAdmin;
+    $isCallOwner = (!empty($entity['user_id']) && $entity['user_id'] === $_SESSION['COD']) ? true : false;
+    ?>
+    <style>
+        .select2-selection {
+            height: 38px !important;
+        }
+    </style>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-pen-square pr-1"></i>
+                                Chamado <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-primary btnRadius"
+                                onclick="openSupportDetails('<?php echo $entity['id']; ?>');"
+                                title="Voltar para Detalhamento">
+                                <i class="fas fa-arrow-left"></i> 
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body cardWrapperBody">
+                            <form method="post" name="formUpdateCall" id="formUpdateCall"
+                                enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Código</label>
+                                            <input type="text" class="form-control" value="<?php echo $entity['id']; ?>" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Data de abertura</label>
+                                            <input type="text" class="form-control" value="<?php echo $this->formatDateTime($entity['created_at']); ?>" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="status">Situação</label>
+                                            <select name="status" id="status_1" class="form-control">
+                                                <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>1 - Aberto</option>
+                                                <option value="2" <?php echo ($entity['status'] == '2' ? 'selected' : ''); ?>>2 - Em Atendimento</option>
+                                                <option value="3" <?php echo ($entity['status'] == '3' ? 'selected' : ''); ?>>3 - Finalizado</option>
+                                                <option value="4" <?php echo ($entity['status'] == '4' ? 'selected' : ''); ?>>4 - Fechado</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <?php if (!empty($entity['customerName'])): ?>
+                                        <div class="col-md-12"> 
+                                            <span class="fa fa-building pr-1"></span>
+                                            <b>Cliente</b>
+                                            <p>
+                                                <?php echo $entity['customerCod'] . ' - ' . $entity['customerName']; ?>
+                                            </p>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Assunto</label>
+                                            <p>
+                                                <?php echo $entity['title']; ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Descrição do problema</label>
+                                            <p>
+                                                <?php echo $entity['description']; ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-12"><hr></div>
+                                            <div class="col-10 col-md-11">
+                                                <h4><span class="fa fa-users pr-1"></span> Responsáveis</h4>
+                                            </div>
+                                            <div class="col-2 col-md-1">
+                                                <button type="button" class="btn btn-info btnRadius" style="width: 100%; position: relative; top: -5px"
+                                                        onclick="searchModules('Responsáveis', 'responsavel');">
+                                                    <span class="fa fa-search"></span>
+                                                </button>
+                                            </div>
+                                            <div class="col-12" id="responsiblesTable"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="call_answer">Descrição da solução do problema</label>
+                                            <textarea name="call_answer" id="call_answer" class="form-control" rows="5" 
+                                                placeholder="Descreva a solução do problema"><?php echo $entity['call_answer']; ?></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 offset-md-3">
+                                        <?php if ($this->view->files):  ?>
+                                            <div class="text-center mt-3">
+                                                <b>Arquivos enviados:</b>
+                                                <?php foreach ($this->view->files as $file): ?>
+                                                    <div class="my-2" id="box_<?php echo $file['id']; ?>">
+                                                        <?php if ($this->isImage($file['file'])): ?>
+                                                            <a href="<?php echo baseUrl . 'public/uploads/support/'
+                                                                . $entity['id'] . '/' . $file['file']; ?>" target="_blank" title="Abrir o arquivo"
+                                                                data-lightbox="image-1"
+                                                                data-title="<?php echo $file['file']; ?>">
+                                                                <span class="fa fa-image pr-1"></span>
+                                                                <?php echo $file['file']; ?>
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <a href="<?php echo baseUrl . 'public/uploads/support/'
+                                                                . $entity['id'] . '/' . $file['file']; ?>" target="_blank" title="Abrir o arquivo" class="">
+                                                                <span class="fa fa-file pr-1"></span>
+                                                                <?php echo $file['file']; ?>
+                                                            </a>
+                                                        <?php endif; ?>
+                                                        <?php if ($entity['status'] != '3' || !$isCallOwner || $isAdmin): ?>
+                                                            <a onclick="deleteFile('<?php echo $file['id']; ?>');" style="cursor: pointer; font-size: 10px;" 
+                                                                class="btn btn-danger btn-xs ml-1 btnRadius">
+                                                                <span class="fa fa-trash"></span>
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                                <?php if (empty($this->view->files)): ?>
+                                                    <p>Nenhum arquivo enviado</p>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6 offset-md-3 mt-2 mb-3">
+                                        <div class="bg-info text-center p-3 btnRadius">
+                                            <span style="font-size: 20px; color: #fff; ">
+                                                <i class="fa fa-file-upload pr-1"></i> <b>Enviar Arquivos</b>
+                                            </span>
+                                            <div class="form-group text-center">
+                                                <label for="file"><small style="color: #fff;">
+                                                    <i>(jpg, jpeg, png, gif, pdf)</i></small>
+                                                </label>
+                                                <input type="file" class="form-control inputUpload" name="file[]" multiple id="file"
+                                                    accept=".png,.jpg,.jpeg,.gif,.pdf">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-1">
+                                        <div class="row">
+                                            <?php if ($entity['status'] != '3' || !$isCallOwner || $isAdmin): ?>
+                                                <div class="col-md-6 offset-md-3 mb-2">
+                                                    <input type="hidden" name="id" id="id" value="<?php echo $entity['id']; ?>">
+                                                    <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit" title="Salvar Chamado">
+                                                        <i class="fa fa-save pr-1"></i> Salvar
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openSupportDetails('<?php echo $entity['id']; ?>');" 
+                        title="Voltar para Detalhamento">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php if ($entity['status'] != '3' || !$isCallOwner || $isAdmin): ?>
+        <script>
+            $(document).ready(function() {
+                $('#formUpdateCall').validate({
+                    submitHandler: async  function() {
+                        let form_data = new FormData();         
+                        
+                        $.each($("input[type='file']")[0].files, function (i, file) {
+                            form_data.append('file_' + i, file);
+                        });
+
+                        form_data.append('call_answer', $("#call_answer").val());    
+                        form_data.append('status', $("#status_1").val());    
+                        form_data.append('id', $("#id").val());    
+                        
+                        form_data.append('target', '<?php echo $this->getTarget(); ?>');
+                        
+                        if ($('#send_email_user').is(':checked')) {
+                            form_data.append('send_email_user', $("#send_email_user").val());    
+                        }
+
+                        $("#baseLoader").show();
+                        $("#btnSubmit").show('disabled', true);
+
+                        await $.ajax({
+                            type: "POST",
+                            url: "<?php echo baseUrl; ?>chamados/processa-edicao",
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: form_data,
+                            dataType: 'json',
+                            async: true
+                        }).done(function(data) {
+                            showAlert(data.type, data.title, data.msg, data.pos);
+                            if (data.type === 'success') {
+                                openSupportDetails('<?php echo $entity['id']; ?>');
+                            } else {
+                                $("#baseLoader").fadeOut();
+                                $("#btnSubmit").attr('disabled', false);
+                            }
+                        }).fail(function() {
+                            showInternalErrorAlert();
+                            $("#baseLoader").fadeOut();
+                            $("#btnSubmit").attr('disabled', false);
+                        });
+
+                        return false;
+                    }
+                });
+            });
+
+            function deleteFile(id) {
+                $("#modalDeleteBasicFileTitle").html('<i class="fa fa-trash pr-2"></i> Remover Arquivo');
+                $("#modalDeleteBasicFileLoader").hide();
+                $("#modalDeleteBasicFile").modal('show');
+                $("#modalDeleteBasicFileResult").html('<button type="button" class="btn btn-danger btnRadius" title="Confirmar Exclusão" onclick="runFileDelete(\'' + id + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+            }
+            
+            async function runFileDelete(id) {
+                if (id !== null) {
+                    $("#modalDeleteBasicFileLoader").show();
+
+                    let send_notification_target = null;
+                    if ($('#basic_delete_notification_file').is(':checked')) {
+                        send_notification_target = $("#basic_delete_notification_file").val();    
+                    }
+
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>chamados/remove-arquivo",
+                        data: { 
+                            id: id,
+                            support_id: '<?php echo $_POST['id']; ?>',
+                            target: '<?php echo $this->getTarget(); ?>',
+                            send_mail: send_notification_target
+                        },
+                        async: true
+                    }).done(async function (data) {
+                        $("#box_" + id).fadeOut(999);
+                        $("#modalDeleteBasicFile").modal('hide');
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#modalDeleteBasicFileLoader").hide();
+                    });
+                }
+            }
+
+            async function searchModules(targetTitle, targetRoute) {
+                $("#modalMidResult").empty();
+                $("#modalMidTitle").html(`<i class="fa fa-search pr-2"></i> Buscar ${targetTitle}`);
+                $("#modalMid").modal('show');
+
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>chamados/busca-modulo",
+                    data: {
+                        support_id: '<?php echo $entity['id']; ?>',
+                        title: targetTitle,
+                        target: targetRoute
+                    },
+                    async: true
+                }).done(function(data) {
+                    $("#modalMidResult").html(data);
+                    $("#modalMidLoader").hide();
+                }).fail(function() {
+                    showInternalErrorAlert();
+                    $("#modalMidLoader").hide();
+                });
+            }
+
+            async function loadModulesTable(mod) {
+                $(`#${mod}Table`).html('Carregando...');
+                $("#baseLoader").show();
+
+                await $.ajax({
+                    type: 'post',
+                    url: `<?php echo baseUrl; ?>chamados/lista-${mod}`,
+                    data: {
+                        support_id: '<?php echo $entity['id']; ?>',
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function(data) {
+                    $(`#${mod}Table`).html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+
+            loadModulesTable('responsibles');
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

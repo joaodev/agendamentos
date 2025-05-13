@@ -1,0 +1,134 @@
+<?php if ($this->view->acl['canCreateProvider']): ?>
+    <form method="post" name="formCreateProvider" id="formCreateProvider">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="name">Nome*</label>
+                    <input type="text" class="form-control" name="name" id="name" required maxlength="100" placeholder="Nome completo do Fornecedor/Empresa">
+                </div>
+            </div>
+            <div class="col-12 col-md-4 ">
+                <div class="form-group">
+                    <label for="document_2">CNPJ</label>
+                    <input type="text" class="form-control" name="document_2" id="document_2" onchange="validateCNPJ();"
+                        placeholder="00.000.000/0000-00">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="email">Email*</label>
+                    <input type="email" class="form-control" name="email" id="email" required maxlength="100"
+                    placeholder="fornecedor@exemplo.com">
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="form-group">
+                    <label for="phone">Telefone</label>
+                    <input type="text" class="form-control" name="phone" id="phone"
+                        placeholder="(00)0000-0000">
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="form-group">
+                    <label for="cellphone">Celular</label>
+                    <input type="text" class="form-control" name="cellphone" id="cellphone"
+                        placeholder="(00)00000-0000">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <hr class="cardLine">
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="postal_code">CEP</label>
+                    <input type="text" class="form-control" name="postal_code" id="postal_code" placeholder="00000-000">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="address">Endereço</label>
+                    <input type="text" class="form-control" name="address" id="address"  maxlength="100" placeholder="Endereço completo">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="number">Número</label>
+                    <input type="text" class="form-control" name="number" id="number"  maxlength="50" placeholder="000">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="complement">Complemento</label>
+                    <input type="text" class="form-control" name="complement" id="complement"  maxlength="50" placeholder="Complemento adicional">
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label for="neighborhood">Bairro</label>
+                    <input type="text" class="form-control" name="neighborhood" id="neighborhood"  maxlength="100" placeholder="Nome do Bairro">
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label for="city">Cidade</label>
+                    <input type="text" class="form-control" name="city" id="city"  maxlength="100" placeholder="Nome da Cidade">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="state">UF</label>
+                    <input type="text" class="form-control" name="state" id="state"  maxlength="2" placeholder="Estado">
+                </div>
+            </div>
+            <div class="col-md-12 mt-3 mb-2">
+                <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
+                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmitProvider" title="Salvar Fornecedor">
+                    <i class="fa fa-save pr-1"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </form>
+    <script src="<?php echo baseUrl; ?>public/js/api_cep.js"></script>
+    <script src="<?php echo baseUrl; ?>public/js/documents_validators.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#name").focus();
+            $("#document_2").mask("99.999.999/9999-99");
+            $("#phone").mask("(99)9999-9999");
+            $("#cellphone").mask("(99)99999-9999");
+            $("#postal_code").mask("99999-999");
+            
+            $('#formCreateProvider').validate({
+                submitHandler: async function( form ){
+                    let dados = $( form ).serialize();
+                    $("#modalGreenLargeLoader").show();
+                    $("#btnSubmitProvider").attr('disabled', true);
+                    
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>fornecedores/processa-cadastro",
+                        data: dados,
+                        dataType: 'json',
+                        async: true
+                    }).done(function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        if (data.type === 'success') {
+                            $("#provider_id").append('<option value="'+data.id+'" selected>'+data.id+' - '+data.name+'</option>');
+                            $("#sendMailProvider").removeAttr("style");
+                            $("#modalGreenLarge").modal('hide');   
+                        }
+        
+                        $("#btnSubmitProvider").attr('disabled', false);
+                        $("#modalGreenLargeLoader").hide();
+                    }).fail(function() {
+                        showInternalErrorAlert(); 
+                        $("#modalGreenLargeLoader").hide();
+                        $("#btnSubmitProvider").attr('disabled', false);
+                    }); 
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

@@ -14,39 +14,37 @@ class User extends Model
         $this->setTable('user');
     }
 
-    public function getOne($uuid, $parentUUID = null)
+    public function getOne(int $id, bool $deleted = true): bool|array|string
     {
         try {
-            $whereParams = "";
-            if (!empty($parentUUID)) {
-                $whereParams = " AND u.parent_uuid = :parent_uuid";
+            $withDeleted = "";
+            if ($deleted) {
+                $withDeleted = "AND u.deleted = :deleted";
             }
 
-            $query = "
-                SELECT u.uuid, u.name, u.email, u.status, u.role_uuid, u.whatsapp,
-                        u.cellphone, u.job_role, r.name as role, u.phone,
-                        r.is_admin, u.created_at, u.updated_at, u.file,
-                        u.postal_code, u.address, u.number, u.complement, 
-                        u.neighborhood, u.city, u.state, u.gender, u.birthdate,
-                        u.start_date, u.end_date, u.salary,                 
-                        u.document_1, u.document_2, u.auth2factor,
-                        u.parent_uuid, u.parent_uuid
-                FROM user AS u
-                INNER JOIN role AS r
-                    ON u.role_uuid = r.uuid
-                WHERE u.uuid = :uuid AND u.deleted = '0'
-                $whereParams
-                ORDER BY u.name 
-            ";
+            $query = "SELECT u.id, u.name, u.email, u.status, u.role_id,
+                            u.cellphone, u.job_role, r.name as role, u.phone, u.whatsapp,
+                            r.is_admin, u.created_at, u.updated_at, u.file,
+                            u.postal_code, u.address, u.number, u.complement, 
+                            u.neighborhood, u.city, u.state, u.document_1, u.document_2,
+                            u.salary, u.start_date, u.end_date, 
+                            u.birthdate, u.gender, u.auth2factor, u.deleted
+                        FROM {$this->getTable()} AS u
+                        INNER JOIN role AS r
+                            ON u.role_id = r.id
+                        WHERE u.id = :id 
+                            $withDeleted
+                        ORDER BY u.name";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":uuid", $uuid);
-
-            if (!empty($parentUUID)) {
-                $stmt->bindValue(":parent_uuid", $parentUUID);
+            $stmt->bindValue(":id", $id);
+            
+            if ($deleted) {
+                $stmt->bindValue(":deleted", '0');
             }
 
             $stmt->execute();
+
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             $stmt = null;
@@ -58,27 +56,55 @@ class User extends Model
         }
     }
 
-    public function getAll($parent): bool|array|string
+    public function getProfile(int $id): bool|array|string
     {
         try {
-            $query = "
-                SELECT u.uuid, u.name, u.email, u.status, u.file, u.phone, u.whatsapp,
-                        u.cellphone, u.job_role, r.name as role, u.created_at, u.updated_at,
-                        u.postal_code, u.address, u.number, u.complement, 
-                        u.neighborhood, u.city, u.state, u.gender, u.birthdate,
-                        u.start_date, u.end_date, u.salary,                         
-                        u.document_1, u.document_2, u.auth2factor, u.parent_uuid  
-                FROM user AS u
-                INNER JOIN role AS r
-                    ON u.role_uuid = r.uuid
-                WHERE u.deleted = :deleted
-                    AND u.parent_uuid = :parent_uuid
-                ORDER BY u.name 
-            ";
+            $query = "SELECT u.id, u.name, u.email, u.status, u.role_id,
+                            u.cellphone, u.job_role, r.name as role, u.phone, u.whatsapp,
+                            r.is_admin, u.created_at, u.updated_at, u.file,
+                            u.postal_code, u.address, u.number, u.complement, 
+                            u.neighborhood, u.city, u.state, u.document_1, u.document_2,
+                            u.salary, u.start_date, u.end_date, 
+                            u.birthdate, u.gender, u.auth2factor   
+                        FROM {$this->getTable()} AS u
+                        INNER JOIN role AS r
+                            ON u.role_id = r.id
+                        WHERE u.id = :id 
+                            AND u.deleted = :deleted
+                        ORDER BY u.name";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":id", $id);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+
+            return $result;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function getAll(): bool|array|string
+    {
+        try {
+            $query = "SELECT u.id, u.name, u.email, u.status, u.file, u.phone,  u.whatsapp,
+                            u.cellphone, u.job_role, r.name as role, u.created_at, u.updated_at,
+                            u.postal_code, u.address, u.number, u.complement, 
+                            u.neighborhood, u.city, u.state, u.document_1, u.document_2,
+                            u.salary, u.start_date, u.end_date 
+                        FROM {$this->getTable()} AS u
+                        INNER JOIN role AS r
+                            ON u.role_id = r.id
+                        WHERE u.deleted = :deleted
+                        ORDER BY u.name";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", '0');
-            $stmt->bindValue(":parent_uuid", $parent);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -92,29 +118,24 @@ class User extends Model
         }
     }
 
-    public function getAllActives($parent): bool|array|string
+    public function getAllActives(): bool|array|string
     {
         try {
-            $query = "
-                SELECT u.uuid, u.name, u.email, u.status, u.file, u.phone, u.whatsapp,
-                        u.cellphone, u.job_role, r.name as role, u.created_at, u.updated_at,
-                        u.postal_code, u.address, u.number, u.complement, 
-                        u.neighborhood, u.city, u.state, u.gender, u.birthdate,
-                        u.start_date, u.end_date, u.salary,                         
-                        u.document_1, u.document_2, u.auth2factor, u.parent_uuid  
-                FROM user AS u
-                INNER JOIN role AS r
-                    ON u.role_uuid = r.uuid
-                WHERE u.deleted = :deleted
-                    AND u.status = :status
-                    AND u.parent_uuid = :parent_uuid
-                ORDER BY u.name 
-            ";
+            $query = "SELECT u.id, u.name, u.email, u.status, u.file, u.phone,  u.whatsapp,
+                            u.cellphone, u.job_role, r.name as role, u.created_at, u.updated_at,
+                            u.postal_code, u.address, u.number, u.complement, 
+                            u.neighborhood, u.city, u.state, u.document_1, u.document_2,
+                            u.salary, u.start_date, u.end_date 
+                        FROM {$this->getTable()} AS u
+                        INNER JOIN role AS r
+                            ON u.role_id = r.id
+                        WHERE u.deleted = :deleted
+                        AND u.status = :status
+                        ORDER BY u.name";
 
             $stmt = $this->openDb()->prepare($query);
             $stmt->bindValue(":deleted", '0');
             $stmt->bindValue(":status", '1');
-            $stmt->bindValue(":parent_uuid", $parent);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -131,11 +152,9 @@ class User extends Model
     public function totalUsers(): int|string
     {
         try {
-            $query = "
-                SELECT uuid
-                FROM user 
-                WHERE deleted = '0'
-            ";
+            $query = "SELECT id
+                        FROM {$this->getTable()} 
+                        WHERE deleted = '0'";
 
             $stmt = $this->openDb()->query($query);
             $result = $stmt->rowCount();
@@ -148,21 +167,19 @@ class User extends Model
             return $e->getMessage();
         }
     }
-  
-    public function getAllByRoleUuid($uuid): bool|array|string
+
+    public function getAllByRoleId(int $id): bool|array|string
     {
         try {
-            $query = "
-                SELECT u.uuid, u.name, u.email, u.status, u.file,  u.phone, u.parent_uuid,
-                        u.cellphone, u.job_role, r.name as role, u.created_at
-                FROM user AS u
-                INNER JOIN role AS r
-                    ON u.role_uuid = r.uuid
-                WHERE u.role_uuid = :role_uuid AND u.deleted = '0'
-            ";
+            $query = "SELECT u.id, u.name, u.email, u.status, u.file,  u.phone, u.whatsapp,
+                            u.cellphone, u.job_role, r.name as role, u.created_at
+                        FROM {$this->getTable()} AS u
+                        INNER JOIN role AS r
+                            ON u.role_id = r.id
+                        WHERE u.role_id = :role_id AND u.deleted = '0'";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":role_uuid", $uuid);
+            $stmt->bindValue(":role_id", $id);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -175,24 +192,21 @@ class User extends Model
             return $e->getMessage();
         }
     }
-  
-    public function authByCrenditials($email, $password, $token)
+
+    public function authByCrenditials(string $email, string $password, string $token): bool|array|string
     {
-    	try {
+        try {
             if (!empty($email) && !empty($password) && !empty($token)) {
-                $query = "
-                    SELECT u.uuid, u.name, u.email, u.password, u.file,
-                            r.name as role, u.role_uuid, 
-                            r.is_admin, u.auth2factor, u.parent_uuid 
-                    FROM user AS u
-                    INNER JOIN role AS r
-                        ON u.role_uuid = r.uuid
-                    WHERE u.email=:email AND u.password=:password
-                        AND u.status = :status
-                        AND u.code = :code
-                        AND u.code_validated = :code_validated
-                        AND u.deleted = :deleted
-                ";
+                $query = "SELECT u.id, u.name, u.email, u.password, u.file,
+                                r.name as role, u.role_id, r.is_admin, u.auth2factor
+                            FROM {$this->getTable()} AS u
+                            INNER JOIN role AS r
+                                ON u.role_id = r.id
+                            WHERE u.email=:email AND u.password=:password
+                                AND u.status = :status
+                                AND u.code = :code
+                                AND u.code_validated = :code_validated
+                                AND u.deleted = :deleted";
 
                 $stmt = $this->openDb()->prepare($query);
                 $stmt->bindValue(":email", $email);
@@ -221,30 +235,29 @@ class User extends Model
         }
     }
 
-    public function findByCrenditials($email, $password)
+    public function findByCredentials(string $email, string $password): bool|array|string
     {
         if (!empty($email) && !empty($password)) {
             try {
-                $query = "
-                    SELECT u.uuid, u.name, u.email, u.password, u.file,
-                            r.name as role, u.role_uuid, r.is_admin,
-                            u.code, u.auth2factor, u.parent_uuid 
-                    FROM user AS u
-                    INNER JOIN role AS r
-                        ON u.role_uuid = r.uuid
-                    WHERE u.email=:email
-                        AND u.status = :status
-                        AND u.deleted = :deleted
-                ";
+                $query = "SELECT u.id, u.name, u.email, u.password, u.file,
+                                r.name as role, u.role_id, r.is_admin,
+                                u.code, u.auth2factor
+                            FROM {$this->getTable()} AS u
+                            INNER JOIN role AS r
+                                ON u.role_id = r.id
+                            WHERE u.email=:email
+                                AND u.status = :status
+                                AND u.deleted = :deleted";
 
                 $stmt = $this->openDb()->prepare($query);
                 $stmt->bindValue(":email", $email);
                 $stmt->bindValue(":status", '1');
                 $stmt->bindValue(":deleted", '0');
                 $stmt->execute();
-              
+
                 if ($stmt->rowCount() == 1) {
                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
                     if (Bcrypt::check($password, $user['password'])) {
                         $data = $user;
                     } else {
@@ -265,21 +278,22 @@ class User extends Model
             return false;
         }
     }
-    
-    public function checkDeletePermission($roleUuid): bool|string
+
+    public function checkDeletePermission(int $roleId): bool|string
     {
         try {
-            $query = "SELECT role_uuid 
-                        FROM user
-                        WHERE role_uuid = :role_uuid AND deleted = :deleted";
+            $query = "SELECT role_id 
+                        FROM {$this->getTable()}
+                        WHERE role_id = :role_id 
+                        AND deleted = :deleted";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":role_uuid", $roleUuid);
+            $stmt->bindValue(":role_id", $roleId);
             $stmt->bindValue(":deleted", '0');
             $stmt->execute();
 
-            $results = $stmt->rowCount();   
-            
+            $results = $stmt->rowCount();
+
             $stmt = null;
             $this->closeDb();
 
@@ -287,7 +301,61 @@ class User extends Model
                 return false;
             } else {
                 return true;
-            }            
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function searchData(string $postData): bool|array|string
+    {
+        try {
+            $query = "SELECT id, name, job_role, email
+                        FROM {$this->getTable()}
+                        WHERE deleted = '0' AND status = '1' 
+                            AND (name LIKE '%$postData%' OR id LIKE '%$postData%')
+                        ORDER BY name  LIMIT 15";
+
+            $stmt = $this->openDb()->query($query);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+
+            return $result;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function getAllAdminActives(): bool|array|string
+    {
+        try {
+            $query = "SELECT u.id, u.name, u.email, u.status, u.file, u.phone,  u.whatsapp,
+                            u.cellphone, u.job_role, r.name as role, u.created_at, u.updated_at,
+                            u.postal_code, u.address, u.number, u.complement, 
+                            u.neighborhood, u.city, u.state, u.document_1, u.document_2,
+                            u.salary, u.start_date, u.end_date 
+                        FROM {$this->getTable()} AS u
+                        INNER JOIN role AS r
+                            ON u.role_id = r.id
+                        WHERE u.deleted = :deleted
+                        AND u.status = :status
+                        AND r.is_admin = :is_admin
+                        ORDER BY u.name";
+
+            $stmt = $this->openDb()->prepare($query);
+            $stmt->bindValue(":deleted", '0');
+            $stmt->bindValue(":status", '1');
+            $stmt->bindValue(":is_admin", '1');
+            $stmt->execute();
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $stmt = null;
+            $this->closeDb();
+
+            return $result;
         } catch (Exception $e) {
             return $e->getMessage();
         }

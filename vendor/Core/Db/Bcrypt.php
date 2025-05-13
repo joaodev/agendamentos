@@ -5,7 +5,8 @@ namespace Core\Db;
 /**
  * Bcrypt hashing class
  */
-class Bcrypt {
+class Bcrypt
+{
     /**
      * Default salt prefix
      *
@@ -44,7 +45,7 @@ class Bcrypt {
         // Salt
         $salt = self::generateRandomSalt();
         // Hash string
-        $hashString = self::__generateHashString((int)$cost, $salt);
+        $hashString = self::__generateHashString((int) $cost, $salt);
         return crypt($string, $hashString);
     }
     /**

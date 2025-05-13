@@ -4,35 +4,47 @@ namespace Core\Db;
 
 class Crud extends InitDb
 {
-    public function create($dataPost): bool|string
+    public function create(array $dataPost): bool|string
     {
         try {
-            $fields = [];
-            $values = [];
+            $fields = "";
+            $values = "";
+            $totalData = count($dataPost);
 
             foreach ($dataPost as $field => $value) {
-                $fields[] = $field;
-                $values[] = $value;
+                $totalData--;
+                $fields .= $field . ($totalData >= 1 ? ',' : null);
+                $values .= $value . ($totalData >= 1 ? "','" : null);
             }
 
-            $f = implode(",", $fields);
-            $v = implode("','", $values);
-            $v = "'" . $v . "'";
+            $values = "'" . $values . "'";
 
-            $query = "INSERT INTO {$this->getTable()} ({$f}) VALUES ({$v})";
-            $stmt = $this->openDb()->prepare($query);
-            $stmt->execute();
-            
-            $stmt = null; 
-            $this->closeDb();
+            if (!empty($fields) && !empty($values)) {
+                $pdo = $this->openDb();
 
-            return true;
+                $query = "INSERT INTO {$this->getTable()} ({$fields}) VALUES ({$values})";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute();
+
+                $lastId = $pdo->lastInsertId();
+                if (!$lastId) {
+                    $pdo->rollBack();
+                    return false;
+                }
+
+                $stmt = null;
+                $this->closeDb();
+
+                return $lastId;
+            } else {
+                return false;
+            }
         } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
 
-    public function update($data, $uuid, $uuidField, $secondParams = null): bool|string
+    public function update(array $data, string $id, string $idField, array $secondParams = null): bool|string
     {
         try {
             $otherParam = "";
@@ -55,16 +67,16 @@ class Crud extends InitDb
                 $query .= $key;
             }
 
-            $query .= " WHERE {$uuidField} =:uuid {$otherParam}";
+            $query .= " WHERE {$idField} =:id {$otherParam}";
             $stmt = $this->openDb()->prepare($query);
 
             foreach ($data as $column => $value) {
                 $stmt->bindValue(":" . $column, $value);
             }
-            $stmt->bindValue(":uuid", $uuid);
-            $update = $stmt->execute();
+            $stmt->bindValue(":id", $id);
+            $stmt->execute();
 
-            $stmt = null; 
+            $stmt = null;
             $this->closeDb();
 
             return true;
@@ -73,19 +85,19 @@ class Crud extends InitDb
         }
     }
 
-    public function delete($uuid, $uuidField): bool|string
+    public function delete(string $id, string $idField): bool|string
     {
         try {
             $query = "
                 DELETE FROM {$this->getTable()}  
-                WHERE {$uuidField} = :uuid
+                WHERE {$idField} = :id
             ";
 
             $stmt = $this->openDb()->prepare($query);
-            $stmt->bindValue(":uuid", $uuid);
+            $stmt->bindValue(":id", $id);
             $stmt->execute();
 
-            $stmt = null; 
+            $stmt = null;
             $this->closeDb();
 
             return true;

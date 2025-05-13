@@ -1,194 +1,713 @@
-<?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('view'), $this->moduleCodes('expenses'))): ?>
+<?php
+$isAdmin = $this->view->isAdmin;
+$aclData = $this->view->acl;
+$canView = $aclData['canView'];
+$canUpdate = $aclData['canUpdate'];
+$canDelete = $aclData['canDelete'];
+
+if (!empty($_POST['viewFiles']) && $_POST['viewFiles'] == 1):
+    $tabDataActive = '';
+    $tabFilesActive = 'active';
+else:
+    $tabDataActive = 'active';
+    $tabFilesActive = '';
+endif;
+
+if ($canView): ?>
     <?php $entity = $this->view->entity; ?>
     <?php if(empty($_POST['modal'])): ?>
-        <section class="content-header mt-5">
-            <div class="container-fluid mt-2">
-                <div class="row">
-                    <div class="col-9" >
-                        <h1 style="position: relative; top: 5px; font-size: 25px;">
-                            <i class="fas fa-info-circle pr-1"></i>
-                            Despesa para <?php echo $this->formatDate($entity['expense_date']); ?>
-                        </h1>
-                    </div>
-                    <div class="col-3">
-                        <ol class="breadcrumb float-right">
-                            <li class="breadcrumb-item">
-                                <button type="button" class="btn btn-outline-info mr-1" title="Imprimir"
-                                    onclick="window.print();">
-                                    <i class="fas fa-print"></i> 
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" title="Voltar para Despesas"
-                                    onclick="openModule('despesas?m=<?php echo $_POST['month']; ?>');">
-                                    <i class="fas fa-arrow-left"></i> 
-                                </button>
-                            </li>
-                        </ol>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-money-bill-wave pr-1"></i>
+                                Conta <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-info mr-1 btnRadius" title="Imprimir"
+                                onclick="window.print();">
+                                <i class="fas fa-print"></i> 
+                            </button>
+                            <button type="button" class="btn btn-primary btnRadius" title="Voltar para Contas"
+                                onclick="openModule('contas?m=<?php echo $_POST['month']; ?>');">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
-        <section class="content" style="margin-left: 9px; margin-right: 9px;">
-            <div class="container-fluid">
-                <div class="row">
+            <div class="row">
+                <?php if ($entity['deleted'] == 1): ?>
                     <div class="col-md-12">
-                    <?php endif; ?>
-                    <div class="card">
-                        <div class="card-body"> 
-                            <div class="row" id="printable">
-                                <div class="col-md-12">
-                                    <?php if ($entity['status'] == '1'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: orange;"></i> Pagamento pendente
-                                    <?php endif; ?>
-                                    <?php if ($entity['status'] == '2'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: green;"></i> Pagamento concluído
-                                    <?php endif; ?>
-                                    <?php if ($entity['status'] == '3'): ?>
-                                        <i class="fa fa-circle pr-1" style="color: red;"></i> Pagamento cancelado
-                                    <?php endif; ?>
-                                    <hr>
-                                </div>
-                                <div class="col-md-12">
-                                    <b>Despesa</b>
-                                    <p><?php echo $entity['title']; ?></p>
-                                </div>
-                                <?php if (!empty($entity['description'])): ?>
-                                    <div class="col-md-12">
-                                        <b>Descrição</b>
-                                        <p><?php echo $entity['description']; ?></p>
-                                    </div>
-                                <?php endif; ?>
-                                <?php if (!empty($entity['customerName'])): ?>
-                                    <div class="col-md-12">
-                                        <b>Cliente</b>
-                                        <p><?php echo $entity['customerName']; ?></p>
-                                    </div>
-                                <?php endif; ?>
-                                <?php if (!empty($entity['userName'])): ?>
-                                    <div class="col-md-12">
-                                        <b>Usuário</b>
-                                        <p><?php echo $entity['userName']; ?></p>
-                                    </div>
-                                <?php endif; ?>
-                                <div class="col-md-12"><hr></div>
-                                <div class="col-md-3">
-                                    <b>Data</b>
-                                    <p><?php echo $this->formatDate($entity['expense_date']); ?></p>
-                                </div>
-                                <div class="col-md-3">
-                                    <b>Valor</b>
-                                    <p>R$ <?php echo number_format($entity['amount'], 2, ",", "."); ?></p>
-                                </div>
-                                <div class="col-md-4">
-                                    <b>Forma de Pagamento</b>
-                                    <p>
-                                        <?php echo $entity['paymentTypeName']; ?>    
-                                    </p>
-                                </div>
-                                <div class="col-md-12"><hr></div>
-                                <div class="col-md-12 text-center">
-                                    <b>Arquivos Enviados</b>
-                                    <?php if (!empty($this->view->files)) : ?>
-                                        <?php foreach ($this->view->files as $file) : ?>
-                                            <div>
-                                                <?php if ($this->isImage($file['file'])): ?>
-                                                    <a href="<?php echo baseUrl . 'public/uploads/expenses/' . $entity['uuid'] . '/' . $file['file']; ?>" 
-                                                        data-lightbox="image-1"
-                                                        data-title="<?php echo $file['file']; ?>">
-                                                        <span class="fa fa-image pr-1"></span> <?php echo $file['file']; ?>
-                                                    </a>
-                                                <?php else: ?>
-                                                    <a href="<?php echo baseUrl . 'public/uploads/expenses/' . $entity['uuid'] . '/' . $file['file']; ?>" 
-                                                        target="_blank">
-                                                        <span class="fa fa-file-pdf pr-1"></span> <?php echo $file['file']; ?>
-                                                    </a>
-                                                <?php endif; ?>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    <?php else : ?>
-                                        <p class="text-center mt-2">Nenhum arquivo enviado</p>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-12"><hr></div>
-                                <div class="col-6 text-left">
-                                    <span class="fa fa-calendar pr-1"></span>
-                                    <span>Cadastrada em</span> <br>
-                                    <b>
-                                        <?php echo $this->formatDateTime($entity['created_at']); ?>
-                                    </b>
-                                </div>
-                                <div class="col-6 text-right">
-                                    <?php if (!empty($entity['updated_at'])): ?>
-                                        <span class="fa fa-calendar pr-1"></span>
-                                        <span>Atualizada em</span> <br>
-                                        <b>
-                                            <?php echo $this->formatDateTime($entity['updated_at']); ?>
-                                        </b>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-12"><hr></div>                            
+                        <div class="alert alert-danger">
+                            <i class="fa fa-info-circle pr-1"></i> 
+                            Conta removida em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <?php if ($entity['status'] == 2): ?>
+                        <div class="col-md-12">
+                            <div class="alert alert-success">
+                                <i class="fa fa-info-circle pr-1"></i> 
+                                Conta paga em <?php echo $this->formatDateTime($entity['updated_at']); ?>
                             </div>
-                            <div class="row">
-                                <?php if(empty($_POST['modal'])): ?>
-                                    <?php if ($entity['status'] == '1' || $this->parentUUID == $_SESSION['COD']): ?>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('delete'), $this->moduleCodes('expenses'))): ?>
-                                                <button type="button" class="btn btn-outline-danger"  title="Excluir Despesa"
-                                                    onclick="deleteExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-trash"></i> Excluir
-                                                </button>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($entity['status'] == 3): ?>
+                        <div class="col-md-12">
+                            <div class="alert alert-danger">
+                                <i class="fa fa-info-circle pr-1"></i> 
+                                Conta cancelada em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($entity['status'] == 4): ?>
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle pr-1"></i> 
+                                Enviada para análise em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <div class="col-md-12">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link <?php echo $tabDataActive; ?>" id="info-tab" data-toggle="tab" data-target="#info" 
+                                type="button" role="tab" aria-controls="info" aria-selected="true">
+                                <span class="fa fa-info-circle pr-1"></span> Dados
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link <?php echo $tabFilesActive; ?>" id="files-tab" data-toggle="tab" data-target="#files" 
+                                type="button" role="tab" aria-controls="files" aria-selected="false">
+                                <span class="fa fa-file-download pr-1"></span> Arquivos
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="historic-tab" data-toggle="tab" data-target="#historic" 
+                                type="button" role="tab" aria-controls="historic" aria-selected="false">
+                                <span class="fa fa-list pr-1"></span> Histórico
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show <?php echo $tabDataActive; ?>" id="info" role="tabpanel" aria-labelledby="info-tab">
+                            <?php endif; ?>
+                            <div class="card">
+                                <div class="card-body cardWrapperDetails">
+                                    <div class="row w-100 pt-3" id="printable" style="margin: 0 !important;">
+                                        <div class="col-6 col-md-4">
+                                            <div class="form-group">
+                                                <span class="fa fa-info-circle pr-1"></span>
+                                                <b>Código</b>
+                                                <p>
+                                                    <?php echo $entity['id']; ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 col-md-4">
+                                            <span class="fa fa-info-circle pr-1"></span>
+                                            <b>Situação</b>
+                                            <p>
+                                                <?php if ($entity['status'] == '1'): ?>
+                                                    <i class="fa fa-circle pr-1 text-info"></i> Pendente
+                                                <?php endif; ?>
+                                                <?php if ($entity['status'] == '2'): ?>
+                                                    <i class="fa fa-circle pr-1 text-success"></i> Paga
+                                                <?php endif; ?>
+                                                <?php if ($entity['status'] == '3'): ?>
+                                                    <i class="fa fa-circle pr-1 text-danger"></i> Cancelada
+                                                <?php endif; ?>
+                                                <?php if ($entity['status'] == '4'): ?>
+                                                    <i class="fa fa-circle pr-1 text-purple"></i> Em Análise
+                                                <?php endif; ?>
+                                            </p>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <span class="fa fa-calendar pr-1"></span>
+                                            <b>Data</b>
+                                            <p>
+                                                <?php 
+                                                $today = strtotime(date('Y-m-d'));
+                                                $entityDate = strtotime($entity['expense_date']);
+                                                
+                                                $textInfo = "";
+                                                $textColor = "";
+                                                if ($entityDate == $today && ($entity['status'] == 1)):
+                                                    $textColor = "color: blue !important";
+                                                    $textInfo = " (Para Hoje)";
+                                                elseif ($entityDate < $today && ($entity['status'] == 1)):
+                                                    $textColor = "color: red !important;";
+                                                    $textInfo = " (Atrasada)";
+                                                endif;
+                                                ?>
+                                                <span style="<?php echo $textColor; ?>"><?php echo $this->formatDate($entity['expense_date']); ?></span>
+                                                <span style="<?php echo $textColor; ?>"><?php echo $textInfo; ?></span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <hr class="cardLine">
+                                            <span class="fa fa-info-circle pr-1"></span>
+                                            <b>Conta</b>
+                                            <p>
+                                                <?php echo $entity['title']; ?>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <hr class="cardLine">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <span class="fa fa-info-circle pr-1"></span>
+                                            <b>Tipo</b>
+                                            <p>
+                                                <?php if ($entity['expense_type'] == '1'): ?>
+                                                    <span style="color: red;">
+                                                        <i class="fa fa-dollar-sign pr-1"></i> Conta a Pagar
+                                                    </span>
+                                                <?php endif; ?>
+                                                <?php if ($entity['expense_type'] == '2'): ?>
+                                                    <span style="color: green;">
+                                                        <i class="fa fa-dollar-sign pr-1"></i> Conta a Receber
+                                                    </span>
+                                                <?php endif; ?>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <span class="fa fa-dollar-sign pr-1"></span>
+                                            <b>Valor</b>
+                                            <p>R$
+                                                <?php echo number_format($entity['amount'], 2, ",", "."); ?>
+                                            </p>
+                                        </div>
+                                        <?php if ($entity['paymentTypeCod']): ?>
+                                            <div class="col-md-4">
+                                                <span class="fa fa-credit-card pr-1"></span>
+                                                <b>Forma de Pagamento</b>
+                                                <p>
+                                                    <?php echo $entity['paymentTypeCod'] . ' - ' . $entity['paymentTypeName']; ?>
+                                                </p>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="col-12"><hr class="cardLine"></div>
+                                        <?php if (!empty($entity['customerName'])): ?>
+                                            <div class="col-md-12"> 
+                                                <span class="fa fa-building pr-1"></span>
+                                                <b>Cliente</b>
+                                                <p>
+                                                    <?php echo $entity['customerCod'] . ' - ' . $entity['customerName']; ?>
+                                                </p>
+                                                <hr class="cardLine">
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($entity['userName'])): ?>
+                                            <div class="col-md-12">
+                                                <span class="fa fa-user pr-1"></span>
+                                                <b>Usuário</b>
+                                                <p>
+                                                    <?php echo $entity['userCod'] . ' - ' . $entity['userName']; ?>
+                                                </p>
+                                                <hr class="cardLine">
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($entity['providerName'])): ?>
+                                            <div class="col-md-12">
+                                                <span class="fa fa-truck pr-1"></span>
+                                                <b>Fornecedor</b>
+                                                <p>
+                                                    <?php echo $entity['providerCod'] . ' - ' . $entity['providerName']; ?>
+                                                </p>
+                                                <hr class="cardLine">
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($entity['description'])): ?>
+                                            <div class="col-md-12">
+                                                <span class="fa fa-info-circle pr-1"></span>
+                                                <b>Informações adicionais</b>
+                                                <p>
+                                                    <?php echo $entity['description']; ?>
+                                                </p>
+                                                <hr class="cardLine">
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="col-6">
+                                            <span class="fa fa-calendar pr-1"></span>
+                                            <b>Cadastro</b> <br>
+                                            <p>
+                                                <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <?php if (!empty($entity['updated_at'])): ?>
+                                                <span class="fa fa-calendar pr-1"></span>
+                                                <b>Última Atualização</b> <br>
+                                                <p>
+                                                    <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                                </p>
                                             <?php endif; ?>
                                         </div>
-                                        <div class="col-md-6 col-lg-4 mt-2 mb-2">
-                                            <?php if ($_SESSION['ROLE_ADM'] == '0' || $this->acl($_SESSION['ROLE'], $this->resourceCodes('update'), $this->moduleCodes('expenses'))): ?>
-                                                <button type="button" class="btn btn-outline-success"  title="Editar Despesa"
-                                                    onclick="updateExpense('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
-                                                    <i class="fa fa-pen pr-1"></i> Editar
-                                                </button>
+                                    </div>
+                                    <?php if(empty($_POST['modal'])): ?>
+                                        <div class="row mb-1">
+                                            <?php if ($entity['deleted'] == 0): ?>
+                                                <?php if ($entity['status'] != '2' || $isAdmin): ?>
+                                                    <?php if ($canUpdate): ?>
+                                                        <div class="col-md-12 mb-2 text-center">
+                                                            <button type="button" class="btn btn-primary btn-lg mb-2 btnRadiusLg" title="Alterar Situação"
+                                                                onclick="changeStatus('<?php echo $entity['id']; ?>');">
+                                                                <i class="fa fa-sync pr-1"></i> Alterar Situação
+                                                            </button>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <?php if ($canDelete): ?>
+                                                        <div class="col-md-6 mb-2">
+                                                            <button type="button" class="btn btn-danger btnRadius" title="Remover Conta"
+                                                                onclick="deleteExpense('<?php echo $entity['id']; ?>');"
+                                                                style="width: 100%;">
+                                                                <i class="fa fa-trash"></i> Remover
+                                                            </button>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <?php if ($canUpdate): ?>
+                                                        <div class="col-md-6 mb-2">
+                                                            <button type="button" class="btn btn-success btnRadius" title="Editar Conta"
+                                                                onclick="updateExpense('<?php echo $entity['id']; ?>');"
+                                                                style="width: 100%;">
+                                                                <i class="fa fa-pen pr-1"></i> Editar
+                                                            </button>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <?php if ($canUpdate): ?>
+                                                    <div class="col-md-12 mb-2 text-center">
+                                                        <button type="button" class="btn btn-primary btn-lg mb-2 btnRadiusLg" 
+                                                            title="Restaurar Conta"
+                                                            onclick="restoreExpense('<?php echo $entity['id']; ?>');">
+                                                            <i class="fa fa-sync pr-1"></i> Restaurar
+                                                        </button>
+                                                    </div>
+                                                <?php endif; ?>
                                             <?php endif; ?>
                                         </div>
-                                        <div class="col-md-12 col-lg-4 mt-2 mb-2">
-                                            <button type="button" class="btn btn-outline-primary" title="Voltar para Despesas"
-                                                onclick="openModule('despesas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
-                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                            </button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php if (!empty($_POST['modal']) && $_POST['modal'] == true): ?>
+                                <div class="row mt-md-4">
+                                    <div class="col-12 col-md-4">
+                                        <button type="button" class="btn btn-success w-100 mb-3 btnRadius" 
+                                            onclick="openModDetails('<?php echo $entity['id']; ?>', 'contas', '<?php echo substr($entity['expense_date'], 0,7); ?>');">
+                                            <i class="fa fa-external-link-alt pr-1"></i> Acessar
+                                        </button>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <button type="button" class="btn btn-info w-100 mb-3 btnRadius" title="Imprimir"
+                                            onclick="window.print();">
+                                            <i class="fas fa-print pr-1"></i> Imprimir
+                                        </button>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <button type="button"  class="btn btn-primary w-100 btnRadius" data-dismiss="modal">
+                                            <i class="fa fa-window-close pr-1"></i> Fechar
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                            <?php if(empty($_POST['modal'])): ?>
+                        </div>
+                        <div class="tab-pane fade show <?php echo $tabFilesActive; ?>" id="files" role="tabpanel" aria-labelledby="files-tab">
+                            <div class="card">
+                                <div class="card-body">
+                                    <?php if ($entity['status'] != '2' && $entity['status'] != '3' || $isAdmin): ?>
+                                        <?php if ($canUpdate && $entity['deleted'] == 0): ?>
+                                            <div class="row mb-2">
+                                                <div class="col-md-4 offset-md-4">
+                                                    <button type="button" class="btn btn-info w-100 btnRadius" onclick="openUploadModal();">
+                                                        <i class="fa fa-upload"></i> Enviar Arquivos
+                                                    </button>
+                                                </div>
+                                                <script>
+                                                    async function openUploadModal() {
+                                                        $("#modalGreenMidResult").html('Carregando...');
+                                                        $("#modalGreenMidLoader").hide();
+                                                        $("#modalGreenMidTitle").html('<i class="fa fa-upload pr-2"></i> Enviar Arquivos');
+                                                        $("#modalGreenMid").modal('show');
+
+                                                        await $.ajax({
+                                                            type: 'post',
+                                                            url: "<?php echo baseUrl; ?>contas/enviar-arquivos",
+                                                            data: {
+                                                                id: '<?php echo $entity['id']; ?>',
+                                                                target: '<?php echo $this->getTarget(); ?>'
+                                                            },
+                                                            async: true
+                                                        }).done(function(data) {
+                                                            $("#modalGreenMidResult").html(data);
+                                                            $("#modalGreenMidLoader").hide();
+                                                        }).fail(function() {
+                                                            showInternalErrorAlert();
+                                                            $("#modalGreenMidLoader").hide();
+                                                        });
+                                                    }
+                                                </script>
+                                            </div> 
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                    <div id="files_table" class="newPrintable w-100"></div>
+                                    <script>
+                                        async function loadExpenseFiles() {
+                                            $("#files_table").html('Carregando...');
+
+                                            await $.ajax({
+                                                type: 'post',
+                                                url: "<?php echo baseUrl; ?>contas/arquivos",
+                                                data: {
+                                                    id: '<?php echo $entity['id']; ?>',
+                                                    target: '<?php echo $this->getTarget(); ?>',
+                                                    hasUpdate: '<?php echo ($canUpdate ? 'true' : 'false'); ?>',
+                                                    hasDeleted: '<?php echo ($entity['deleted'] == 1 ? 'true' : 'false'); ?>',
+                                                    status: '<?php echo $entity['status']; ?>'
+                                                },
+                                                async: true
+                                            }).done(function (data) {
+                                                $("#files_table").html(data);
+                                            }).fail(function () {
+                                                showInternalErrorAlert();
+                                                $("#files_table").html('Erro ao listar arquivos.');
+                                            });
+                                        }
+
+                                        loadExpenseFiles();
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade show" id="historic" role="tabpanel" aria-labelledby="historic-tab">
+                            <div class="card">
+                                <div class="card-body newPrintable w-100 cardWrapper mb-1">
+                                    <?php if (!$this->view->historic): ?>
+                                        <div class="alert alert-info mt-3" role="alert">
+                                            <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
                                         </div>
                                     <?php else: ?>
-                                        <div class="col-md-4 offset-md-4 mt-2 mb-2">
-                                            <button type="button" class="btn btn-outline-primary" title="Voltar para Despesas"
-                                                onclick="openModule('despesas?m=<?php echo $_POST['month']; ?>');" style="width: 100%;">
-                                                <i class="fas fa-arrow-left pr-1"></i> Voltar
-                                            </button>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover tableHistoric w-100">
+                                                <thead class="bg-primary text-white">
+                                                    <tr class="text-center">
+                                                        <th style="font-size: 14px; padding: 2px; color: white;">Data</th>
+                                                        <th style="font-size: 14px; padding: 2px; color: white;">Responsável</th>
+                                                        <th style="font-size: 14px; padding: 2px; color: white;">Situação</th>
+                                                        <th style="display: none;">cod</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($this->view->historic as $historicItem): ?>
+                                                        <tr style="text-align: center; ">
+                                                            <td style="font-size: 15px;">
+                                                                <?php echo $this->formatDateTime($historicItem['created_at']); ?>
+                                                            </td>
+                                                            <td style="font-size: 15px;">
+                                                                <?php if (!empty($historicItem['userCod'])): ?>
+                                                                    <?php echo $historicItem['userCod'] . ' - ' . $historicItem['userName']; ?>
+                                                                <?php endif; ?>
+                                                                <?php if (!empty($historicItem['customerCod'])): ?>
+                                                                    <?php echo $historicItem['customerCod'] . ' - ' . $historicItem['customerName']; ?>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                            <td style="font-size: 15px;">
+                                                                <?php if (!empty($historicItem['status']) && $historicItem['status'] == '1'): ?>
+                                                                    <i class="fa fa-circle pr-1 text-info"></i> Conta Pendente</span>
+                                                                <?php endif; ?>
+                                                                <?php if (!empty($historicItem['status']) && $historicItem['status'] == '2'): ?>
+                                                                    <i class="fa fa-circle pr-1 text-success"></i> Conta Paga</span>
+                                                                <?php endif; ?>
+                                                                <?php if (!empty($historicItem['status']) && $historicItem['status'] == '3'): ?>
+                                                                    <i class="fa fa-circle pr-1 text-danger"></i> Conta Cancelada
+                                                                <?php endif; ?>
+                                                                <?php if (!empty($historicItem['status']) && $historicItem['status'] == '4'): ?>
+                                                                    <i class="fa fa-circle pr-1 text-purple"></i> Conta em Análise
+                                                                <?php endif; ?>
+                                                            </td>
+                                                            <td style="display: none;"><?php echo $historicItem['id']; ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     <?php endif; ?>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <?php if (!empty($_POST['modal']) && $_POST['modal'] == true): ?>
-                        <div class="row mt-md-4">
-                            <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-success w-100 mb-3" 
-                                    onclick="openModDetails('<?php echo $entity['uuid']; ?>', 'despesas', '<?php echo substr($entity['expense_date'], 0,7); ?>');">
-                                    <i class="fa fa-external-link-alt pr-1"></i> Acessar
-                                </button>
-                            </div>
-                            <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-primary w-100 mb-3" title="Imprimir"
-                                    onclick="window.print();">
-                                    <i class="fas fa-print pr-1"></i> Imprimir
-                                </button>
-                            </div>
-                            <div class="col-12 col-md-4">
-                                <button type="button" class="btn btn-outline-danger w-100" data-dismiss="modal">
-                                    <i class="fa fa-window-close pr-1"></i> Fechar
-                                </button>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if(empty($_POST['modal'])): ?>
+                                </div>
+                            </div> 
+                        </div> 
                     </div>
                 </div>
             </div>
-        </section>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openModule('contas?m=<?php echo $_POST['month']; ?>');"
+                        title="Voltar para Contas">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modalDeleteExpense" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="overlay" id="modalDeleteExpenseLoader">
+                    <i class="fas fa-2x fa-sync fa-spin"></i>
+                </div>
+                <div class="modal-header text-white bg-danger">
+                    <h4 class="modal-title" id="modalDeleteExpenseTitle"></h4>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="text-center pt-3">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <b>Tem certeza que deseja excluir este registro? 
+                                <br>Após esta operação, não será possível revertê-la.</b>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <input type="checkbox" name="expense_delete_notification" id="expense_delete_notification" value="1" class="mr-1"> 
+                            <small style="position: relative; top: -2px;">Enviar notificação sobre a operação.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body text-center" id="modalDeleteExpenseResult"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalDeleteExpenseFile" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="overlay" id="modalDeleteExpenseFileLoader">
+                    <i class="fas fa-2x fa-sync fa-spin"></i>
+                </div>
+                <div class="modal-header text-white bg-danger">
+                    <h4 class="modal-title" id="modalDeleteExpenseFileTitle"></h4>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="text-center pt-3">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <b>Tem certeza que deseja excluir este registro? 
+                                <br>Após esta operação, não será possível revertê-la.</b>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <input type="checkbox" name="expense_delete_notification_file" id="expense_delete_notification_file" value="1" class="mr-1"> 
+                            <small style="position: relative; top: -2px;">Enviar notificação sobre a operação.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body text-center" id="modalDeleteExpenseFileResult"></div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+    <?php if(empty($_POST['modal'])): ?>
+        <?php if ($entity['deleted'] == 1 && $canUpdate): ?>
+            <script>
+                function restoreExpense(id) {
+                    $("#modalRestoreTitle").html('<i class="fa fa-sync pr-2"></i> Restaurar Conta');
+                    $("#modalRestoreLoader").hide();
+                    $("#modalRestore").modal('show');
+                    $("#modalRestoreResult").html('<button type="button" class="btn btn-primary btnRadius" title="Confirmar" onclick="runRestore(\''+id+'\');"><i class="fa fa-check"></i> CONFIRMAR</button>');
+                }
+
+                async function runRestore(id) {
+                    if (id !== null) {
+                        $("#modalRestoreLoader").show();
+
+                        let status_mail = null;
+                        if ($('#basic_restore_notification').is(':checked')) {
+                            status_mail = $("#basic_restore_notification").val();
+                        } 
+
+                        await $.ajax({
+                            type: "POST",
+                            url: "<?php echo baseUrl; ?>contas/restaurar",
+                            data: {
+                                id: id, 
+                                send_mail: status_mail,
+                                target: '<?php echo $this->getTarget(); ?>'
+                            },
+                            dataType: 'json',
+                            async: true
+                        }).done(async function(data) {
+                            showAlert(data.type, data.title, data.msg, data.pos);
+                            $("#modalRestore").modal('hide');
+                            await openExpenseDetails(id);
+                        }).fail(function() {
+                            showInternalErrorAlert();
+                            $("#modalRestoreLoader").hide();
+                        });
+                    }
+                }
+            </script>
+        <?php endif; ?>
+        <?php if (!empty($this->view->historic)): ?>
+            <script>
+                $(document).ready(function () {
+                    $('.tableHistoric').DataTable({
+                        "sDom": 'tip',
+                        searching: true,
+                        order: [[3, "desc"]],
+                        columnDefs: [{orderable: false, targets: [0,1,2]}],
+                        responsive: true,
+                        info: true,
+                        processing: true,
+                        scrollCollapse: true,
+                        paging: true,
+                        "pageLength": 25,
+                        "language": {
+                            "sEmptyOs": "Nenhum registro encontrado",
+                            "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                            "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                            "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                            "sInfoPostFix": "",
+                            "sInfoThousands": ".",
+                            "sLengthMenu": "_MENU_ &nbsp;",
+                            "sLoadingRecords": "Carregando...",
+                            "sProcessing": "Processando...",
+                            "sZeroRecords": "Nenhum registro encontrado",
+                            "sSearch": "Filtrar",
+                            "oPaginate": {
+                                "sNext": "Próximo",
+                                "sPrevious": "Anterior",
+                                "sFirst": "Primeiro",
+                                "sLast": "Último"
+                            },
+                            "oAria": {
+                                "sSortAscending": ": Ordenar colunas de forma ascendente",
+                                "sSortDescending": ": Ordenar colunas de forma descendente"
+                            }
+                        }
+                    });
+                });
+            </script>
+        <?php endif; ?>
+        <script>
+            async function openExpenseDetails(id) {
+                $("#baseLoader").show();
+                await $.ajax({
+                    type: 'post',
+                    url: "<?php echo baseUrl; ?>contas/detalhes",
+                    data: {
+                        id:id,
+                        month: '<?php echo $_POST['month']; ?>',
+                        target: '<?php echo $this->getTarget(); ?>'
+                    },
+                    async: true
+                }).done(function (data) {
+                    $("#sis_content").html(data);
+                    $("#baseLoader").fadeOut();
+                }).fail(function () {
+                    showInternalErrorAlert();
+                    $("#baseLoader").fadeOut();
+                });
+            }
+        </script>
+        <?php if ($entity['deleted'] == 0): ?>
+            <?php if ($entity['status'] != '2' && $canUpdate || $isAdmin): ?>
+                <script>
+                    async function changeStatus(id) {
+                        $("#modalMidTitle").html('<i class="fa fa-info-circle pr-2"></i> Alterar Situação');
+                        $("#modalMidLoader").show();
+                        $("#modalMid").modal('show');     
+
+                        await $.ajax({
+                            type: 'post',
+                            url: "<?php echo baseUrl; ?>contas/alterar-situacao",
+                            data: { 
+                                id: id,
+                                month: '<?php echo $_POST['month']; ?>',
+                                target: '<?php echo $this->getTarget(); ?>'
+                            },
+                            async: true
+                        }).done(function (data) {
+                            $("#modalMidResult").html(data);
+                            $("#modalMidLoader").hide();
+                        }).fail(function () {
+                            showInternalErrorAlert();
+                            $("#modalMidLoader").hide();
+                        });
+                    }
+                </script>
+            <?php endif; ?>
+            <?php if ($canUpdate && ($entity['status'] != '2') || $isAdmin): ?>
+                <script>
+                    async function updateExpense(id) {
+                        $("#baseLoader").show();
+                        await $.ajax({
+                            type: 'post',
+                            url: "<?php echo baseUrl; ?>contas/editar",
+                            data: { 
+                                id: id,
+                                target: '<?php echo $this->getTarget(); ?>' 
+                            },
+                            async: true
+                        }).done(function (data) {
+                            $("#sis_content").html(data);
+                            $("#baseLoader").fadeOut();
+                        }).fail(function () {
+                            showInternalErrorAlert();
+                            $("#baseLoader").fadeOut();
+                        });
+                    }
+                </script>
+            <?php endif; ?>
+            <?php if ($canDelete && ($entity['status'] != '2') || $isAdmin): ?>
+                <script>
+                    function deleteExpense(id) {
+                        $("#modalXL").modal('hide');
+                        $("#modalDeleteExpenseTitle").html('<i class="fa fa-trash pr-2"></i> Remover Conta');
+                        $("#modalDeleteExpenseLoader").hide();
+                        $("#modalDeleteExpense").modal('show');
+                        $("#modalDeleteExpenseResult").html('<button type="button" class="btn btn-danger btnRadius" title="Confirmar Exclusão" onclick="runDelete(\'' + id + '\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
+                    }
+
+                    async function runDelete(id) {
+                        if (id !== null) {
+                            $("#modalDeleteExpenseLoader").show();
+                            
+                            let status_mail = null;
+                            if ($('#expense_delete_notification').is(':checked')) {
+                                status_mail = $("#expense_delete_notification").val();
+                            } 
+
+                            let month = '<?php echo $_POST['month']; ?>';
+                            await $.ajax({
+                                type: "POST",
+                                url: "<?php echo baseUrl; ?>contas/excluir",
+                                data: { 
+                                    id: id,
+                                    send_mail: status_mail,
+                                    target: '<?php echo $this->getTarget(); ?>'  
+                                },
+                                dataType: 'json',
+                                async: true
+                            }).done(async function (data) {
+                                showAlert(data.type, data.title, data.msg, data.pos);
+                                $("#modalDeleteExpense").modal('hide');
+                                await openModule('contas?m=' + month);
+                            }).fail(function () {
+                                showInternalErrorAlert();
+                                $("#modalDeleteExpenseLoader").hide();
+                            });
+                        }
+                    }
+                </script>
+            <?php endif; ?>
+        <?php endif; ?>
     <?php endif; ?>
 <?php endif; ?>

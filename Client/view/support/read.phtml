@@ -1,0 +1,550 @@
+<?php 
+$entity = $this->view->entity; 
+
+if (!empty($_POST['viewFiles']) && $_POST['viewFiles'] == 1):
+    $tabDataActive = '';
+    $tabMsgsActive = '';
+    $tabFilesActive = 'active';
+elseif (!empty($_POST['viewMsgs']) && $_POST['viewMsgs'] == true):
+    $tabDataActive = '';
+    $tabFilesActive = '';
+    $tabMsgsActive = 'active';
+else:
+    $tabDataActive = 'active';
+    $tabMsgsActive = '';
+    $tabFilesActive = '';
+endif; 
+?>
+<section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body cardWrapper">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="pt-2">
+                            <i class="fas fa-info-circle pr-1"></i>
+                            Chamado <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                        </h5>
+                    </div>
+                    <div class="col-6 text-right">
+                        <button type="button" class="btn btn-info mr-1 btnRadius" 
+                            title="Imprimir"
+                            onclick="window.print();">
+                            <i class="fas fa-print"></i> 
+                        </button>
+                        <button type="button" class="btn btn-primary btnRadius" 
+                            title="Voltar para Chamados"
+                            onclick="openModule('chamados');">
+                            <i class="fas fa-arrow-left"></i> 
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <?php if ($entity['deleted'] == 1): ?>
+                <div class="col-md-12">
+                    <div class="alert alert-danger">
+                        <i class="fa fa-info-circle pr-1"></i> 
+                        Chamado removido em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                    </div>
+                </div>
+            <?php else: ?>
+                <?php if ($entity['status'] == 2): ?>
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle pr-1"></i> 
+                            Chamado executado em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <?php if ($entity['status'] == 3): ?>
+                    <div class="col-md-12">
+                        <div class="alert alert-success">
+                            <i class="fa fa-info-circle pr-1"></i> 
+                            Chamado finalizado em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <?php if ($entity['status'] == 4): ?>
+                    <div class="col-md-12">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-info-circle pr-1"></i> 
+                            Chamado fechado em <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+            <div class="col-md-12">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link <?php echo $tabDataActive; ?>" id="info-tab" data-toggle="tab" data-target="#info" 
+                            type="button" role="tab" aria-controls="info" aria-selected="true">
+                            <span class="fa fa-info-circle pr-1"></span> Dados Gerais
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link <?php echo $tabFilesActive; ?>" id="files-tab" data-toggle="tab" data-target="#files" 
+                            type="button" role="tab" aria-controls="files" aria-selected="false">
+                            <span class="fa fa-file-download pr-1"></span> Arquivos Enviados
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link <?php echo $tabMsgsActive; ?>" id="messages-tab" data-toggle="tab" data-target="#messages" 
+                            type="button" role="tab" aria-controls="messages" aria-selected="false">
+                            <span class="fa fa-comments pr-1"></span> Mensagens
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="historic-tab" data-toggle="tab" data-target="#historic" 
+                            type="button" role="tab" aria-controls="historic" aria-selected="false">
+                            <span class="fa fa-list pr-1"></span> Histórico
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show <?php echo $tabDataActive; ?>" id="info" role="tabpanel" aria-labelledby="info-tab">
+                        <div class="card">
+                            <div class="card-body cardWrapperDetails">
+                                <div class="row w-100 pt-3" id="printable" style="margin: 0 !important;">
+                                    <div class="col-6 col-md-4">
+                                        <div class="form-group">
+                                            <span class="fa fa-info-circle pr-1"></span>
+                                            <b>Código</b>
+                                            <p>
+                                                <?php echo $entity['id']; ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Situação</b>
+                                        <p>
+                                            <?php if ($entity['status'] == '1'): ?>
+                                                <i class="fa fa-circle pr-1 text-info"></i> Aberto
+                                            <?php endif; ?>
+                                            <?php if ($entity['status'] == '2'): ?>
+                                                <i class="fa fa-circle pr-1 text-purple"></i> Em Atendimento
+                                            <?php endif; ?>
+                                            <?php if ($entity['status'] == '3'): ?>
+                                                <i class="fa fa-circle pr-1 text-success"></i> Finalizado
+                                            <?php endif; ?>
+                                            <?php if ($entity['status'] == '4'): ?>
+                                                <i class="fa fa-circle pr-1 text-danger"></i> Fechado
+                                            <?php endif; ?>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span class="fa fa-calendar pr-1"></span>
+                                        <b>Data de abertura</b> <br>
+                                        <p>
+                                            <?php echo $this->formatDateTime($entity['created_at']); ?>
+                                        </p>
+                                    </div>
+                                    <div class="col-12"><hr class="cardLine"></div>
+                                    <div class="col-md-12">
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Assunto</b>
+                                        <p><?php echo $entity['title']; ?></p>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <span class="fa fa-info-circle pr-1"></span>
+                                        <b>Descrição do problema</b>
+                                        <p><?php echo $entity['description']; ?></p>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <hr class="cardLine">
+                                    </div>
+                                    <?php if (!empty($this->view->responsibles)): ?>
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4><span class="fa fa-users pr-1"></span> Responsáveis</h4>
+                                                </div>
+                                                <div class="col-12" id="reponsiblesTable">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-hover tableSupport" id="table_responsibles"
+                                                            style=" border: 1px solid #ccc;">
+                                                            <thead>
+                                                                <tr class="text-center bg-primary">
+                                                                    <th style="font-size: 14px; color: white;"><i class="fa fa-image"></i></th>
+                                                                    <th style="font-size: 14px; color: white;">Responsável</th>
+                                                                    <th style="font-size: 14px; color: white;">Cargo</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php foreach ($this->view->responsibles as $responsible): ?>
+                                                                    <tr style="text-align: center;">
+                                                                        <td style="width: 35px;">
+                                                                            <?php if (!empty($responsible['userAvatar']) && $this->isImage($responsible['userAvatar'], 'users')): ?>
+                                                                                <a href="<?php echo baseUrl . 'public/uploads/users/' . $responsible['userAvatar']; ?>" 
+                                                                                    data-lightbox="image-1"
+                                                                                    data-title="<?php echo $responsible['userAvatar']; ?>">
+                                                                                    <img src="<?php echo baseUrl . 'public/uploads/users/'
+                                                                                        . $responsible['userAvatar']; ?>" style="width: 30px; height: 30px;" 
+                                                                                        alt="<?php echo $responsible['userName']; ?>"
+                                                                                        class="img-circle">
+                                                                                </a>
+                                                                            <?php else: ?>
+                                                                                <img src="<?php echo baseUrl . 'public/uploads/semfoto.png'; ?>" 
+                                                                                    style="width: 30px; height: 30px;" alt="<?php echo $responsible['userName']; ?> - SEM FOTO"
+                                                                                    title="Responsável sem foto" class="img-circle">
+                                                                            <?php endif; ?>
+                                                                        </td>
+                                                                        <td style="font-size: 15px" class="pt-2">
+                                                                            <?php echo $responsible['userCod']; ?> - <?php echo $responsible['userName']; ?>
+                                                                        </td>
+                                                                        <td style="font-size: 15px" class="pt-2">
+                                                                            <?php echo $responsible['userRole']; ?>
+                                                                        </td>
+                                                                    </tr>
+                                                                <?php endforeach; ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($entity['call_answer']): ?>
+                                        <div class="col-md-12 mt-3">
+                                            <span class="fa fa-info-circle pr-1"></span>
+                                            <b>Descrição da solução do problema</b>
+                                            <p><?php echo $entity['call_answer']; ?></p>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="col-12 mt-3">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <span class="fa fa-user pr-1"></span>
+                                                <b>Chamado aberto por</b> <br>
+                                                <p>
+                                                    <?php 
+                                                    if (!empty($entity['user_id'])): ?>
+                                                        <?php echo $entity['userName']; ?>
+                                                    <?php elseif (!empty($entity['customer_id'])): ?>
+                                                        <?php echo $entity['customerName']; ?>
+                                                    <?php else: ?>
+                                                        Nenhuma informação
+                                                    <?php endif; ?>
+                                                </p>
+                                            </div>
+                                            <div class="col-66">
+                                                <?php if (!empty($entity['updated_at'])): ?>
+                                                    <span class="fa fa-calendar pr-1"></span>
+                                                    <b>Última Atualização</b> <br>
+                                                    <p>
+                                                        <?php echo $this->formatDateTime($entity['updated_at']); ?>
+                                                    </p>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade show <?php echo $tabFilesActive; ?>" id="files" role="tabpanel" aria-labelledby="files-tab">
+                        <div class="card">
+                            <div class="card-body cardWrapper mb-1">
+                                <div id="files_table" class="newPrintable w-100"></div>
+                                <script>
+                                    async function loadSupportFiles() {
+                                        $("#files_table").html('Carregando...');
+
+                                        await $.ajax({
+                                            type: 'post',
+                                            url: "<?php echo baseUrl; ?>cliente/chamados/arquivos",
+                                            data: {
+                                                id: '<?php echo $entity['id']; ?>',
+                                                target: '<?php echo $this->getClientTarget(); ?>'
+                                            },
+                                            async: true
+                                        }).done(function (data) {
+                                            $("#files_table").html(data);
+                                        }).fail(function () {
+                                            showInternalErrorAlert();
+                                            $("#files_table").html('Erro ao listar arquivos.');
+                                        });
+                                    }
+
+                                    loadSupportFiles();
+                                </script>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="tab-pane fade show <?php echo $tabMsgsActive; ?>" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-body pt-1 newPrintable" id="messagesBox" 
+                                        style="max-height: 400px; overflow-y: scroll; width: 100%;"></div>
+                                </div>
+                                <?php if (($entity['status'] == '1' || $entity['status'] == '2') && $entity['deleted'] == '0'): ?>
+                                    <div class="text-center my-3" onclick="loadSupportMessages();">
+                                        <button type="button" class="btn btn-sm btn-outline-primary btnRadius">
+                                            <span class="fa fa-sync"></span> Atualizar mensagens
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php if (($entity['status'] == '1' || $entity['status'] == '2') && $entity['deleted'] == '0'): ?>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-body cardWrapper">
+                                            <div class="row">
+                                                <div class="col-12 col-md-12">
+                                                    <form method="post" name="formSendMessage" id="formSendMessage">
+                                                        <div class="row">
+                                                            <div class="col-9 col-md-10 col-lg-11 my-1">
+                                                                <input type="text" class="form-control" placeholder="Mensagem" 
+                                                                    name="message" id="message"
+                                                                    title="Escreva uma mensagem..."
+                                                                    maxlength="200" required>
+                                                            </div>
+                                                            <div class="col-3 col-md-2 col-lg-1 my-1">
+                                                                <input type="hidden" name="id" value="<?php echo $entity['id']; ?>">
+                                                                <input type="hidden" name="target" value="<?php echo $this->getClientTarget(); ?>">
+                                                                <button type="submit" class="btn btn-primary btnRadius" style="width: 100%;" id="btnSubmit">
+                                                                    <span class="fa fa-share"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="tab-pane fade show" id="historic" role="tabpanel" aria-labelledby="historic-tab">
+                        <div class="card">
+                            <div class="card-body newPrintable w-100 cardWrapper mb-1">
+                                <?php if (!$this->view->historic): ?>
+                                    <div class="alert alert-info mt-3" role="alert">
+                                        <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                    </div>
+                                <?php else: ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover tableHistoric w-100">
+                                            <thead class="bg-primary text-white">
+                                                <tr class="text-center">
+                                                    <th style="font-size: 14px; padding: 2px; color: white;">Data</th>
+                                                    <th style="font-size: 14px; padding: 2px; color: white;">Responsável</th>
+                                                    <th style="font-size: 14px; padding: 2px; color: white;">Situação</th>
+                                                    <th style="display: none;">cod</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($this->view->historic as $historicItem): ?>
+                                                    <tr style="text-align: center; ">
+                                                        <td style="font-size: 15px;">
+                                                            <?php echo $this->formatDateTime($historicItem['created_at']); ?>
+                                                        </td>
+                                                        <td style="font-size: 15px;">
+                                                            <?php if (!empty($historicItem['userCod'])): ?>
+                                                                <?php echo $historicItem['userName']; ?>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($historicItem['customerCod'])): ?>
+                                                                <?php echo $historicItem['customerName']; ?>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td style="font-size: 15px;">
+                                                            <?php if (!empty($historicItem['status']) && $historicItem['status'] == '1'): ?>
+                                                                <i class="fa fa-circle pr-1 text-info"></i> Chamado Aberto</span>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($historicItem['status']) && $historicItem['status'] == '2'): ?>
+                                                                <i class="fa fa-circle pr-1 text-purple"></i> Chamado em Atendimento</span>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($historicItem['status']) && $historicItem['status'] == '3'): ?>
+                                                                <i class="fa fa-circle pr-1 text-success"></i> Chamado Finalizado
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($historicItem['status']) && $historicItem['status'] == '4'): ?>
+                                                                <i class="fa fa-circle pr-1 text-danger"></i> Chamado Fechado
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td style="display: none;"><?php echo $historicItem['id']; ?></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div> 
+                    </div>  
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center mb-3">
+                <button type="button" class="btn btn-default btn-sm btnRadius"
+                    onclick="openModule('chamados');"
+                    title="Voltar para Chamados">
+                    <i class="fas fa-arrow-left pr-1"></i> Voltar
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+<?php if (!empty($this->view->historic)): ?>
+    <script>
+        $(document).ready(function () {
+            $('.tableHistoric').DataTable({
+                "sDom": 'tip',
+                searching: true,
+                order: [[3, "desc"]],
+                columnDefs: [{orderable: false, targets: [0,1,2]}],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: true,
+                "pageLength": 25,
+                "language": {
+                    "sEmptyOs": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+    </script>
+<?php endif; ?>
+<script>
+    async function loadSupportMessages() {
+        $("#messagesBox").html('<br>Carregando mensagens...');
+        $("#baseLoader").show();
+        await $.ajax({
+            type: "POST",
+            url: "<?php echo baseUrl; ?>cliente/chamados/mensagens",
+            data: {
+                id: '<?php echo $entity['id']; ?>',
+                target: '<?php echo $this->getClientTarget(); ?>'
+            },
+            async: true
+        }).done(function(data) {
+            $("#baseLoader").fadeOut();
+            $("#messagesBox").html(data)
+        }).fail(function() {
+            showInternalErrorAlert(); 
+            $("#baseLoader").fadeOut();   
+        }); 
+    }
+
+    loadSupportMessages();
+    
+    async function openDetails(id) {
+        $("#baseLoader").show();
+        await $.ajax({
+            type: 'post',
+            url: "<?php echo baseUrl; ?>cliente/chamados/detalhes",
+            data: {
+                id:id,
+                target: '<?php echo $this->getClientTarget(); ?>'
+            },
+            async: true
+        }).done(function (data) {
+            $("#sis_content").html(data);
+            $("#baseLoader").fadeOut();
+        }).fail(function () {
+            showInternalErrorAlert();
+            $("#baseLoader").fadeOut();
+        });
+    }
+</script>
+<?php if (($entity['status'] == '1' || $entity['status'] == '2') && $entity['deleted'] == '0'): ?>
+    <script>
+        $(document).ready(function() {
+            $('#formSendMessage').validate({
+                submitHandler: async function( form ){
+                    let dados = $( form ).serialize();
+
+                    $("#baseLoader").show();   
+                    $("#btnSubmit").attr('disabled', true);
+            
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>cliente/chamados/processa-mensagem",
+                        data: dados,
+                        dataType: 'json',
+                        async: true
+                    }).done(async function(data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        $("#baseLoader").fadeOut();
+                        $("#btnSubmit").attr('disabled', false);
+                        $("#message").val('');
+                        await loadSupportMessages();
+                    }).fail(function() {
+                        showInternalErrorAlert(); 
+                        $("#baseLoader").fadeOut();   
+                        $("#btnSubmit").attr('disabled', false);
+                    }); 
+                
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>
+<?php if (!empty($this->view->responsibles)): ?>
+    <script>
+        $(document).ready(function () {
+            $('.tableSupport').DataTable({
+                "sDom": '',
+                searching: false,
+                order: [[1, "asc"]],
+                columnDefs: [{orderable: false, targets: [0]}],
+                responsive: true,
+                info: true,
+                processing: true,
+                scrollCollapse: true,
+                paging: false,
+                "language": {
+                    "sEmptyOs": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ &nbsp;",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Filtrar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    }
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

@@ -1,0 +1,35 @@
+<?php
+
+$url = "http://localhost/intranet/";
+
+define('baseDir', '/intranet');
+define('baseUrl', $url);
+define('ENV_PRODUCTION', false);
+
+define('DB_SERVER', 'localhost');
+define('DB_DATABASE', 'intranet');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_PORT', '3306');
+
+setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
+date_default_timezone_set('America/Sao_Paulo');
+
+//GERAR PASTAS DE UPLOADS
+//RECOMENDADO APLICAR A PERMISSÃO VIA TERMINAL
+//sudo chmod -R 777 public/uploads
+
+$folders = [
+    'tasks', 'purchases', 'expenses',
+    'users', 'menu', 'support',
+    'schedules', 'customers', 'items',
+    'os', 'os/os_files', 'os/os_follow_ups',
+    'budgets'
+];
+
+foreach ($folders as $folder) {
+    $dir = "../public/uploads/$folder";
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777);
+    }
+}

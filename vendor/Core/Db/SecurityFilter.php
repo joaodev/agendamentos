@@ -7,15 +7,20 @@ class SecurityFilter
     private static function getMaliciousLabels(): array
     {
         return [
-            'SELECT', '<script>',
-            'UNION', 'INSERT', 'DELETE',  'DROP', 'EXECUTE',
+            'SELECT',
+            '<script>',
+            'UNION',
+            'INSERT',
+            'DELETE',
+            'DROP',
+            'EXECUTE',
             'JOIN'
         ];
     }
 
-    private static function splitOutput($output): array|bool
+    private static function splitOutput($output): array |bool
     {
-        return preg_split('/ /', $output , -1, PREG_SPLIT_OFFSET_CAPTURE);
+        return preg_split('/ /', $output, -1, PREG_SPLIT_OFFSET_CAPTURE);
     }
 
     private function registerAttack($attack): void
@@ -32,7 +37,7 @@ class SecurityFilter
                 filter_var($output, FILTER_UNSAFE_RAW)
             ) {
                 $split_names = self::splitOutput($output);
-                $malicious 	 = self::getMaliciousLabels();
+                $malicious = self::getMaliciousLabels();
 
                 foreach ($split_names as $key => $split_name) {
                     if (!empty($split_name[0])) {

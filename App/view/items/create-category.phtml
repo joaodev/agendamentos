@@ -1,0 +1,53 @@
+<?php if ($this->view->acl['canCreateCategory']): ?>
+    <form method="post" name="formCreateItemCategory" id="formCreateItemCategory">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="title">Título*</label>
+                    <input type="text" class="form-control" name="title" required maxlength="150"
+                        placeholder="Título da Categoria">
+                </div>
+            </div>
+            <div class="col-md-12 mt-3 mb-2">
+                <input type="hidden" name="target" value="<?php echo $this->getTarget(); ?>">
+                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmitCategory" title="Salvar Categoria">
+                    <i class="fa fa-save pr-1"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </form>
+    <script>
+        $(document).ready(function () {
+            $('#formCreateItemCategory').validate({
+                submitHandler: async function (form) {
+                    let dados = $(form).serialize();
+
+                    $("#modalGreenMidLoader").show();
+                    $("#btnSubmitCategory").attr('disabled', true);
+
+                    await $.ajax({
+                        type: "POST",
+                        url: "<?php echo baseUrl; ?>categorias/processa-cadastro",
+                        data: dados,
+                        dataType: 'json',
+                        async: true
+                    }).done(function (data) {
+                        showAlert(data.type, data.title, data.msg, data.pos);
+                        if (data.type === 'success') {
+                            $("#category_id").append('<option value="' + data.id + '" selected>'+data.id+' - ' + data.titlecat + '</option>');
+                            $("#modalGreenMid").modal('hide');
+                        }
+
+                        $("#btnSubmitCategory").attr('disabled', false);
+                    }).fail(function () {
+                        showInternalErrorAlert();
+                        $("#modalGreenMidLoader").hide();
+                        $("#btnSubmitCategory").attr('disabled', false);
+                    });
+
+                    return false;
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

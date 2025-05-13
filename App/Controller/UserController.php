@@ -3,9 +3,13 @@
 namespace App\Controller;
 
 use Core\Controller\ActionController;
-use Core\Di\Container;
 use Core\Db\Crud;
 use App\Interfaces\CrudInterface;
+use App\Model\Acl;
+use App\Model\Privilege;
+use App\Model\Role;
+use App\Model\TimeSheets;
+use App\Model\User;
 use Core\Db\Bcrypt;
 
 class UserController extends ActionController implements CrudInterface
@@ -14,130 +18,160 @@ class UserController extends ActionController implements CrudInterface
     private mixed $roleModel;
     private mixed $privilegeModel;
     private mixed $aclModel;
+    private mixed $timeSheetsModel;
+    private array $aclData;
 
     public function __construct()
     {
-        parent::__construct();  
-        $this->model = Container::getClass("User", "app");
-        $this->roleModel = Container::getClass("Role", "app");
-        $this->privilegeModel = Container::getClass("Privilege", "app");
-        $this->aclModel = Container::getClass("Acl", "app");
+        parent::__construct();
+
+        $this->model = new User();
+        $this->roleModel = new Role();
+        $this->privilegeModel = new Privilege();
+        $this->aclModel = new Acl();
+        $this->timeSheetsModel = new TimeSheets();
+        
+        $this->aclData = [
+            'canView' => $this->getAcl('view', 'user'),
+            'canCreate' => $this->getAcl('create', 'user'),
+            'canUpdate' => $this->getAcl('update', 'user'),
+            'canDelete' => $this->getAcl('delete', 'user'),
+            'canViewAcl' => $this->getAcl('view', 'privileges'),
+            'canUpdateAcl' => $this->getAcl('update', 'privileges'),
+            'canViewTimeSheets' => $this->getAcl('view', 'time-sheets'),
+            'canCreateTimeSheets' => $this->getAcl('create', 'time-sheets'),
+            'canUpdateTimeSheets' => $this->getAcl('update', 'time-sheets'),
+            'canDeleteTimeSheets' => $this->getAcl('delete', 'time-sheets'),
+        ];
+
+        $this->view->acl = $this->aclData;
     }
 
     public function indexAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $activePlan = self::getActivePlan();
-            $totalUsers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
-            
-            $totalFree = ($activePlan['total_users'] - $totalUsers);
-            $this->view->total_free = $totalFree;
-
-            if ($totalUsers >= $activePlan['total_users']) {
-                $reached_limit = true;
-            } else {
-                $reached_limit = false;
-            }   
-            $this->view->reached_limit = $reached_limit;
-
-            $data = $this->model->getAll($this->parentUUID);
+        if ($this->validatePostParams($_POST) && $this->aclData['canView']) {
+            $data = $this->model->getAll();
             $this->view->data = $data;
             $this->render('index', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function createAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $roles = $this->roleModel->getAll(null);
+        if ($this->validatePostParams($_POST) && $this->aclData['canCreate']) {
+            $roles = $this->roleModel->getAll();
             $this->view->roles = $roles;
-        
+            
             $this->render('create', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function createProcessAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canCreate']) {
             unset($_POST['target']);
-            $activePlan = self::getActivePlan();
-            $totalUsers = $this->model->totalData($this->model->getTable(), $this->parentUUID);
-            if ($totalUsers >= $activePlan['total_users']) {
-                $data  = [
+            
+            if ($this->model->fieldExists('name', $_POST['name'], 'id')) {
+                $data = [
                     'title' => 'Erro!',
-                    'msg' => 'Você atingiu o limite de cadastros disponíveis para este plano.',
-                    'type' => 'error',
-                    'pos'   => 'top-center'
+                    'msg' => 'Nome já cadastrado, informe outro.',
+                    'type' => 'error', 'pos' => 'top-center'
+                ];
+
+                echo json_encode($data);
+                return false;
+            }
+
+            if ($this->model->fieldExists('email', $_POST['email'], 'id')) {
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'Email já cadastrado, informe outro.',
+                    'type' => 'error', 'pos' => 'top-center'
+                ];
+
+                echo json_encode($data);
+                return false;
+            }
+
+            if ($this->model->fieldExists('cellphone', $_POST['cellphone'], 'id')) {
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'Celular já cadastrado, informe outro.',
+                    'type' => 'error', 'pos' => 'top-center'
+                ];
+
+                echo json_encode($data);
+                return false;
+            }
+
+            $passwordToken = $this->randomString(8);
+            $_POST['password'] = Bcrypt::hash(md5($passwordToken));
+
+            if ($_POST['salary']) {
+                $_POST['salary'] = $this->moneyToDb($_POST['salary']);
+            } else {
+                unset($_POST['salary']);
+            }
+
+            if (empty($_POST['birthdate'])) {
+                unset($_POST['birthdate']);
+            }
+            if (empty($_POST['end_date'])) {
+                unset($_POST['end_date']);
+            }
+
+            $_POST['code'] = md5($this->randomString(10));
+            $_POST['code_validated'] = 1;
+
+            $crud = new Crud();
+            $crud->setTable($this->model->getTable());
+            $transaction = $crud->create($_POST);
+
+            if ($transaction) {
+                $newId = $transaction;
+                $privileges = $this->privilegeModel->getAllByRoleId($_POST['role_id']);
+
+                foreach ($privileges as $privilege) {
+                    $aclData = [
+                        'user_id' => $newId,
+                        'privilege_id' => $privilege['id']
+                    ];
+
+                    $crud->setTable($this->aclModel->getTable());
+                    $crud->create($aclData);
+                }
+
+                $message = "<p>Você foi adicionado ao sistema, veja as informações de como acessar:</p>
+                            <br>
+                            <p>Email: <b>{$_POST['email']}</b></p>
+                            <p>Senha: <b>$passwordToken</b></p>";
+
+                $this->sendMail([
+                    'title' => 'Senha de Acesso',
+                    'message' => $message,
+                    'name' => $_POST['name'],
+                    'toAddress' => $_POST['email']
+                ]);
+
+                $this->toLog("Cadastrou o usuário: {$_POST['name']} #{$newId}");
+                $data = [
+                    'title' => 'Sucesso!',
+                    'msg' => 'Usuário cadastrado.',
+                    'type' => 'success',
+                    'pos' => 'top-right',
+                    'id' => $newId
                 ];
             } else {
-                if (!empty($_POST['role_uuid'])) {
-                    $role = $this->roleModel->getOne($_POST['role_uuid']);
-                    if (!$role) {
-                        $data  = [
-                            'title' => 'Erro!', 
-                            'msg' => 'Nível de acesso inválido.',
-                            'type' => 'error',
-                            'pos'   => 'top-center'
-                        ];
-                        
-                        echo json_encode($data);
-                        return true;
-                    }
-                } else {
-                    $customerProfileUuid = $this->getCustomerProfileUuid();
-                    $_POST['role_uuid'] = $customerProfileUuid;
-                }
-
-                if ($_POST['password'] != $_POST['confirmation']) {
-                    $data  = [
-                        'title' => 'Erro!', 
-                        'msg' => 'Senhas incorretas.',
-                        'type' => 'error',
-                        'pos'   => 'top-center'
-                    ];
-                } else {
-                    unset($_POST['confirmation']);
-                    $_POST['password'] = Bcrypt::hash($_POST['password']);
-
-                    $_POST['code'] = md5($this->randomString());
-                    $_POST['code_validated'] = 1;
-        
-                    $_POST['uuid'] = $this->model->NewUUID();
-                    $_POST['parent_uuid'] = $this->parentUUID;
-
-                    $crud = new Crud();
-                    $crud->setTable($this->model->getTable());
-                    $transaction = $crud->create($_POST);
-        
-                    if ($transaction) {
-                        $privileges = $this->privilegeModel->getAllByRoleUuid($_POST['role_uuid']);
-                        foreach ($privileges as $privilege) {
-                            $aclData = [
-                                'uuid' => $this->privilegeModel->NewUUID(),
-                                'user_uuid' => $_POST['uuid'],
-                                'privilege_uuid' => $privilege['uuid']
-                            ];
-        
-                            $crud->setTable($this->aclModel->getTable());
-                            $crud->create($aclData);
-                        }
-        
-                        $this->toLog("Cadastrou o usuário: {$_POST['name']} #{$_POST['uuid']}");
-                        $data  = [
-                            'title' => 'Sucesso!', 
-                            'msg'   => 'Usuário cadastrado.',
-                            'type'  => 'success',
-                            'pos'   => 'top-right'
-                        ];
-                    } else {
-                        $data  = [
-                            'title' => 'Erro!', 
-                            'msg' => 'O Usuário não foi cadastrado.',
-                            'type' => 'error',
-                            'pos'   => 'top-center'
-                        ];
-                    }
-                }
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'O Usuário não foi cadastrado.',
+                    'type' => 'error',
+                    'pos' => 'top-center'
+                ];
             }
 
             echo json_encode($data);
@@ -147,65 +181,118 @@ class UserController extends ActionController implements CrudInterface
         }
     }
 
-	public function readAction(): void
+    public function readAction(): void
     {
-        if (!empty($_POST['uuid']) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
-            $this->view->entity = $entity;
-            $this->render('read', false);
+        if (!empty($_POST['id']) && $this->validatePostParams($_POST) && $this->aclData['canView']) {
+            $entity = $this->model->getOne($_POST['id'], false);
+            if ($entity) {
+                $this->view->entity = $entity;
+                $this->render('read', false);
+            } else {
+                $this->render('../error/not-found', false);
+            }
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
-	public function updateAction(): void
+    public function updateAction(): void
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $roles = $this->roleModel->getAll(null);
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            $roles = $this->roleModel->getAll();
             $this->view->roles = $roles;
 
-            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
+            $entity = $this->model->getOne($_POST['id']);
             $this->view->entity = $entity;
 
             $this->render('update', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
             unset($_POST['target']);
-            $entity = $this->model->getOne($_POST['uuid'], $this->parentUUID);
+
+            if ($this->model->fieldExists('name', $_POST['name'], 'id', $_POST['id'])) {
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'Nome já cadastrado, informe outro.',
+                    'type' => 'error', 'pos' => 'top-center'
+                ];
+
+                echo json_encode($data);
+                return false;
+            }
+
+            if ($this->model->fieldExists('email', $_POST['email'], 'id', $_POST['id'])) {
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'Email já cadastrado, informe outro.',
+                    'type' => 'error', 'pos' => 'top-center'
+                ];
+
+                echo json_encode($data);
+                return false;
+            }
+
+            if ($this->model->fieldExists('cellphone', $_POST['cellphone'], 'id', $_POST['id'])) {
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'Celular já cadastrado, informe outro.',
+                    'type' => 'error', 'pos' => 'top-center'
+                ];
+
+                echo json_encode($data);
+                return false;
+            }
+            
+            $entity = $this->model->getOne($_POST['id']);
+
             if (!empty($_POST['password'])) {
                 unset($_POST['password']);
             }
 
-            if (empty($_POST['role_uuid'])) {
-                $customerProfileUuid = $this->getCustomerProfileUuid();
-                $_POST['role_uuid'] = $customerProfileUuid;
-            }
-            
             $_POST['updated_at'] = date('Y-m-d H:i:s');
+
+            if (!empty($_POST['salary']) && $_POST['salary'] != '0,00') {
+                $_POST['salary'] = $this->moneyToDb($_POST['salary']);
+            } else {
+                $_POST['salary'] = null;
+            }
+
+            if (empty($_POST['birthdate'])) {
+                $_POST['birthdate'] = null;
+            }
+
+            if (empty($_POST['end_date'])) {
+                $_POST['end_date'] = null;
+            }
+
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
-            $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
+            $transaction = $crud->update($_POST, $_POST['id'], 'id');
 
-            if ($transaction) {  
-                if ($entity['role_uuid'] != $_POST['role_uuid']) {
-                    $this->reorganizeAcl($_POST['role_uuid'], $_POST['uuid']);
+            if ($transaction) {
+                if (!empty($_POST['role_id']) && $entity['role_id'] != $_POST['role_id']) {
+                    $this->reorganizeAcl($_POST['role_id'], $_POST['id']);
                 }
 
-                $this->toLog("Atualizou o usuário: {$_POST['name']} #{$_POST['uuid']}");
-                $data  = [
-                    'title' => 'Sucesso!', 
-                    'msg'   => 'Usuário atualizado.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right'
+                $this->toLog("Atualizou o usuário: {$_POST['name']} #{$_POST['id']}");
+                $data = [
+                    'title' => 'Sucesso!',
+                    'msg' => 'Usuário atualizado.',
+                    'type' => 'success',
+                    'pos' => 'top-right'
                 ];
             } else {
-                $data  = [
-                    'title' => 'Erro!', 
+                $data = [
+                    'title' => 'Erro!',
                     'msg' => 'O Usuário não foi atualizado.',
                     'type' => 'error',
-                    'pos'   => 'top-center'
+                    'pos' => 'top-center'
                 ];
             }
 
@@ -216,32 +303,41 @@ class UserController extends ActionController implements CrudInterface
         }
     }
 
-	public function deleteAction(): bool
+    public function deleteAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $updateData = [
-                'updated_at' => date('Y-m-d H:i:s'),
-                'deleted' => '1'
-            ];
-
-            $crud = new Crud();
-            $crud->setTable($this->model->getTable());
-            $transaction = $crud->update($updateData, $_POST['uuid'], 'uuid');
-
-            if ($transaction) {
-                $this->toLog("Removeu o usuário: #{$_POST['uuid']}");
-                $data  = [
-                    'title' => 'Sucesso!', 
-                    'msg'   => 'Usuário removido.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right'
+        if ($this->validatePostParams($_POST) && $this->aclData['canDelete']) {
+            if (($_POST['id'] != $_SESSION['COD'])) {
+                $updateData = [
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'deleted' => '1'
                 ];
+
+                $crud = new Crud();
+                $crud->setTable($this->model->getTable());
+                $transaction = $crud->update($updateData, $_POST['id'], 'id');
+
+                if ($transaction) {
+                    $this->toLog("Removeu o usuário: #{$_POST['id']}");
+                    $data = [
+                        'title' => 'Sucesso!',
+                        'msg' => 'Usuário removido.',
+                        'type' => 'success',
+                        'pos' => 'top-right'
+                    ];
+                } else {
+                    $data = [
+                        'title' => 'Erro!',
+                        'msg' => 'O Usuário não foi removido.',
+                        'type' => 'error',
+                        'pos' => 'top-center'
+                    ];
+                }
             } else {
-                $data  = [
-                    'title' => 'Erro!', 
-                    'msg' => 'O Usuário não foi removido.',
+                $data = [
+                    'title' => 'Erro!',
+                    'msg' => 'O Usuário está logado.',
                     'type' => 'error',
-                    'pos'   => 'top-center'
+                    'pos' => 'top-center'
                 ];
             }
         } else {
@@ -252,59 +348,42 @@ class UserController extends ActionController implements CrudInterface
         return true;
     }
 
-    public function fieldExistsAction(): void
-    {
-        if (!empty($_POST)) {
-            $uuid  = (!empty($_POST['uuid']) ? $_POST['uuid'] : null);
-            $field = "";
-
-            if (!empty($_POST['name'])) $field      = 'name';
-            if (!empty($_POST['email'])) $field     = 'email';
-            if (!empty($_POST['cellphone'])) $field = 'cellphone';
-            
-            $exists = $this->model->fieldExists($field, $_POST[$field], 'uuid', $uuid);
-            if ($exists) {
-                echo 'false';
-            } else {
-                echo 'true';
-            }
-        }
-    }
-
     public function aclAction(): void
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $user = $this->model->getOne($_POST['uuid'], $this->parentUUID);
+        if ($this->validatePostParams($_POST) && $this->aclData['canViewAcl']) {
+            $user = $this->model->getOne($_POST['id']);
             $this->view->user = $user;
-            
-            $data = $this->aclModel->getUserPrivileges($_POST['uuid']);
+
+            $data = $this->aclModel->getUserPrivileges($_POST['id']);
             $this->view->data = $data;
             $this->render('acl', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function alterPrivilegeAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdateAcl']) {
             unset($_POST['target']);
+            
             $crud = new Crud();
             $crud->setTable($this->aclModel->getTable());
-            $transaction = $crud->update($_POST, $_POST['uuid'], 'uuid');
+            $transaction = $crud->update($_POST, $_POST['id'], 'id');
 
             if ($transaction) {
-                $this->toLog("Permissões de usuário atualizadas: #{$_POST['uuid']}");
-                $data  = [
-                    'title' => 'Sucesso!', 
-                    'msg'   => 'Privilégio atualizado.',
-                    'type'  => 'success',
-                    'pos'   => 'top-right'
+                $data = [
+                    'title' => 'Sucesso!',
+                    'msg' => 'Privilégio atualizado.',
+                    'type' => 'success',
+                    'pos' => 'top-right'
                 ];
             } else {
-                $data  = [
-                    'title' => 'Erro!', 
+                $data = [
+                    'title' => 'Erro!',
                     'msg' => 'O Privilégio não foi atualizado.',
                     'type' => 'error',
-                    'pos'   => 'top-center'
+                    'pos' => 'top-center'
                 ];
             }
 
@@ -315,21 +394,106 @@ class UserController extends ActionController implements CrudInterface
         }
     }
 
+    public function timeSheetsAction(): void
+    {
+        if (!empty($_POST['id']) && $this->validatePostParams($_POST) && $this->aclData['canViewTimeSheets']) {
+            if (!empty($_POST['month'])) {
+                $month = $_POST['month'];
+            } else {
+                $month = date('Y-m');
+            }
+
+            $this->view->month = self::formatMonth($month);
+            
+            $user = $this->model->getOne($_POST['id'], false);
+            $this->view->user = $user;
+
+            $data = $this->timeSheetsModel->getAllByUser($_POST['id'], $month);
+            $this->view->data = $data;
+            
+            $this->render('time-sheet', false);
+        } else {
+            $this->render('../error/not-found', false);
+        }
+    }
+
+    public function timesheetDetailsAction(): void
+    {
+        if (!empty($_POST['id']) && $this->validatePostParams($_POST) && $this->aclData['canViewTimeSheets']) {
+            $user = $this->model->getOne($_POST['user_id'], false);
+            $this->view->user = $user;
+
+            $entity = $this->timeSheetsModel->getOne($_POST['id']);
+            $this->view->entity = $entity;
+
+            $this->render('timesheet-details', false);
+        } else {
+            $this->render('../error/not-found', false);
+        }
+    }
+
+    public function timesheetCreateAction(): void
+    {
+        if (!empty($_POST['user_id']) && $this->validatePostParams($_POST) && $this->aclData['canCreateTimeSheets']) {
+            $user = $this->model->getOne($_POST['user_id']);
+            $this->view->user = $user;
+
+            $this->render('timesheet-create', false);
+        } else {
+            $this->render('../error/not-found', false);
+        }
+    }
+
+    public function timesheetUpdateAction(): void
+    {
+        if (!empty($_POST['id']) && !empty($_POST['user_id']) && $this->validatePostParams($_POST) && $this->aclData['canUpdateTimeSheets']) {
+            $user = $this->model->getOne($_POST['user_id']);
+            $this->view->user = $user;
+
+            $entity = $this->timeSheetsModel->getOne($_POST['id']);
+            $this->view->entity = $entity;
+            
+            $this->render('timesheet-update', false);
+        } else {
+            $this->render('../error/not-found', false);
+        }
+    }
+
+    public function searchResponsibleAction(): bool
+    {
+        if (!empty($_POST)) {
+            $res = [];
+            if (!empty($_POST['term']) && strlen($_POST['term']) >= 1) {
+                $data = $this->model->searchData($_POST['term']);
+
+                foreach ($data as $entity) {
+                    $res[] = [
+                        'id' => $entity['id'],
+                        'text' => $entity['id']
+                        .' - '. $entity['name'] 
+                        .' - '. $entity['job_role'] . ' (' . $entity['email'] . ')'
+                    ];
+                }
+            }
+
+            echo json_encode($res);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private function reorganizeAcl($role, $user): void
     {
         if (!empty($role) && !empty($user)) {
-            //limpa a acl de usuario
             if ($this->aclModel->cleanUserAcl($user)) {
-                //limpa os privilegios de usuarios
                 if ($this->privilegeModel->cleanUserPrivileges($user)) {
-                    //configura os novos privilegios
                     $crud = new Crud();
-                    $privileges = $this->privilegeModel->getAllByRoleUuid($role);
+                    $privileges = $this->privilegeModel->getAllByRoleId($role);
                     foreach ($privileges as $privilege) {
                         $aclData = [
-                            'uuid' => $this->privilegeModel->NewUUID(),
-                            'user_uuid' => $user,
-                            'privilege_uuid' => $privilege['uuid']
+                            'user_id' => $user,
+                            'privilege_id' => $privilege['id']
                         ];
                         
                         $crud->setTable($this->aclModel->getTable());
@@ -337,6 +501,64 @@ class UserController extends ActionController implements CrudInterface
                     }
                 }
             }
+        }
+    }
+
+
+
+    public function restoreProcessAction(): bool
+    {
+        if ($this->validatePostParams($_POST) && $this->aclData['canUpdate']) {
+            
+            $entity = $this->model->getOne($_POST['id'], false);
+            if ($entity) {
+
+                $crud = new Crud();
+                $crud->setTable($this->model->getTable());
+                $transaction = $crud->update([
+                    'deleted' => '0',
+                    'status' => '1',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ], $_POST['id'], 'id');
+
+                if ($transaction) {
+                    if (!empty($_POST['send_mail']) && $_POST['send_mail'] == 1) {
+                        $url = baseUrl;
+                        $message = "<h3>Acesso  restaurado:</h3>";
+                        $message .= "<p><b>{$entity['name']}</b></p>";
+                        $message .= "<p><a href='$url'>acesse a plataforma</a> para conferir.</p>";
+
+                        $this->sendMail([
+                            'title' => "Acesso restaurado",
+                            'message' => $message,
+                            'name' => $entity['name'],
+                            'toAddress' => $entity['email']
+                        ]);
+                    }
+
+                    $this->toLog("Restaurou o usuário {$_POST['id']}");
+                    $data  = [
+                        'title' => 'Sucesso!',
+                        'msg'   => 'Usuário restaurado.',
+                        'type'  => 'success',
+                        'pos'   => 'top-right'
+                    ];
+                } else {
+                    $data  = [
+                        'title' => 'Erro!',
+                        'msg' => 'O Usuário não foi restaurado.',
+                        'type' => 'error',
+                        'pos'   => 'top-center'
+                    ];
+                }
+
+                echo json_encode($data);
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;   
         }
     }
 }

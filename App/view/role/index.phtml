@@ -1,210 +1,158 @@
-<?php $data = $this->view->data; ?>
-<?php if ($_SESSION['ROLE_ADM'] == '1'): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11" >
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-lock pr-1"></i>
-                        Controle de Acesso
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-success"
-                                onclick="createRole();" style="width: 100%;" title="Adicionar Perfil">
+<?php if ($this->view->isAdmin): ?>
+    <?php $data = $this->view->data; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-lock pr-1"></i>
+                                Controle de Acesso
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-success btnRadius" 
+                                title="Adicionar Perfil"
+                                onclick="createRole();">
                                 <i class="fas fa-plus"></i> 
                             </button>
-                        </li>
-                    </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table_role" style="width: 100%;">
-                                    <thead>
-                                        <tr class="text-center" style="height: 30px;">
-                                            <th style="font-size: 14px;">Nome</th>
-                                            <th style="font-size: 14px;">Administrador</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($data as $entity): ?>
-                                            <tr class="text-center" style="cursor: pointer;" 
-                                                onclick="openDetails('<?php echo $entity['uuid']; ?>');">
-                                                <td style="font-size: 15px">
-                                                    <?php echo $entity['name']; ?>
-                                                </td>
-                                                <td style="font-size: 15px">
-                                                    <?php echo ($entity['is_admin'] == 1) ? 'Sim' : 'Não'; ?>
-                                                </td>
+                        <div class="card-body cardWrapperList">
+                            <?php if (!$data): ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle pr-1"></i> Nenhuma informação até o momento.
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table_role" style="width: 100%;">
+                                        <thead>
+                                            <tr class="text-center" style="height: 30px;">
+                                                <th style="font-size: 14px;">Nome</th>
+                                                <th style="font-size: 14px;">Administrador</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($data as $entity): ?>
+                                                <tr class="text-center" style="cursor: pointer;" 
+                                                    onclick="openRoleDetails('<?php echo $entity['id']; ?>');">
+                                                    <td style="font-size: 15px">
+                                                        <?php echo $entity['name']; ?>
+                                                    </td>
+                                                    <td style="font-size: 15px">
+                                                        <?php echo ($entity['is_admin'] == 1) ? 'Sim' : 'Não'; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            let buttonCommon = {
-                exportOptions: {
-                    format: {
-                        body: function ( data ) {
-                            return data;
+    <?php if ($data): ?>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                let buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function ( data ) {
+                                return data;
+                            }
                         }
                     }
-                }
-            };	
+                };	
 
-            $('#table_role').DataTable({
-                "sDom": 'flBtp',
-                searching: true,
-                buttons: [
-                    $.extend( true, {}, buttonCommon, {
-                        extend: 'excel',
-                        title: 'NÍVEIS DE ACESSO',
-                        exportOptions: {columns: [0,1]}
-                    })
-                ],
-                order: [ [0, "asc"] ],
-                responsive: true,
-                info: true,
-                processing: true,
-                scrollCollapse: true,
-                paging: true,
-                "pageLength": 10,
-                "language": {
-                    "sEmptyTable": "Nenhum registro encontrado",
-                    "sInfo": "_START_ até _END_ de _TOTAL_ registros",
-                    "sInfoEmpty": "0 até 0 de 0 registros",
-                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
-                    "sInfoPostFix": "",
-                    "sInfoThousands": ".",
-                    "sLengthMenu": "_MENU_ &nbsp;",
-                    "sLoadingRecords": "Carregando...",
-                    "sProcessing": "Processando...",
-                    "sZeroRecords": "Nenhum registro encontrado",
-                    "sSearch": "Filtrar",
-                    "oPaginate": {
-                        "sNext": "Próximo",
-                        "sPrevious": "Anterior",
-                        "sFirst": "Primeiro",
-                        "sLast": "Último"
-                    },
-                    "oAria": {
-                        "sSortAscending": ": Ordenar colunas de forma ascendente",
-                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                $('#table_role').DataTable({
+                    "sDom": 'flBtp',
+                    searching: true,
+                    buttons: [
+                        $.extend( true, {}, buttonCommon, {
+                            extend: 'excel',
+                            title: 'NÍVEIS DE ACESSO',
+                            exportOptions: {columns: [0,1]}
+                        })
+                    ],
+                    order: [ [0, "asc"] ],
+                    responsive: true,
+                    info: true,
+                    processing: true,
+                    scrollCollapse: true,
+                    paging: true,
+                    "pageLength": 25,
+                    "language": {
+                        "sEmptyTable": "Nenhum registro encontrado",
+                        "sInfo": "_START_ até _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "0 até 0 de 0 registros",
+                        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sInfoThousands": ".",
+                        "sLengthMenu": "_MENU_ &nbsp;",
+                        "sLoadingRecords": "Carregando...",
+                        "sProcessing": "Processando...",
+                        "sZeroRecords": "Nenhum registro encontrado",
+                        "sSearch": "Filtrar",
+                        "oPaginate": {
+                            "sNext": "Próximo",
+                            "sPrevious": "Anterior",
+                            "sFirst": "Primeiro",
+                            "sLast": "Último"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ordenar colunas de forma ascendente",
+                            "sSortDescending": ": Ordenar colunas de forma descendente"
+                        }
                     }
-                }
+                });
             });
-        });
-
-        function openDetails(uuid) {
+        </script>
+    <?php endif; ?>
+    <script>
+        async function createRole() {
             $("#baseLoader").show();
-            $.ajax({
-                type: 'post',
-                url: "<?php echo baseUrl; ?>controle-acesso/detalhes",
-                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
-                async: true
-            }).done(function(data) {
-                $("#sis_content").html(data);
-                $("#baseLoader").hide();
-            }).fail(function() {
-                showInternalErrorAlert();
-                $("#baseLoader").hide();
-            });
-        }
-
-        function rolePrivileges(uuid) {
-            $("#baseLoader").show();
-            $.ajax({
-                type: 'post',
-                url: "<?php echo baseUrl; ?>controle-acesso/permissoes",
-                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
-                async: true
-            }).done(function(data) {
-                $("#sis_content").html(data);
-                $("#baseLoader").hide();
-            }).fail(function() {
-                showInternalErrorAlert();
-                $("#baseLoader").hide();
-            });
-        }
-
-        function createRole() {
-            $("#baseLoader").show();
-            $.ajax({
+            await $.ajax({
                 type: 'post',
                 url: "<?php echo baseUrl; ?>controle-acesso/cadastrar",
-                data: {
-                    target: '<?php echo $this->getTarget(); ?>'
+                data: { 
+                    target: '<?php echo $this->getTarget(); ?>' 
                 },
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
-                $("#baseLoader").hide();
+                $("#baseLoader").fadeOut();
             }).fail(function() {
                 showInternalErrorAlert();
-                $("#baseLoader").hide();
+                $("#baseLoader").fadeOut();
             });
         }
 
-        function updateRole(uuid) {
+        async function openRoleDetails(id) {
             $("#baseLoader").show();
-            $.ajax({
+            await $.ajax({
                 type: 'post',
-                url: "<?php echo baseUrl; ?>controle-acesso/editar",
-                data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
+                url: "<?php echo baseUrl; ?>controle-acesso/detalhes",
+                data: { 
+                    id: id,
+                    target: '<?php echo $this->getTarget(); ?>' 
+                },
                 async: true
             }).done(function(data) {
                 $("#sis_content").html(data);
-                $("#baseLoader").hide();
+                $("#baseLoader").fadeOut();
             }).fail(function() {
                 showInternalErrorAlert();
-                $("#baseLoader").hide();
+                $("#baseLoader").fadeOut();
             });
-        }
-
-        function deleteRole(uuid) {
-            $("#modalLarge").modal('hide');
-            $("#modalDeleteTitle").html('<i class="fa fa-trash pr-2"></i> Excluir Perfil de Acesso');
-            $("#modalDeleteLoader").hide();
-            $("#modalDelete").modal('show');
-            $("#modalDeleteResult").html('<button type="button" class="btn btn-danger" title="Confirmar Exclusão" onclick="runDelete(\''+uuid+'\');"><i class="fa fa-trash"></i> CONFIRMAR E EXCLUIR</button>');
-        }   
-
-        function runDelete(uuid) {
-            if (uuid !== null) {
-                $("#modalDeleteLoader").show();
-
-                $.ajax({
-                    type: "POST",
-                    url: "<?php echo baseUrl; ?>controle-acesso/excluir",
-                    data: {uuid:uuid, target: '<?php echo $this->getTarget(); ?>'},
-                    dataType: 'json',
-                    async: true
-                }).done(function(data) {
-                    showAlert(data.type, data.title, data.msg, data.pos);
-                    $("#modalDelete").modal('hide');
-                    openModule('controle-acesso');
-                }).fail(function() {
-                    showInternalErrorAlert();
-                    $("#modalDeleteLoader").hide();
-                });
-            }
         }
     </script>
 <?php endif; ?>

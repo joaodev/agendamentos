@@ -1,50 +1,49 @@
-<?php
-$entity = $this->view->entity;
-$role = $_SESSION['ROLE'];
-?>
-<?php if ($_SESSION['ROLE_ADM'] == '1' || $this->acl($role, $this->resourceCodes('update'), $this->moduleCodes('payment-types'))): ?>
-    <section class="content-header mt-5">
-        <div class="container-fluid mt-2">
-            <div class="row">
-                <div class="col-11">
-                    <h1 style="position: relative; top: 5px; font-size: 25px;">
-                        <i class="fas fa-pen-square pr-1"></i>
-                        Forma de Pagamento
-                    </h1>
-                </div>
-                <div class="col-1">
-                    <ol class="breadcrumb float-right">
-                        <li class="breadcrumb-item">
-                            <button type="button" class="btn btn-outline-primary" title="Voltar para Formas de Pagamento"
-                                onclick="openDetails('<?php echo $entity['uuid']; ?>');" style="width: 100%;">
+<?php if ($this->view->acl['canUpdate']): ?>
+<?php $entity = $this->view->entity; ?>
+    <section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body cardWrapper">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="pt-2">
+                                <i class="fas fa-pen-square pr-1"></i>
+                                Forma de Pagamento <small class="text-gray">#<?php echo $entity['id']; ?></small>
+                            </h5>
+                        </div>
+                        <div class="col-6 text-right">
+                            <button type="button" class="btn btn-primary btnRadius" 
+                                title="Voltar para Forma de Pagamento"
+                                onclick="openPaymentTypeDetails('<?php echo $entity['id']; ?>');">
                                 <i class="fas fa-arrow-left"></i>
                             </button>
-                        </li>
-                    </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="content" style="margin-left: 9px; margin-right: 9px;">
-        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body cardWrapperBody">
                             <form method="post" name="formUpdateTable" id="formUpdateTable" enctype="multipart/form-data">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-6">
                                         <div class="form-group">
-                                            <label for="name">Situação*</label>
+                                            <label>Código</label>
+                                            <input type="text" class="form-control" value="<?php echo $entity['id']; ?>" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label for="status">Situação</label>
                                             <select name="status" id="status_1" class="form-control">
                                                 <option value="1" <?php echo ($entity['status'] == '1' ? 'selected' : ''); ?>>
-                                                    Ativa no sistema</option>
+                                                    1 - Ativa</option>
                                                 <option value="0" <?php echo ($entity['status'] == '0' ? 'selected' : ''); ?>>
-                                                    Inativa no Sistema</option>
+                                                    2 - Inativa</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-12"><hr></div>
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label for="name">Nome*</label>
@@ -52,21 +51,14 @@ $role = $_SESSION['ROLE'];
                                                 value="<?php echo $entity['name']; ?>">
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-12 mt-1">
                                         <div class="row">
-                                            <input type="hidden" name="uuid" id="uuid_pgto"
-                                                value="<?php echo $entity['uuid']; ?>">
-                                            <div class="col-md-8 mt-2 mb-2">
-                                                <button type="submit" class="btn btn-success w-100" id="btnSubmit"
+                                            <input type="hidden" name="id" id="id_mesa"
+                                                value="<?php echo $entity['id']; ?>">
+                                            <div class="col-md-6 offset-md-3 mb-2">
+                                                <button type="submit" class="btn btn-success w-100 btnRadius" id="btnSubmit"
                                                     title="Salvar Forma de Pagamento">
                                                     <i class="fa fa-save pr-1"></i> Salvar
-                                                </button>
-                                            </div>
-                                            <div class="col-md-4 mt-2 mb-2">
-                                                <button type="button" class="btn btn-outline-primary w-100"
-                                                    onclick="openDetails('<?php echo $entity['uuid']; ?>');"
-                                                    title="Voltar para Formas de Pagamento">
-                                                    <i class="fas fa-arrow-left pr-1"></i> Voltar
                                                 </button>
                                             </div>
                                         </div>
@@ -77,37 +69,32 @@ $role = $_SESSION['ROLE'];
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    <button type="button" class="btn btn-default btn-sm btnRadius"
+                        onclick="openPaymentTypeDetails('<?php echo $entity['id']; ?>');"
+                        title="Voltar para Forma de Pagamento">
+                        <i class="fas fa-arrow-left pr-1"></i> Voltar
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
     <script>
         $(document).ready(function () {
             $('#formUpdateTable').validate({
-                rules: {
-                    name: {
-                        remote: {
-                            type: "post",
-                            url: "<?php echo baseUrl; ?>formas-pagamento/valor-existente",
-                            data: { uuid: '<?php echo $_POST['uuid']; ?>' }
-                        }
-                    },
-                },
-                messages: {
-                    name: {
-                        remote: "Forma de Pagamento já cadastrada"
-                    },
-                },
-                submitHandler: function () {
+                submitHandler: async function () {
                     let form_data = new FormData();
 
                     form_data.append('name', $("#name").val());
                     form_data.append('status', $("#status_1").val());
-                    form_data.append('uuid', $("#uuid_pgto").val());
+                    form_data.append('id', $("#id_mesa").val());
                     form_data.append('target', '<?php echo $this->getTarget(); ?>');
 
                     $("#baseLoader").show();
                     $("#btnSubmit").attr('disabled', true);
 
-                    $.ajax({
+                    await $.ajax({
                         type: "POST",
                         url: "<?php echo baseUrl; ?>formas-pagamento/processa-edicao",
                         cache: false,
@@ -116,17 +103,17 @@ $role = $_SESSION['ROLE'];
                         data: form_data,
                         dataType: 'json',
                         async: true
-                    }).done(function (data) {
+                    }).done(async function (data) {
                         showAlert(data.type, data.title, data.msg, data.pos);
                         if (data.type === 'success') {
-                            openDetails('<?php echo $entity['uuid']; ?>');
+                            await openPaymentTypeDetails('<?php echo $entity['id']; ?>');
                         } else {
-                            $("#baseLoader").hide();
+                            $("#baseLoader").fadeOut();
                             $("#btnSubmit").attr('disabled', false);
                         }
                     }).fail(function () {
                         showInternalErrorAlert();
-                        $("#baseLoader").hide();
+                        $("#baseLoader").fadeOut();
                         $("#btnSubmit").attr('disabled', false);
                     });
 
@@ -135,4 +122,4 @@ $role = $_SESSION['ROLE'];
             });
         });
     </script>
-<?php endif; ?>
+<?php endif; ?> 

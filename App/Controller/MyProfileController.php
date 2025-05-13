@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Model\User;
 use Core\Controller\ActionController;
 use Core\Db\Bcrypt;
-use Core\Di\Container;
 use Core\Db\Crud;
 
 class MyProfileController extends ActionController
@@ -14,24 +14,26 @@ class MyProfileController extends ActionController
     public function __construct()
     {
         parent::__construct();
-        $this->model = Container::getClass("User", "app");
+        $this->model = new User();
     }
 
     public function indexAction(): void
     {
-        if (!empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
-            $entity = $this->model->getOne($_SESSION['COD'], $this->parentUUID);
+        $entity = $this->model->getProfile($_SESSION['COD']);
+        if ($this->validatePostParams($_POST) && $_SESSION['COD'] == $entity['id']) {
             $this->view->entity = $entity;
             $this->render('index', false);
+        } else {
+            $this->render('../error/not-found', false);
         }
     }
 
     public function updateProcessAction(): bool
     {
-        if (!empty($_POST) && !empty($_POST['target']) && $this->targetValidated($_POST['target'])) {
+        if ($this->validatePostParams($_POST)) {
             unset($_POST['target']);
             
-            $exists = $this->model->fieldExists('email', $_POST['email'], 'uuid', $_SESSION['COD']);
+            $exists = $this->model->fieldExists('email', $_POST['email'], 'id', $_SESSION['COD']);
             if ($exists) {
                 $data  = [
                     'title' => 'Erro!', 
@@ -66,13 +68,19 @@ class MyProfileController extends ActionController
 
             if (!empty($_FILES) && !empty( $_FILES["file"])) {
                 $image_name = $_FILES["file"]["name"];
-                $image_name = str_replace(" ", "_", $image_name);
                 if ($image_name != null) {
-                    $tmp_name1  =  $_FILES["file"]["tmp_name"];
-                    $dir1 = "../public/uploads/users/" . $image_name;
-                    if (move_uploaded_file($tmp_name1, $dir1)) {
-                        $_POST['file'] = $image_name;
-                    } 
+                    $ext_img = explode(".", $image_name, 2);
+                    $new_name  = md5($ext_img[0]) . '.' . $ext_img[1];
+                    if ($ext_img[1] == 'jpg' || $ext_img[1] == 'jpeg'
+                        || $ext_img[1] == 'png' || $ext_img[1] == 'gif') {
+                        $tmp_name1  =  $_FILES["file"]["tmp_name"];
+                        $new_image_name = md5($new_name . time()).'.png';
+                        $dir1 = "../public/uploads/users/" . $new_image_name;
+
+                        if (move_uploaded_file($tmp_name1, $dir1)) {
+                            $_POST['file'] = $new_image_name;
+                        } 
+                    }
                 }
             } else {
                 if (!empty($_POST['remove_image'])) {
@@ -91,7 +99,7 @@ class MyProfileController extends ActionController
             $_POST['updated_at'] = date('Y-m-d H:i:s');
             $crud = new Crud();
             $crud->setTable($this->model->getTable());
-            $transaction = $crud->update($_POST, $_SESSION['COD'], 'uuid');
+            $transaction = $crud->update($_POST, $_SESSION['COD'], 'id');
 
             if ($transaction){
                 $_SESSION['NAME']  = $_POST['name'];

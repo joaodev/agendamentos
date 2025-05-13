@@ -1,0 +1,228 @@
+<?php $entity = $this->view->entity; ?>
+<section class="content" style="margin-left: 9px; margin-right: 9px; padding-top: 75px;">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body cardWrapper">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="pt-2">
+                            <i class="fas fa-user-edit pr-1"></i> 
+                            Meu Perfil
+                        </h5>
+                    </div>
+                    <div class="col-6 text-right">
+                        <a href="<?php echo baseUrl; ?>" class="btn btn-primary btnRadius" 
+                            title="Página Inicial">
+                            <i class="fas fa-home"></i> 
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body cardWrapperBody">
+                        <form method="post" name="formUpdateMyProfile" id="formUpdateMyProfile" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Nome*</label>
+                                        <input type="text" class="form-control" name="name" id="name" required
+                                            value="<?php echo $entity['name']; ?>" maxlength="100" placeholder="Nome completo do Cliente/Empresa">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="document_1">CPF</label>
+                                        <input type="text" class="form-control" name="document_1" id="document_1" 
+                                            value="<?php echo $entity['document_1']; ?>" onchange="validateCPF();" placeholder="000.000.000-00">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="document_2">CNPJ</label>
+                                        <input type="text" class="form-control" name="document_2" id="document_2" 
+                                            value="<?php echo $entity['document_2']; ?>" onchange="validateCNPJ();" placeholder="00.000.000/0000-00">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email">Email*</label>
+                                        <input type="email" class="form-control" name="email" id="email" required maxlength="100"
+                                            value="<?php echo $entity['email']; ?>" placeholder="cliente@exemplo.com">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="phone">Telefone</label>
+                                        <input type="text" class="form-control" name="phone" id="phone"
+                                            value="<?php echo $entity['phone']; ?>" placeholder="(00)0000-0000">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="form-group">
+                                        <label for="cellphone">Celular</label>
+                                        <input type="text" class="form-control" name="cellphone" id="cellphone" 
+                                            value="<?php echo $entity['cellphone']; ?>" placeholder="(00)00000-0000">
+                                    </div>
+                                </div>
+                                <div class="col-12"><hr></div> 
+                                <div class="col-md-12" style="border-radius: 5px;">
+                                    <h5 class="pt-2"><i class="fas fa-image pr-1"></i> Foto de Perfil</h5>
+                                    <hr>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="title">Imagem de Perfil <small style="color: red; margin-left: 5px;"><i>(jpg, jpeg, png, gif)</i></small></label>
+                                        <?php if (!empty($entity['file']) && $this->isImage($entity['file'], 'customers')): ?><br>
+                                            <a href="<?php echo baseUrl . 'public/uploads/customers/' . $entity['file']; ?>" 
+                                                data-lightbox="image-1"
+                                                data-title="<?php echo $entity['file']; ?>">
+                                                <img src="<?php echo baseUrl . 'public/uploads/customers/'
+                                                    . $entity['file']; ?>" style="max-height: 200px; margin-bottom: 15px;" alt="<?php echo $entity['name']; ?>">
+                                            </a>
+                                            <div class="mb-2">
+                                                <input type="checkbox" name="remove_image" id="remove_image" value="1" class="mr-1"> Remover imagem de perfil
+                                            </div>
+                                        <?php endif; ?>
+                                        <input type="file" class="form-control inputUpload" name="file" id="file" accept=".png,.jpg,.jpeg,.gif">
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-12"><hr></div> 
+                                <div class="col-md-12" style="border-radius: 5px;">
+                                    <h5 class="pt-2"><i class="fas fa-map-marker pr-1"></i> Localização</h5>
+                                    <hr>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="postal_code">CEP</label>
+                                        <input type="text" class="form-control" name="postal_code" id="postal_code" 
+                                            value="<?php echo $entity['postal_code']; ?>" placeholder="00000-000">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="address">Endereço</label>
+                                        <input type="text" class="form-control" name="address" id="address"  maxlength="100"
+                                            value="<?php echo $entity['address']; ?>" placeholder="Endereço completo">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="number">Número</label>
+                                        <input type="text" class="form-control" name="number" id="number"  maxlength="50"
+                                            value="<?php echo $entity['number']; ?>" placeholder="000">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="complement">Complemento</label>
+                                        <input type="text" class="form-control" name="complement" id="complement"  maxlength="50"
+                                            value="<?php echo $entity['complement']; ?>" placeholder="Complemento adicional">
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label for="neighborhood">Bairro</label>
+                                        <input type="text" class="form-control" name="neighborhood" id="neighborhood"  maxlength="100"
+                                            value="<?php echo $entity['neighborhood']; ?>" placeholder="Nome do Bairro">
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label for="city">Cidade</label>
+                                        <input type="text" class="form-control" name="city" id="city"  maxlength="100"
+                                            value="<?php echo $entity['city']; ?>" placeholder="Nome da Cidade">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="state">UF</label>
+                                        <input type="text" class="form-control" name="state" id="state"  maxlength="2"
+                                            value="<?php echo $entity['state']; ?>" placeholder="Estado">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-md-6 offset-md-3 mb-2">
+                                    <button type="submit" class="btn btn-success btn-lg w-100 btnRadiusLg" id="btnSubmit" title="Atualizar Perfil">
+                                        <i class="fa fa-sync pr-1"></i> Atualizar Perfil
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="<?php echo baseUrl; ?>public/js/api_cep.js"></script>
+<script src="<?php echo baseUrl; ?>public/js/documents_validators.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#document_1").mask("999.999.999-99");
+        $("#document_2").mask("99.999.999/9999-99");
+        $("#phone").mask("(99)9999-9999");
+        $("#cellphone").mask("(99)99999-9999");
+        $("#postal_code").mask("99999-999");
+
+        $('#formUpdateMyProfile').validate({
+            submitHandler: async function() {
+                let file_data = $('#file').prop('files')[0];
+                let form_data = new FormData();         
+
+                form_data.append('file', file_data);    
+                form_data.append('name', $("#name").val());    
+                form_data.append('document_1', $("#document_1").val()); 
+                form_data.append('document_2', $("#document_2").val()); 
+                form_data.append('email', $("#email").val()); 
+                form_data.append('phone', $("#phone").val()); 
+                form_data.append('cellphone', $("#cellphone").val()); 
+                form_data.append('postal_code', $("#postal_code").val()); 
+                form_data.append('address', $("#address").val()); 
+                form_data.append('number', $("#number").val()); 
+                form_data.append('complement', $("#complement").val()); 
+                form_data.append('neighborhood', $("#neighborhood").val()); 
+                form_data.append('city', $("#city").val()); 
+                form_data.append('state', $("#state").val()); 
+
+                form_data.append('target', '<?php echo $this->getClientTarget(); ?>');
+
+                if ($('#remove_image').is(':checked')) {
+                    form_data.append('remove_image', $("#remove_image").val());    
+                }
+
+                $("#baseLoader").show();
+                $("#btnSubmit").attr('disabled', true);
+
+                await $.ajax({
+                    type: "POST",
+                    url: "<?php echo baseUrl; ?>cliente/meus-dados/processa-edicao",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    dataType: 'json',
+                    async: true
+                }).done(function(data) {
+                    showAlert(data.type, data.title, data.msg, data.pos);
+                    if(data.type === 'success') {
+                        window.location.href = "<?php echo baseUrl; ?>cliente?mod=meus-dados";
+                    } else {
+                        $("#btnSubmit").attr('disabled', false);
+                        $("#baseLoader").fadeOut();   
+                    }
+                }).fail(function() {
+                    showInternalErrorAlert(); 
+                    $("#baseLoader").fadeOut();   
+                    $("#btnSubmit").attr('disabled', false);
+                });     
+
+                return false;
+            }
+        });
+    });
+</script>
