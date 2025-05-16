@@ -25,8 +25,6 @@ class Items extends Model
                             p.name, p.description, p.price, 
                             p.quantity, p.min_quantity, p.file,
                             p.status, p.created_at, p.updated_at,
-                            pr.id as providerId, p.provider_id, pr.name as providerName,
-                            pr.email as providerEmail,
                             c.title as categoryTitle, c.id as categoryCod,
                             s.title as subcategoryTitle, s.id as subcategoryCod,
                             p.deleted
@@ -35,8 +33,6 @@ class Items extends Model
                             ON p.category_id = c.id
                         LEFT JOIN subcategories AS s
                             ON p.subcategory_id = s.id
-                        LEFT JOIN providers AS pr
-                            ON p.provider_id = pr.id
                         WHERE p.id = :id 
                             $withDeleted";
 
@@ -100,7 +96,7 @@ class Items extends Model
                             p.description, p.price, p.file, 
                             p.quantity, p.min_quantity,
                             p.status, p.created_at, p.updated_at,
-                            c.title as categoryTitle, p.provider_id
+                            c.title as categoryTitle
                         FROM {$this->getTable()} AS p
                         INNER JOIN categories AS c
                             ON p.category_id = c.id

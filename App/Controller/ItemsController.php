@@ -7,7 +7,6 @@ use Core\Db\Crud;
 use App\Interfaces\CrudInterface;
 use App\Model\Categories;
 use App\Model\Items;
-use App\Model\ItemsControl;
 use App\Model\Subcategories;
 
 class ItemsController extends ActionController implements CrudInterface
@@ -42,7 +41,6 @@ class ItemsController extends ActionController implements CrudInterface
         if ($this->validatePostParams($_POST) && $this->aclData['canView']) {
             $data = $this->model->getAll();
             $this->view->data = $data;
-
             $this->render('index', false);
         } else {
             $this->render('../error/not-found', false);
